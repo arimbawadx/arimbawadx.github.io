@@ -46,7 +46,7 @@
               <a class="nav-link" href="#">Certificates</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">My CV</a>
+              <a class="nav-link" href="https://arimbawadx.github.io/myCV">My CV</a>
             </li>
             
           </ul>
