@@ -2,8 +2,8 @@ document.addEventListener("DOMContentLoaded", function () {
   var lazyContainer = document.getElementById("lazy-container");
   var images = [];
 
-  for (var i = 1; i <= 30; i++) {
-    images.push(`media/scroll/img (${i}).jpg`);
+  for (var i = 1; i <= 50; i++) {
+    images.push(`img/img (${i}).jpg`);
   }
 
   var imageIndex = 0;
