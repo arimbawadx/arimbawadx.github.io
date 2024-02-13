@@ -1,0 +1,57 @@
+body {
+    background-color: #f8d7da;
+  }
+  
+  .container {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  
+  .img-fluid {
+    max-width: 100%;
+    height: auto;
+  }
+  
+
+  /* slideshow */
+  body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  .container-fluid {
+    padding: 0;
+  }
+  
+  #slideshow-container {
+    overflow: hidden;
+    width: 100%;
+  }
+  
+  #slideshow {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    width: 100%;
+    justify-content: space-between; /* Membuat ruang antara item-item slideshow */
+  }
+  
+  .media-item {
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+  }
+  
+  #lazy-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .lazy-image {
+    width: 60%;
+    height: auto;
+    margin: 10px 0; /* Margin between images */
+    display: block;
+  }

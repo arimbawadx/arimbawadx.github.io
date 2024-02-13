@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Valentine Greetings</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <div id="countdown-container" class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-8 text-center">
+                <h1 class="text-danger">Happy</h1>
+                <h1 class="text-danger">Valentine's Day</h1>
+                <h1 class="text-danger">Treni Sayangg!</h1>
+                <p class="lead">Semoga hari cepat berlalu, lopiuuu more & Miss u sayangg.</p>
+                <br>
+                <p class="lead">Klik Gambar Hati dibawah ini.</p>
+                <img id="playButton" src="heart.png" alt="Heart Image" class="img-fluid mt-3">
+            </div>
+        </div>
+    </div>
+    <div id="countdown">
+    </div>
+
+
+    <!-- <div id="slideshow-container" class="container mt-5">
+        <div id="slideshow">
+
+        </div>
+    </div> -->
+
+    <div id="lazy-container" class="container-fluid mt-5" hidden></div>
+    <audio id="backgroundMusic" loop>
+        <source src="backsound.mp3" type="audio/mp3">
+        Maaf, browser Anda tidak mendukung tag audio.
+    </audio>
+
+    <script>
+        // Fungsi untuk memulai pemutaran audio setelah klik tombol
+        document.getElementById('playButton').addEventListener('click', function () {
+            var audio = document.getElementById('backgroundMusic');
+            audio.play();
+            document.getElementById('lazy-container').hidden = false;
+        });
+    </script>
+
+    <script src="lazyscroll.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="countdown.js"></script>
+    <script src="slideshow.js"></script>
+</body>
+
+</html>
