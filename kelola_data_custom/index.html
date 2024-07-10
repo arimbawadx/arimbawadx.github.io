@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Management</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/dataTables.bootstrap4.min.css">
+    <!-- Load DataTables Buttons CSS -->
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.datatables.net/buttons/2.3.5/css/buttons.dataTables.min.css">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <input type="text" id="newTitle" placeholder="Enter new title" class="form-control form-control-sm d-inline"
+            style="width: auto;">
+        <button class="btn btn-primary btn-sm fa-solid fa-floppy-disk" id="changeTitleBtn">Change</button>
+        <h2 id="judulTabel"></h2>
+        <button id="addTableBtn" class="btn btn-primary mb-3">Add Table</button>
+        <div id="tablesContainer"></div>
+    </div>
+
+    <!-- Modal for table management -->
+    <div class="modal fade" id="tableModal" tabindex="-1" role="dialog" aria-labelledby="tableModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tableModalLabel">Manage Table</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="tableForm">
+                        <div class="form-group">
+                            <label for="tableName">Table Name</label>
+                            <input type="text" class="form-control" id="tableName" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for column management -->
+    <div class="modal fade" id="columnModal" tabindex="-1" role="dialog" aria-labelledby="columnModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="columnModalLabel">Manage Columns</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="columnForm">
+                        <div class="form-group">
+                            <label for="columnName">Column Name</label>
+                            <input type="text" class="form-control" id="columnName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="columnType">Column Type</label>
+                            <select class="form-control" id="columnType" required>
+                                <option value="text">Text</option>
+                                <option value="number">Number</option>
+                                <option value="date">Date</option>
+                                <!-- Add more types as needed -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="columnPosition">Column Position</label>
+                            <input type="number" class="form-control" id="columnPosition" min="1" required>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="autoIncrement">
+                            <label class="form-check-label" for="autoIncrement">Auto Increment</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="saveColumnBtn">Save Column</button>
+                    </form>
+                    <ul id="columnList" class="list-group mt-3"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for row management -->
+    <div class="modal fade" id="rowModal" tabindex="-1" role="dialog" aria-labelledby="rowModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rowModalLabel">Manage Row</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="rowForm">
+                        <div id="rowFields"></div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Load DataTables Buttons JS -->
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.5/js/dataTables.buttons.min.js"></script>
+    <!-- Load DataTables JSZip (optional for PDF) -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <!-- Load DataTables PDFMake (optional for PDF) -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <!-- Load DataTables PDFMake (optional for PDF) -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <!-- Load DataTables Buttons HTML5 (optional for PDF) -->
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.5/js/buttons.html5.min.js"></script>
+
+    <script src="main.js"></script>
+</body>
+
+</html>
