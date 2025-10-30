@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Surat Masuk & Keluar</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f7f8fa;
+    }
+    h2 {
+      color: #333;
+      margin-top: 40px;
+    }
+.top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+.btn {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.2s;
+      text-decoration: none;
+    }
+    .btn:hover {
+      background-color: #0056b3;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background: white;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background: #eee;
+    }
+    .filter-box {
+      margin: 10px 0;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    select, button {
+      padding: 5px;
+    }
+    .kosong {
+      text-align: center;
+      color: #888;
+      font-style: italic;
+    }
+    @media print {
+      .filter-box, h1 {
+        display: none;
+      }
+      table {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header dan Tombol Input -->
+  <div class="top-bar">
+    <h1>📂 Data Surat Masuk & Surat Keluar</h1>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSfo58UIK3JVTigL9s9B80kVauidzyN6E8gTnJIAW5KWKw77FQ/viewform" 
+       target="_blank" class="btn">➕ Input Data Surat</a>
+  </div>
+
+  <!-- ===================== SURAT MASUK ===================== -->
+  <h2>Surat Masuk</h2>
+  <div class="filter-box">
+    <label>Tahun:</label>
+    <select id="tahunMasuk"><option value="">Pilih Tahun</option></select>
+    <label>Bulan:</label>
+    <select id="bulanMasuk"><option value="">Semua</option></select>
+    <button onclick="filterData('masuk')">Terapkan</button>
+    <button onclick="resetFilter('masuk')">Reset</button>
+    <button onclick="printData('masuk')">Print</button>
+  </div>
+  <table id="tabelMasuk">
+    <thead>
+      <tr>
+        <th>Tanggal Input</th>
+        <th>Nomor Surat</th>
+        <th>Pengirim</th>
+        <th>Tanggal Surat</th>
+        <th>Perihal</th>
+        <th>Link Surat</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td colspan="6" class="kosong">Silakan pilih filter untuk menampilkan data.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ===================== SURAT KELUAR ===================== -->
+  <h2>Surat Keluar</h2>
+  <div class="filter-box">
+    <label>Tahun:</label>
+    <select id="tahunKeluar"><option value="">Pilih Tahun</option></select>
+    <label>Bulan:</label>
+    <select id="bulanKeluar"><option value="">Semua</option></select>
+    <button onclick="filterData('keluar')">Terapkan</button>
+    <button onclick="resetFilter('keluar')">Reset</button>
+    <button onclick="printData('keluar')">Print</button>
+  </div>
+  <table id="tabelKeluar">
+    <thead>
+      <tr>
+        <th>Tanggal Input</th>
+        <th>Nomor Surat</th>
+        <th>Penerima</th>
+        <th>Tanggal Surat</th>
+        <th>Perihal</th>
+        <th>Link Surat</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td colspan="6" class="kosong">Silakan pilih filter untuk menampilkan data.</td></tr>
+    </tbody>
+  </table>
+	
+<!-- Tambah library QRious -->
+  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+
+  <script>
+    // === Ganti dengan ID dan nama sheet kamu ===
+    const sheetId = '11tARXYsPxaJzHNVeBSmNIV1guw1fbT__s_sMeuPwSn0'; 
+    const sheetName = 'Form Responses 1'; 
+    const url = `https://opensheet.elk.sh/${sheetId}/${sheetName}`;
+
+    let semuaData = [];
+
+    // === Ambil data dari Google Sheets ===
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        semuaData = data;
+        isiDropdownFilter();
+      })
+      .catch(err => console.error('Gagal ambil data:', err));
+
+    // === Parsing aman tanggal (format dd/mm/yyyy atau yyyy-mm-dd) ===
+    function parseTanggal(str) {
+      if (!str) return null;
+      const parts = str.split(/[-/]/);
+      if (parts.length === 3) {
+        if (parts[0].length === 4) {
+          // format yyyy-mm-dd
+          return new Date(parts[0], parts[1] - 1, parts[2]);
+        } else {
+          // format dd/mm/yyyy
+          return new Date(parts[2], parts[1] - 1, parts[0]);
+        }
+      }
+      const d = new Date(str);
+      return isNaN(d) ? null : d;
+    }
+
+    // === Render tabel ===
+    function renderTabel(kategori, tahun, bulan) {
+      const tbody = document.querySelector(`#tabel${kategori === 'masuk' ? 'Masuk' : 'Keluar'} tbody`);
+      tbody.innerHTML = '';
+
+      const dataFiltered = semuaData.filter(row => {
+        if (!row['Tanggal Surat'] || !row['Kategori Surat']) return false;
+        const kat = row['Kategori Surat'].toLowerCase();
+        const cocokKategori = kat === (kategori === 'masuk' ? 'surat masuk' : 'surat keluar');
+        if (!cocokKategori) return false;
+
+        const tgl = parseTanggal(row['Tanggal Surat']);
+        if (!tgl) return false;
+        const tahunData = tgl.getFullYear().toString();
+        const bulanData = String(tgl.getMonth() + 1).padStart(2, '0');
+
+        if (tahun && tahunData !== tahun) return false;
+        if (bulan && bulanData !== bulan) return false;
+        return true;
+      });
+
+      if (dataFiltered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="kosong">Tidak ada data untuk filter tersebut.</td></tr>`;
+        return;
+      }
+
+      dataFiltered.forEach(row => {
+        let linkSurat = (row['Upload Surat'] || '').trim();
+        if (linkSurat && !linkSurat.startsWith('http')) linkSurat = 'https://' + linkSurat;
+
+        const qrBox = document.createElement('div');
+        qrBox.className = 'qr-box';
+
+        if (linkSurat) {
+          const canvas = document.createElement('canvas');
+          const qr = new QRious({
+            element: canvas,
+            value: linkSurat,
+            size: 90
+          });
+          const linkA = document.createElement('a');
+          linkA.href = linkSurat;
+          linkA.target = '_blank';
+          linkA.textContent = 'Lihat Surat';
+          qrBox.appendChild(canvas);
+          qrBox.appendChild(linkA);
+        } else {
+          qrBox.innerHTML = '<span style="color:#aaa;">Tidak ada file</span>';
+        }
+
+
+	const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row['Column 1'] || ''}</td>
+          <td>${row['Nomor Surat'] || ''}</td>
+          <td>${row['Pengirim/Penerima'] || ''}</td>
+          <td>${row['Tanggal Surat'] || ''}</td>
+          <td>${row['Perihal'] || ''}</td>
+          <td></td>
+        `;
+        tr.children[5].appendChild(qrBox);
+        tbody.appendChild(tr);
+      });
+    }
+
+    // === Isi dropdown tahun & bulan ===
+    function isiDropdownFilter() {
+      const tahunSet = new Set();
+      semuaData.forEach(row => {
+        const tgl = parseTanggal(row['Tanggal Surat']);
+        if (tgl) tahunSet.add(tgl.getFullYear());
+      });
+
+      const tahunMasuk = document.getElementById('tahunMasuk');
+      const tahunKeluar = document.getElementById('tahunKeluar');
+      [...tahunSet].sort().forEach(tahun => {
+        tahunMasuk.innerHTML += `<option value="${tahun}">${tahun}</option>`;
+        tahunKeluar.innerHTML += `<option value="${tahun}">${tahun}</option>`;
+      });
+
+      const bulanNama = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+      const bulanMasuk = document.getElementById('bulanMasuk');
+      const bulanKeluar = document.getElementById('bulanKeluar');
+      bulanNama.forEach((nama, i) => {
+        const val = String(i + 1).padStart(2, '0');
+        bulanMasuk.innerHTML += `<option value="${val}">${nama}</option>`;
+        bulanKeluar.innerHTML += `<option value="${val}">${nama}</option>`;
+      });
+    }
+
+    // === Terapkan filter ===
+    function filterData(kategori) {
+      const tahun = document.getElementById(`tahun${kategori === 'masuk' ? 'Masuk' : 'Keluar'}`).value;
+      const bulan = document.getElementById(`bulan${kategori === 'masuk' ? 'Masuk' : 'Keluar'}`).value;
+      renderTabel(kategori, tahun, bulan);
+    }
+
+    // === Reset filter ===
+    function resetFilter(kategori) {
+      document.getElementById(`tahun${kategori === 'masuk' ? 'Masuk' : 'Keluar'}`).value = '';
+      document.getElementById(`bulan${kategori === 'masuk' ? 'Masuk' : 'Keluar'}`).value = '';
+      const tbody = document.querySelector(`#tabel${kategori === 'masuk' ? 'Masuk' : 'Keluar'} tbody`);
+      tbody.innerHTML = `<tr><td colspan="6" class="kosong">Silakan pilih filter untuk menampilkan data.</td></tr>`;
+    }
+
+    // === Print berdasarkan filter ===
+    function printData(kategori) {
+      const tabel = document.getElementById(`tabel${kategori === 'masuk' ? 'Masuk' : 'Keluar'}`);
+      if (!tabel || tabel.querySelectorAll('tbody tr').length === 0) {
+        alert('Tidak ada data untuk dicetak!');
+        return;
+      }
+      window.print();
+    }
+  </script>
+
+</body>
+</html>
