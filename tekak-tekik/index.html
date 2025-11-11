@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+
+    <title>Tekak-Tekik</title>
+
+    <!-- Custom fonts for this template-->
+    <link
+      href="vendor/fontawesome-free/css/all.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+      rel="stylesheet"
+    />
+    <!-- Custom styles for this page -->
+    <link
+      href="vendor/datatables/dataTables.bootstrap4.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Custom styles for this template-->
+    <link href="css/sb-admin-2.min.css" rel="stylesheet" />
+    <style>
+      #accordionSidebar {
+        display: none !important;
+      }
+      #content-wrapper {
+        margin-left: 0 !important;
+      }
+    </style>
+  </head>
+
+  <body id="page-top">
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+      <!-- Content Wrapper -->
+      <div id="content-wrapper" class="d-flex flex-column">
+        <!-- Main Content -->
+        <div id="content">
+          <!-- Topbar -->
+          <nav
+            class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow d-flex justify-content-center"
+          >
+            <img src="img/logo.png" width="200px" alt="logo" />
+          </nav>
+          <!-- End of Topbar -->
+
+          <!-- Begin Page Content -->
+          <div class="container-fluid">
+            <!-- Page Heading -->
+            <div class="row">
+              <!-- Total Kas Utama -->
+              <div class="col-12 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                  <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                      <div class="col mr-2">
+                        <div
+                          class="text-xs font-weight-bold text-primary text-uppercase mb-1"
+                        >
+                          Total Kas Utama
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                          <span id="totalKas"></span>
+                        </div>
+                      </div>
+                      <div class="col-auto">
+                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Collapsable Card Data Iuran -->
+            <div class="card shadow mb-4">
+              <!-- Card Header - Accordion -->
+              <div class="d-block card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Data Iuran</h6>
+              </div>
+              <!-- Card Content - Collapse -->
+              <div id="dataIuranCard">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-12">
+                      <h5
+                        class="text-center"
+                        style="
+                          color: black;
+                          font-weight: 900;
+                          font-family: sans-serif;
+                        "
+                      >
+                        IURAN ANGGOTA <br />
+                        TEKAK-TEKIK <br />
+                        TAHUN 2025
+                      </h5>
+                      <div class="table-responsive">
+                        <table
+                          class="table table-bordered"
+                          id="dataTableIuran1"
+                          width="100%"
+                          cellspacing="0"
+                        >
+                          <thead>
+                            <tr>
+                              <th>Nama</th>
+                              <th>Jan</th>
+                              <th>Feb</th>
+                              <th>Mar</th>
+                              <th>Apr</th>
+                              <th>Mei</th>
+                              <th>Jun</th>
+                              <th>Jul</th>
+                              <th>Ags</th>
+                              <th>Sep</th>
+                              <th>Okt</th>
+                              <th>Nov</th>
+                              <th>Des</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td colspan="12" class="kosong">Data Kosong</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row mt-5">
+                    <div class="col-12">
+                      <h5
+                        class="text-center"
+                        style="
+                          color: black;
+                          font-weight: 900;
+                          font-family: sans-serif;
+                        "
+                      >
+                        IURAN ANGGOTA <br />
+                        TEKAK-TEKIK <br />
+                        TAHUN 2026
+                      </h5>
+                      <div class="table-responsive">
+                        <table
+                          class="table table-bordered"
+                          id="dataTableIuran2"
+                          width="100%"
+                          cellspacing="0"
+                        >
+                          <thead>
+                            <tr>
+                              <th>Nama</th>
+                              <th>Jan</th>
+                              <th>Feb</th>
+                              <th>Mar</th>
+                              <th>Apr</th>
+                              <th>Mei</th>
+                              <th>Jun</th>
+                              <th>Jul</th>
+                              <th>Ags</th>
+                              <th>Sep</th>
+                              <th>Okt</th>
+                              <th>Nov</th>
+                              <th>Des</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td colspan="12" class="kosong">Data Kosong</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Collapsable Card Data Pembayaran Ogoh Ogoh -->
+            <div class="card shadow mb-4">
+              <!-- Card Header - Accordion -->
+              <div class="d-block card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                  Data Pembayaran Ogoh Ogoh
+                </h6>
+              </div>
+              <!-- Card Content - Collapse -->
+              <div id="dataPembayaranOgohCard">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-12">
+                      <h5
+                        class="text-center"
+                        style="
+                          color: black;
+                          font-weight: 900;
+                          font-family: sans-serif;
+                        "
+                      >
+                        PEMBAYARAN <br />
+                        OGOH-OGOH TEKAK-TEKIK <br />
+                        TAHUN 2026
+                      </h5>
+                    </div>
+                    <!-- Total Pembayaran Ogoh -->
+                    <div class="col-12 mb-4">
+                      <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                          <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                              <div
+                                class="text-xs font-weight-bold text-primary text-uppercase mb-1"
+                              >
+                                Total Pembayaran Ogoh-Ogoh
+                              </div>
+                              <div
+                                class="h5 mb-0 font-weight-bold text-gray-800"
+                              >
+                                <span id="totalPembayaranOgoh"></span>
+                              </div>
+                            </div>
+                            <div class="col-auto">
+                              <i
+                                class="fas fa-dollar-sign fa-2x text-gray-300"
+                              ></i>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="table-responsive">
+                        <table
+                          class="table table-bordered"
+                          id="dataTablePembayaranOgoh"
+                          width="100%"
+                          cellspacing="0"
+                        >
+                          <thead>
+                            <tr>
+                              <th>Nama</th>
+                              <th>Nominal</th>
+                              <th>Dibayar</th>
+                              <th>Kurang</th>
+                              <th>Status</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td colspan="13" class="kosong">Data Kosong</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Collapsable Card Arus Kas Ogoh Ogoh -->
+            <div class="card shadow mb-4">
+              <!-- Card Header - Accordion -->
+              <div class="d-block card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                  Arus Kas Ogoh Ogoh
+                </h6>
+              </div>
+              <!-- Card Content - Collapse -->
+              <div id="arusKasOgohCard">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-12">
+                      <h5
+                        class="text-center"
+                        style="
+                          color: black;
+                          font-weight: 900;
+                          font-family: sans-serif;
+                        "
+                      >
+                        ARUS KAS MASUK DAN KELUAR <br />
+                        OGOH-OGOH TEKAK-TEKIK <br />
+                        TAHUN 2026
+                      </h5>
+                    </div>
+                    <!-- Total Pemasukan Ogoh -->
+                    <div class="col-12 mb-1">
+                      <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                          <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                              <div
+                                class="text-xs font-weight-bold text-success text-uppercase mb-1"
+                              >
+                                Total Pemasukan Kas Ogoh-Ogoh
+                              </div>
+                              <div
+                                class="h5 mb-0 font-weight-bold text-gray-800"
+                              >
+                                <span id="totalPemasukanOgoh"></span>
+                              </div>
+                            </div>
+                            <div class="col-auto">
+                              <i
+                                class="fas fa-dollar-sign fa-2x text-gray-300"
+                              ></i>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Total Pengeluaran Ogoh -->
+                    <div class="col-12 mb-1">
+                      <div class="card border-left-danger shadow h-100 py-2">
+                        <div class="card-body">
+                          <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                              <div
+                                class="text-xs font-weight-bold text-danger text-uppercase mb-1"
+                              >
+                                Total Pengeluaran Kas Ogoh-Ogoh
+                              </div>
+                              <div
+                                class="h5 mb-0 font-weight-bold text-gray-800"
+                              >
+                                <span id="totalPengeluaranOgoh"></span>
+                              </div>
+                            </div>
+                            <div class="col-auto">
+                              <i
+                                class="fas fa-dollar-sign fa-2x text-gray-300"
+                              ></i>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Total Saldo Ogoh -->
+                    <div class="col-12 mb-4">
+                      <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                          <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                              <div
+                                class="text-xs font-weight-bold text-primary text-uppercase mb-1"
+                              >
+                                Total Saldo Kas Ogoh-Ogoh
+                              </div>
+                              <div
+                                class="h5 mb-0 font-weight-bold text-gray-800"
+                              >
+                                <span id="totalSaldoOgoh"></span>
+                              </div>
+                            </div>
+                            <div class="col-auto">
+                              <i
+                                class="fas fa-dollar-sign fa-2x text-gray-300"
+                              ></i>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="table-responsive">
+                        <table
+                          class="table table-bordered"
+                          id="dataTableArusKasOgoh"
+                          width="100%"
+                          cellspacing="0"
+                        >
+                          <thead>
+                            <tr>
+                              <th>Tanggal</th>
+                              <th>Kategori</th>
+                              <th>Uraian</th>
+                              <th>Nominal</th>
+                              <th>Bukti</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td colspan="13" class="kosong">Data Kosong</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Collapsable Card SK TKTK -->
+            <div class="card shadow mb-4">
+              <!-- Card Header - Accordion -->
+              <div class="d-block card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                  SK TEKAK-TEKIK
+                </h6>
+              </div>
+              <!-- Card Content - Collapse -->
+              <div id="skTekakTekik">
+                <div class="card-body">
+                  <iframe
+                    src="sk/001_TKTK_SK_XII_2024.pdf"
+                    width="100%"
+                    height="600px"
+                    style="border: none"
+                  ></iframe>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- /.container-fluid -->
+        </div>
+        <!-- End of Main Content -->
+
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+          <div class="container my-auto">
+            <div class="copyright text-center my-auto">
+              <span>Copyright &copy; Tekak-Tekik</span>
+            </div>
+          </div>
+        </footer>
+        <!-- End of Footer -->
+      </div>
+      <!-- End of Content Wrapper -->
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="js/sb-admin-2.min.js"></script>
+
+    <!-- Page level plugins -->
+    <script src="vendor/chart.js/Chart.min.js"></script>
+
+    <!-- Page level custom scripts -->
+    <script src="js/demo/chart-area-demo.js"></script>
+    <script src="js/demo/chart-pie-demo.js"></script>
+
+    <!-- Page level plugins -->
+    <script src="vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+    <!-- Page level custom scripts -->
+    <script src="js/iuran/iuran.js"></script>
+
+    <!-- Tambah library QRious -->
+    <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+  </body>
+</html>
