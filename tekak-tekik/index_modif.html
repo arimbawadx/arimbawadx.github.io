@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+
+    <title>Tekak-Tekik</title>
+
+    <!-- Custom fonts for this template-->
+    <link
+      href="vendor/fontawesome-free/css/all.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+      rel="stylesheet"
+    />
+    <!-- Custom styles for this page -->
+    <link
+      href="vendor/datatables/dataTables.bootstrap4.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Custom styles for this template-->
+    <link href="css/sb-admin-2.min.css" rel="stylesheet" />
+    <style>
+      #accordionSidebar {
+        display: none !important;
+      }
+      #content-wrapper {
+        margin-left: 0 !important;
+      }
+    </style>
+  </head>
+
+  <body id="page-top">
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+      <!-- Content Wrapper -->
+      <div id="content-wrapper" class="d-flex flex-column">
+        <!-- Main Content -->
+        <div id="content">
+          <!-- Topbar -->
+          <nav
+            class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow d-flex justify-content-center"
+          >
+            <img src="img/logo.png" width="200px" alt="logo" />
+          </nav>
+          <!-- End of Topbar -->
+
+          <!-- Begin Page Content -->
+          <div class="container-fluid">
+            <!-- Page Heading -->
+            <div class="row">
+              <!-- Total Kas Utama -->
+              <div class="col-12 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                  <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                      <div class="col mr-2">
+                        <div
+                          class="text-xs font-weight-bold text-primary text-uppercase mb-1"
+                        >
+                          Total Kas Utama
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                          <span id="totalKas"></span>
+                        </div>
+                      </div>
+                      <div class="col-auto">
+                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Collapsable Card Data Iuran -->
+            <div class="card shadow mb-4">
+              <!-- Card Header - Accordion -->
+              <div class="d-block card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Data Iuran</h6>
+              </div>
+              <!-- Card Content - Collapse -->
+              <div id="dataIuranCard">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-12">
+                      <h5
+                        class="text-center"
+                        style="
+                          color: black;
+                          font-weight: 900;
+                          font-family: sans-serif;
+                        "
+                      >
+                        IURAN ANGGOTA <br />
+                        TEKAK-TEKIK <br />
+                        TAHUN 2025
+                      </h5>
+                      <div class="table-responsive">
+                        <table
+                          class="table table-bordered"
+                          id="dataTableIuran1"
+                          width="100%"
+                          cellspacing="0"
+                        >
+                          <thead>
+                            <tr>
+                              <th>Nama</th>
+                              <th>Jan</th>
+                              <th>Feb</th>
+                              <th>Mar</th>
+                              <th>Apr</th>
+                              <th>Mei</th>
+                              <th>Jun</th>
+                              <th>Jul</th>
+                              <th>Ags</th>
+                              <th>Sep</th>
+                              <th>Okt</th>
+                              <th>Nov</th>
+                              <th>Des</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td colspan="12" class="kosong">Data Kosong</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row mt-5">
+                    <div class="col-12">
+                      <h5
+                        class="text-center"
+                        style="
+                          color: black;
+                          font-weight: 900;
+                          font-family: sans-serif;
+                        "
+                      >
+                        IURAN ANGGOTA <br />
+                        TEKAK-TEKIK <br />
+                        TAHUN 2026
+                      </h5>
+                      <div class="table-responsive">
+                        <table
+                          class="table table-bordered"
+                          id="dataTableIuran2"
+                          width="100%"
+                          cellspacing="0"
+                        >
+                          <thead>
+                            <tr>
+                              <th>Nama</th>
+                              <th>Jan</th>
+                              <th>Feb</th>
+                              <th>Mar</th>
+                              <th>Apr</th>
+                              <th>Mei</th>
+                              <th>Jun</th>
+                              <th>Jul</th>
+                              <th>Ags</th>
+                              <th>Sep</th>
+                              <th>Okt</th>
+                              <th>Nov</th>
+                              <th>Des</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td colspan="12" class="kosong">Data Kosong</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Collapsable Card Data Pembayaran Ogoh Ogoh -->
+            <div class="card shadow mb-4">
+              <!-- Card Header - Accordion -->
+              <div class="d-block card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                  Data Pembayaran Ogoh Ogoh
+                </h6>
+              </div>
+              <!-- Card Content - Collapse -->
+              <div id="dataPembayaranOgohCard">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-12">
+                      <h5
+                        class="text-center"
+                        style="
+                          color: black;
+                          font-weight: 900;
+                          font-family: sans-serif;
+                        "
+                      >
+                        PEMBAYARAN <br />
+                        OGOH-OGOH TEKAK-TEKIK <br />
+                        TAHUN 2026
+                      </h5>
+                    </div>
+                    <!-- Total Pembayaran Ogoh -->
+                    <div class="col-12 mb-4">
+                      <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                          <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                              <div
+                                class="text-xs font-weight-bold text-primary text-uppercase mb-1"
+                              >
+                                Total Pembayaran Ogoh-Ogoh
+                              </div>
+                              <div
+                                class="h5 mb-0 font-weight-bold text-gray-800"
+                              >
+                                <span id="totalPembayaranOgoh"></span>
+                              </div>
+                            </div>
+                            <div class="col-auto">
+                              <i
+                                class="fas fa-dollar-sign fa-2x text-gray-300"
+                              ></i>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="table-responsive">
+                        <table
+                          class="table table-bordered"
+                          id="dataTablePembayaranOgoh"
+                          width="100%"
+                          cellspacing="0"
+                        >
+                          <thead>
+                            <tr>
+                              <th>Nama</th>
+                              <th>Nominal</th>
+                              <th>Dibayar</th>
+                              <th>Kurang</th>
+                              <th>Status</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td colspan="13" class="kosong">Data Kosong</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Collapsable Card Arus Kas Ogoh Ogoh -->
+            <div class="card shadow mb-4">
+              <!-- Card Header - Accordion -->
+              <div class="d-block card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                  Arus Kas Ogoh Ogoh
+                </h6>
+              </div>
+              <!-- Card Content - Collapse -->
+              <div id="arusKasOgohCard">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-12">
+                      <h5
+                        class="text-center"
+                        style="
+                          color: black;
+                          font-weight: 900;
+                          font-family: sans-serif;
+                        "
+                      >
+                        ARUS KAS MASUK DAN KELUAR <br />
+                        OGOH-OGOH TEKAK-TEKIK <br />
+                        TAHUN 2026
+                      </h5>
+                    </div>
+                    <!-- Total Pemasukan Ogoh -->
+                    <div class="col-12 mb-1">
+                      <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                          <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                              <div
+                                class="text-xs font-weight-bold text-success text-uppercase mb-1"
+                              >
+                                Total Pemasukan Kas Ogoh-Ogoh
+                              </div>
+                              <div
+                                class="h5 mb-0 font-weight-bold text-gray-800"
+                              >
+                                <span id="totalPemasukanOgoh"></span>
+                              </div>
+                            </div>
+                            <div class="col-auto">
+                              <i
+                                class="fas fa-dollar-sign fa-2x text-gray-300"
+                              ></i>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Total Pengeluaran Ogoh -->
+                    <div class="col-12 mb-1">
+                      <div class="card border-left-danger shadow h-100 py-2">
+                        <div class="card-body">
+                          <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                              <div
+                                class="text-xs font-weight-bold text-danger text-uppercase mb-1"
+                              >
+                                Total Pengeluaran Kas Ogoh-Ogoh
+                              </div>
+                              <div
+                                class="h5 mb-0 font-weight-bold text-gray-800"
+                              >
+                                <span id="totalPengeluaranOgoh"></span>
+                              </div>
+                            </div>
+                            <div class="col-auto">
+                              <i
+                                class="fas fa-dollar-sign fa-2x text-gray-300"
+                              ></i>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Total Saldo Ogoh -->
+                    <div class="col-12 mb-4">
+                      <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                          <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                              <div
+                                class="text-xs font-weight-bold text-primary text-uppercase mb-1"
+                              >
+                                Total Saldo Kas Ogoh-Ogoh
+                              </div>
+                              <div
+                                class="h5 mb-0 font-weight-bold text-gray-800"
+                              >
+                                <span id="totalSaldoOgoh"></span>
+                              </div>
+                            </div>
+                            <div class="col-auto">
+                              <i
+                                class="fas fa-dollar-sign fa-2x text-gray-300"
+                              ></i>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="table-responsive">
+                        <table
+                          class="table table-bordered"
+                          id="dataTableArusKasOgoh"
+                          width="100%"
+                          cellspacing="0"
+                        >
+                          <thead>
+                            <tr>
+                              <th>Tanggal</th>
+                              <th>Kategori</th>
+                              <th>Uraian</th>
+                              <th>Nominal</th>
+                              <th>Bukti</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td colspan="13" class="kosong">Data Kosong</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Collapsable Card Data Anggota -->
+            <div class="card shadow mb-4">
+              <!-- Card Header - Accordion -->
+              <div class="d-block card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Data Anggota</h6>
+              </div>
+              <!-- Card Content - Collapse -->
+              <div id="dataAnggotaCard">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-12">
+                      <h5
+                        class="text-center"
+                        style="
+                          color: black;
+                          font-weight: 900;
+                          font-family: sans-serif;
+                        "
+                      >
+                        DATA ANGGOTA <br />
+                        TEKAK-TEKIK <br />
+                        TAHUN 2025
+                      </h5>
+                      <div>
+                        <button
+                          id="btn-add-member"
+                          class="btn btn-primary btn-sm"
+                        >
+                          Tambah Anggota
+                        </button>
+                      </div>
+                      <div class="table-responsive">
+                        <table
+                          class="table table-bordered"
+                          id="tbl-members"
+                          width="100%"
+                          cellspacing="0"
+                        >
+                          <thead>
+                            <tr>
+                              <th>ID</th>
+                              <th>Nama</th>
+                              <th>Status</th>
+                              <th>Aksi</th>
+                            </tr>
+                          </thead>
+                          <tbody></tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Collapsable Card SK TKTK -->
+            <div class="card shadow mb-4">
+              <!-- Card Header - Accordion -->
+              <div class="d-block card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                  SK TEKAK-TEKIK
+                </h6>
+              </div>
+              <!-- Card Content - Collapse -->
+              <div id="skTekakTekik">
+                <div class="card-body">
+                  <iframe
+                    src="sk/001_TKTK_SK_XII_2024.pdf"
+                    width="100%"
+                    height="600px"
+                    style="border: none"
+                  ></iframe>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- /.container-fluid -->
+        </div>
+        <!-- End of Main Content -->
+
+        <!-- Modals -->
+        <!-- Member Modal -->
+        <div class="modal fade" id="modalMember" tabindex="-1">
+          <div class="modal-dialog">
+            <form id="form-member" class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Tambah/Edit Anggota</h5>
+              </div>
+              <div class="modal-body">
+                <input type="hidden" id="member-docid" />
+                <div class="mb-2">
+                  <label class="form-label">ID Anggota</label>
+                  <input id="member-id" class="form-control" required />
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Nama</label>
+                  <input id="member-nama" class="form-control" required />
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Status</label>
+                  <select id="member-status" class="form-control form-select">
+                    <option>Ketua</option>
+                    <option>Wakil</option>
+                    <option>Bendahara</option>
+                    <option>Sekretaris</option>
+                    <option>Anggota</option>
+                    <option>Anggota Pasif</option>
+                  </select>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  onclick="modalMember.hide()"
+                  class="btn btn-secondary btn-sm"
+                  data-bs-dismiss="modal"
+                >
+                  Close
+                </button>
+                <button type="submit" class="btn btn-sm btn-primary">
+                  Simpan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+          <div class="container my-auto">
+            <div class="copyright text-center my-auto">
+              <span>Copyright &copy; Tekak-Tekik</span>
+            </div>
+          </div>
+        </footer>
+        <!-- End of Footer -->
+      </div>
+      <!-- End of Content Wrapper -->
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="js/sb-admin-2.min.js"></script>
+
+    <!-- Page level plugins -->
+    <!-- <script src="vendor/chart.js/Chart.min.js"></script> -->
+
+    <!-- Page level custom scripts -->
+    <!-- <script src="js/demo/chart-area-demo.js"></script> -->
+
+    <!-- <script src="js/demo/chart-pie-demo.js"></script> -->
+
+    <!-- Page level plugins -->
+    <script src="vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+    <!-- Tambah library QRious -->
+    <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+    <audio id="bgm" src="mp3/tktk.mp3" loop hidden></audio>
+
+    <!-- Firebase SDKs (compat mode for simpler code) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+    <script>
+      /* ========== Firebase init ========== */
+      // TODO: ganti config dibawah dgn config project firebase kamu
+      const firebaseConfig = {
+        apiKey: "AIzaSyCGu8UVxP4N7nkZNKnB5JwIJO5h8iyL6uU",
+        authDomain: "tekak-tekik.firebaseapp.com",
+        projectId: "tekak-tekik",
+        storageBucket: "tekak-tekik.firebasestorage.app",
+        messagingSenderId: "259929674728",
+        appId: "1:259929674728:web:d336e599aa97a5f36dca5d",
+        measurementId: "G-S04X8Q0HKD",
+      };
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const db = firebase.firestore();
+      const storage = firebase.storage();
+
+      /* ========== DataTables init ========== */
+      let dtMembersAdmin, dtOgoh, dtKasMain, dtKasOgoh;
+      $(document).ready(function () {
+        dtMembersAdmin = $("#tbl-members").DataTable({
+          columnDefs: [{ orderable: false, targets: 3 }],
+        });
+        dtOgoh = $("#tbl-ogoh").DataTable();
+        dtKasMain = $("#tbl-kas-main").DataTable({
+          searching: false,
+          paging: false,
+          info: false,
+        });
+        dtKasOgoh = $("#tbl-kas-ogoh").DataTable({
+          searching: false,
+          paging: false,
+          info: false,
+        });
+      });
+
+      /* ========== Members CRUD ========== */
+      const modalMember = new bootstrap.Modal(
+        document.getElementById("modalMember")
+      );
+      document
+        .getElementById("btn-add-member")
+        .addEventListener("click", () => {
+          document.getElementById("member-docid").value = "";
+          document.getElementById("member-id").value = "";
+          document.getElementById("member-nama").value = "";
+          document.getElementById("member-status").value = "Anggota";
+          modalMember.show();
+        });
+
+      document
+        .getElementById("form-member")
+        .addEventListener("submit", async (ev) => {
+          ev.preventDefault();
+          const docid = document.getElementById("member-docid").value;
+          const id_anggota = document.getElementById("member-id").value.trim();
+          const nama = document.getElementById("member-nama").value.trim();
+          const status = document.getElementById("member-status").value;
+          if (!id_anggota || !nama) return alert("Lengkapi data");
+          const data = { id_anggota, nama, status };
+          try {
+            if (docid) {
+              await db
+                .collection("members")
+                .doc(docid)
+                .set(data, { merge: true });
+            } else {
+              await db.collection("members").add(data);
+            }
+            modalMember.hide();
+            loadMembers();
+          } catch (e) {
+            alert("Gagal menyimpan: " + e.message);
+          }
+        });
+
+      async function loadMembers() {
+        const snap = await db.collection("members").orderBy("nama").get();
+        dtMembersAdmin.clear().draw();
+        // document.getElementById("summary-members").textContent =
+        //   "Anggota: " + snap.size;
+        snap.forEach((doc) => {
+          const d = doc.data();
+          const id = doc.id;
+          // admin table
+          const btnEdit = `<button class="btn btn-sm btn-warning btn-edit-member" data-id="${id}">Edit</button>`;
+          const btnDel = `<button class="btn btn-sm btn-danger btn-del-member" data-id="${id}">Hapus</button>`;
+          dtMembersAdmin.row
+            .add([d.id_anggota, d.nama, d.status, btnEdit + " " + btnDel])
+            .draw(false);
+        });
+
+        // attach events (delegation)
+        $("#tbl-members")
+          .off("click", ".btn-edit-member")
+          .on("click", ".btn-edit-member", async function () {
+            const id = $(this).data("id");
+            const doc = await db.collection("members").doc(id).get();
+            const d = doc.data();
+            document.getElementById("member-docid").value = doc.id;
+            document.getElementById("member-id").value = d.id_anggota || "";
+            document.getElementById("member-nama").value = d.nama || "";
+            document.getElementById("member-status").value =
+              d.status || "Anggota";
+            modalMember.show();
+          });
+        $("#tbl-members")
+          .off("click", ".btn-del-member")
+          .on("click", ".btn-del-member", function () {
+            const id = $(this).data("id");
+            if (confirm("Hapus anggota?")) {
+              db.collection("members")
+                .doc(id)
+                .delete()
+                .then(() => loadMembers());
+            }
+          });
+      }
+
+      /* initial load */
+      loadMembers();
+
+      // PlayMusik
+      document.addEventListener("click", function playMusicOnce() {
+        const audio = document.getElementById("bgm");
+        audio
+          .play()
+          .then(() => {
+            console.log("Audio dimulai setelah user click");
+          })
+          .catch((err) => {
+            console.error("Gagal memutar audio:", err);
+          });
+
+        // Hanya butuh sekali klik, lalu hapus event listener
+        document.removeEventListener("click", playMusicOnce);
+      });
+    </script>
+  </body>
+</html>

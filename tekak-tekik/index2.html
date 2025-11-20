@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tekak-Tekik — Admin</title>
+
+    <!-- Bootstrap 5 (CDN) -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- DataTables (Bootstrap 5) -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css"
+    />
+
+    <style>
+      body {
+        padding-top: 70px;
+      }
+      .small-muted {
+        font-size: 0.9rem;
+        color: #666;
+      }
+      .table-wrap {
+        overflow-x: auto;
+      }
+      .pointer {
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Tekak-Tekik</a>
+        <button
+          class="navbar-toggler"
+          data-bs-toggle="collapse"
+          data-bs-target="#navMenu"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navMenu">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a class="nav-link active" href="#" id="nav-dashboard"
+                >Dashboard</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" id="nav-members">Data Anggota</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" id="nav-iuran">Data Iuran</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" id="nav-ogoh">Ogoh-Ogoh</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" id="nav-kas">Kas</a>
+            </li>
+          </ul>
+          <div class="d-flex">
+            <span id="user-email" class="me-2 small-muted"></span>
+            <button id="btn-login" class="btn btn-outline-light btn-sm me-2">
+              Login
+            </button>
+            <button id="btn-logout" class="btn btn-light btn-sm d-none">
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Container -->
+    <div class="container">
+      <!-- Dashboard -->
+      <div id="page-dashboard" class="page">
+        <div class="row g-3">
+          <div class="col-12">
+            <h3>Dashboard publik</h3>
+            <p class="small-muted">
+              Semua orang bisa melihat ringkasan tanpa login.
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <div class="card p-3">
+              <h5 id="summary-members">Anggota: ...</h5>
+              <p class="small-muted">Jumlah anggota terdaftar</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card p-3">
+              <h5 id="summary-kas">Total Kas Saat Ini: ...</h5>
+              <p class="small-muted">Kas masuk - keluar</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card p-3">
+              <h5 id="summary-ogoh">Ogoh Lunas: ... | Belum Lunas: ...</h5>
+              <p class="small-muted">Ringkasan Ogoh-ogoh</p>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="card p-3">
+              <h6>Preview: Data Anggota (publik)</h6>
+              <div class="table-wrap">
+                <table
+                  id="tbl-members-public"
+                  class="table table-striped"
+                  style="width: 100%"
+                >
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Nama</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Members Page (admin CRUD) -->
+      <div id="page-members" class="page d-none">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h3>Data Anggota</h3>
+          <div>
+            <button id="btn-add-member" class="btn btn-primary btn-sm">
+              Tambah Anggota
+            </button>
+          </div>
+        </div>
+
+        <table
+          id="tbl-members"
+          class="table table-bordered"
+          style="width: 100%"
+        >
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nama</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- Iuran Page -->
+      <div id="page-iuran" class="page d-none">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h3>Data Iuran</h3>
+          <div>
+            <input
+              type="number"
+              id="gen-year"
+              class="form-control form-control-sm d-inline-block"
+              placeholder="Tahun"
+              style="width: 120px"
+            />
+            <button id="btn-generate-iuran" class="btn btn-success btn-sm">
+              Generate Tahun
+            </button>
+          </div>
+        </div>
+
+        <div id="iuran-container"></div>
+      </div>
+
+      <!-- Ogoh Page -->
+      <div id="page-ogoh" class="page d-none">
+        <div class="d-flex justify-content-between">
+          <h3>Data Pembayaran Ogoh-Ogoh</h3>
+          <button id="btn-add-ogoh" class="btn btn-primary btn-sm">
+            Tambah Pembayaran
+          </button>
+        </div>
+
+        <table id="tbl-ogoh" class="table table-striped mt-2">
+          <thead>
+            <tr>
+              <th>Nama</th>
+              <th>Nominal</th>
+              <th>Dibayar</th>
+              <th>Kurang</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- Kas Page -->
+      <div id="page-kas" class="page d-none">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h3>Kas Utama & Kas Ogoh-Ogoh</h3>
+          <div>
+            <button
+              id="btn-add-kas-main"
+              class="btn btn-outline-primary btn-sm"
+            >
+              Tambah Kas Utama
+            </button>
+            <button
+              id="btn-add-kas-ogoh"
+              class="btn btn-outline-secondary btn-sm"
+            >
+              Tambah Kas Ogoh
+            </button>
+          </div>
+        </div>
+
+        <h6>Kas Utama</h6>
+        <table id="tbl-kas-main" class="table table-sm">
+          <thead>
+            <tr>
+              <th>Tgl</th>
+              <th>Kategori</th>
+              <th>Uraian</th>
+              <th>Nominal</th>
+              <th>Bukti</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+
+        <h6 class="mt-4">Kas Ogoh-Ogoh</h6>
+        <table id="tbl-kas-ogoh" class="table table-sm">
+          <thead>
+            <tr>
+              <th>Tgl</th>
+              <th>Kategori</th>
+              <th>Uraian</th>
+              <th>Nominal</th>
+              <th>Bukti</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Member Modal -->
+    <div class="modal fade" id="modalMember" tabindex="-1">
+      <div class="modal-dialog">
+        <form id="form-member" class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Tambah/Edit Anggota</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="member-docid" />
+            <div class="mb-2">
+              <label class="form-label">ID Anggota</label>
+              <input id="member-id" class="form-control" required />
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Nama</label>
+              <input id="member-nama" class="form-control" required />
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Status</label>
+              <select id="member-status" class="form-select">
+                <option>Ketua</option>
+                <option>Wakil</option>
+                <option>Bendahara</option>
+                <option>Sekretaris</option>
+                <option>Anggota</option>
+                <option>Anggota Pasif</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Ogoh Modal -->
+    <div class="modal fade" id="modalOgoh" tabindex="-1">
+      <div class="modal-dialog">
+        <form id="form-ogoh" class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Tambah/Edit Ogoh</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="ogoh-id" />
+            <div class="mb-2">
+              <label class="form-label">Nama (boleh manual)</label>
+              <input id="ogoh-nama" class="form-control" required />
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Nominal</label>
+              <input
+                id="ogoh-nominal"
+                type="number"
+                class="form-control"
+                required
+              />
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Dibayar</label>
+              <input
+                id="ogoh-dibayar"
+                type="number"
+                class="form-control"
+                value="0"
+                required
+              />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary">Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Kas Modal -->
+    <div class="modal fade" id="modalKas" tabindex="-1">
+      <div class="modal-dialog">
+        <form id="form-kas" class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Tambah Kas</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="kas-type" value="main" />
+            <!-- main | ogoh -->
+            <div class="mb-2">
+              <label class="form-label">Kategori</label>
+              <select id="kas-kategori" class="form-select">
+                <option value="masuk">Masuk</option>
+                <option value="keluar">Keluar</option>
+              </select>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Tanggal</label>
+              <input id="kas-tanggal" type="date" class="form-control" />
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Uraian</label>
+              <input id="kas-uraian" class="form-control" />
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Nominal</label>
+              <input id="kas-nominal" type="number" class="form-control" />
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Bukti (opsional)</label>
+              <input id="kas-bukti" type="file" class="form-control" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary">Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Firebase SDKs (compat mode for simpler code) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+    <!-- jQuery (DataTables depends on it) and DataTables -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      /* ========== Firebase init ========== */
+      // TODO: ganti config dibawah dgn config project firebase kamu
+      const firebaseConfig = {
+        apiKey: "AIzaSyCGu8UVxP4N7nkZNKnB5JwIJO5h8iyL6uU",
+        authDomain: "tekak-tekik.firebaseapp.com",
+        projectId: "tekak-tekik",
+        storageBucket: "tekak-tekik.firebasestorage.app",
+        messagingSenderId: "259929674728",
+        appId: "1:259929674728:web:d336e599aa97a5f36dca5d",
+        measurementId: "G-S04X8Q0HKD",
+      };
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const db = firebase.firestore();
+      const storage = firebase.storage();
+
+      /* ========== UI helpers ========== */
+      const showPage = (id) => {
+        document
+          .querySelectorAll(".page")
+          .forEach((p) => p.classList.add("d-none"));
+        document.getElementById(id).classList.remove("d-none");
+      };
+      document
+        .getElementById("nav-dashboard")
+        .addEventListener("click", () => showPage("page-dashboard"));
+      document
+        .getElementById("nav-members")
+        .addEventListener("click", () => showPage("page-members"));
+      document
+        .getElementById("nav-iuran")
+        .addEventListener("click", () => showPage("page-iuran"));
+      document
+        .getElementById("nav-ogoh")
+        .addEventListener("click", () => showPage("page-ogoh"));
+      document
+        .getElementById("nav-kas")
+        .addEventListener("click", () => showPage("page-kas"));
+
+      /* ========== Auth (simple email login modal via prompt) ========== */
+      const btnLogin = document.getElementById("btn-login");
+      const btnLogout = document.getElementById("btn-logout");
+      const userEmailSpan = document.getElementById("user-email");
+
+      btnLogin.addEventListener("click", async () => {
+        const email = prompt("Masukkan email admin:");
+        const pass = prompt("Password:");
+        if (!email || !pass) return alert("Dibatalkan");
+        try {
+          await auth.signInWithEmailAndPassword(email, pass);
+          alert("Login berhasil");
+        } catch (e) {
+          // jika belum ada akun, tawarkan registrasi sederhana
+          if (confirm("Login gagal. Buat akun baru dengan email ini?")) {
+            try {
+              await auth.createUserWithEmailAndPassword(email, pass);
+              alert("Akun dibuat. Silakan login ulang.");
+            } catch (err) {
+              alert("Gagal membuat akun: " + err.message);
+            }
+          } else alert("Login gagal: " + e.message);
+        }
+      });
+      btnLogout.addEventListener("click", () => auth.signOut());
+
+      auth.onAuthStateChanged((user) => {
+        if (user) {
+          userEmailSpan.textContent = user.email;
+          btnLogin.classList.add("d-none");
+          btnLogout.classList.remove("d-none");
+        } else {
+          userEmailSpan.textContent = "";
+          btnLogin.classList.remove("d-none");
+          btnLogout.classList.add("d-none");
+        }
+      });
+
+      /* ========== DataTables init ========== */
+      let dtMembersPublic, dtMembersAdmin, dtOgoh, dtKasMain, dtKasOgoh;
+      $(document).ready(function () {
+        dtMembersPublic = $("#tbl-members-public").DataTable({
+          paging: false,
+          info: false,
+          searching: false,
+        });
+        dtMembersAdmin = $("#tbl-members").DataTable({
+          columnDefs: [{ orderable: false, targets: 3 }],
+        });
+        dtOgoh = $("#tbl-ogoh").DataTable();
+        dtKasMain = $("#tbl-kas-main").DataTable({
+          searching: false,
+          paging: false,
+          info: false,
+        });
+        dtKasOgoh = $("#tbl-kas-ogoh").DataTable({
+          searching: false,
+          paging: false,
+          info: false,
+        });
+      });
+
+      /* ========== Members CRUD ========== */
+      const modalMember = new bootstrap.Modal(
+        document.getElementById("modalMember")
+      );
+      document
+        .getElementById("btn-add-member")
+        .addEventListener("click", () => {
+          document.getElementById("member-docid").value = "";
+          document.getElementById("member-id").value = "";
+          document.getElementById("member-nama").value = "";
+          document.getElementById("member-status").value = "Anggota";
+          modalMember.show();
+        });
+
+      document
+        .getElementById("form-member")
+        .addEventListener("submit", async (ev) => {
+          ev.preventDefault();
+          const docid = document.getElementById("member-docid").value;
+          const id_anggota = document.getElementById("member-id").value.trim();
+          const nama = document.getElementById("member-nama").value.trim();
+          const status = document.getElementById("member-status").value;
+          if (!id_anggota || !nama) return alert("Lengkapi data");
+          const data = { id_anggota, nama, status };
+          try {
+            if (docid) {
+              await db
+                .collection("members")
+                .doc(docid)
+                .set(data, { merge: true });
+            } else {
+              await db.collection("members").add(data);
+            }
+            modalMember.hide();
+            loadMembers();
+          } catch (e) {
+            alert("Gagal menyimpan: " + e.message);
+          }
+        });
+
+      async function loadMembers() {
+        const snap = await db.collection("members").orderBy("nama").get();
+        dtMembersAdmin.clear().draw();
+        dtMembersPublic.clear().draw();
+        document.getElementById("summary-members").textContent =
+          "Anggota: " + snap.size;
+        snap.forEach((doc) => {
+          const d = doc.data();
+          const id = doc.id;
+          // public table
+          dtMembersPublic.row.add([d.id_anggota, d.nama, d.status]).draw(false);
+          // admin table
+          const btnEdit = `<button class="btn btn-sm btn-outline-primary btn-edit-member" data-id="${id}">Edit</button>`;
+          const btnDel = `<button class="btn btn-sm btn-outline-danger btn-del-member" data-id="${id}">Hapus</button>`;
+          dtMembersAdmin.row
+            .add([d.id_anggota, d.nama, d.status, btnEdit + " " + btnDel])
+            .draw(false);
+        });
+
+        // attach events (delegation)
+        $("#tbl-members")
+          .off("click", ".btn-edit-member")
+          .on("click", ".btn-edit-member", async function () {
+            const id = $(this).data("id");
+            const doc = await db.collection("members").doc(id).get();
+            const d = doc.data();
+            document.getElementById("member-docid").value = doc.id;
+            document.getElementById("member-id").value = d.id_anggota || "";
+            document.getElementById("member-nama").value = d.nama || "";
+            document.getElementById("member-status").value =
+              d.status || "Anggota";
+            modalMember.show();
+          });
+        $("#tbl-members")
+          .off("click", ".btn-del-member")
+          .on("click", ".btn-del-member", function () {
+            const id = $(this).data("id");
+            if (confirm("Hapus anggota?")) {
+              db.collection("members")
+                .doc(id)
+                .delete()
+                .then(() => loadMembers());
+            }
+          });
+      }
+
+      /* initial load */
+      loadMembers();
+
+      /* ========== Iuran: generate table per tahun & manage monthly checkboxes ========== */
+      document
+        .getElementById("btn-generate-iuran")
+        .addEventListener("click", async () => {
+          const year = parseInt(document.getElementById("gen-year").value);
+          if (!year) return alert("Masukkan tahun");
+          // Ambil semua anggota
+          const snap = await db.collection("members").orderBy("nama").get();
+          const members = snap.docs.map((d) => ({ docId: d.id, ...d.data() }));
+          // generate dokumen iuran per anggota jika belum ada
+          const batch = db.batch();
+          for (const m of members) {
+            const docId = `${year}_${m.id_anggota}`;
+            const ref = db.collection("iuran").doc(docId);
+            const data = {
+              tahun: year,
+              id_anggota: m.id_anggota,
+              nama: m.nama,
+              nominal: 0,
+              jan: null,
+              feb: null,
+              mar: null,
+              apr: null,
+              may: null,
+              jun: null,
+              jul: null,
+              aug: null,
+              sep: null,
+              oct: null,
+              nov: null,
+              dec: null,
+            };
+            // set only if not exists -> check get
+            const exists = await ref.get();
+            if (!exists.exists) batch.set(ref, data);
+          }
+          await batch.commit();
+          renderIuranTable(year);
+        });
+
+      async function renderIuranTable(year) {
+        const snap = await db
+          .collection("iuran")
+          .where("tahun", "==", year)
+          .orderBy("nama")
+          .get();
+        const container = document.getElementById("iuran-container");
+        container.innerHTML = "";
+        // make table
+        const tbl = document.createElement("table");
+        tbl.className = "table table-sm table-bordered";
+        const thead = document.createElement("thead");
+        thead.innerHTML =
+          "<tr><th>Id</th><th>Nama</th>" +
+          [
+            "jan",
+            "feb",
+            "mar",
+            "apr",
+            "may",
+            "jun",
+            "jul",
+            "aug",
+            "sep",
+            "oct",
+            "nov",
+            "dec",
+          ]
+            .map((m) => `<th>${m.toUpperCase().slice(0, 3)}</th>`)
+            .join("") +
+          "<th>Nominal</th></tr>";
+        tbl.appendChild(thead);
+        const tbody = document.createElement("tbody");
+        snap.forEach((doc) => {
+          const d = doc.data();
+          const row = document.createElement("tr");
+          row.innerHTML =
+            `<td>${d.id_anggota}</td><td>${d.nama}</td>` +
+            [
+              "jan",
+              "feb",
+              "mar",
+              "apr",
+              "may",
+              "jun",
+              "jul",
+              "aug",
+              "sep",
+              "oct",
+              "nov",
+              "dec",
+            ]
+              .map((mon) => {
+                const val = d[mon];
+                const checked = val ? "checked" : "";
+                // checkbox toggles date field: set date now if check, set null if uncheck
+                return `<td class="text-center"><input type="checkbox" class="iuran-check" data-doc="${doc.id}" data-month="${mon}" ${checked}></td>`;
+              })
+              .join("") +
+            `<td><input type="number" class="form-control form-control-sm iuran-nominal" data-doc="${
+              doc.id
+            }" value="${d.nominal || 0}"></td>`;
+          tbody.appendChild(row);
+        });
+        tbl.appendChild(tbody);
+        container.appendChild(tbl);
+
+        // attach checkbox listeners
+        container.querySelectorAll(".iuran-check").forEach((cb) => {
+          cb.addEventListener("change", async (e) => {
+            const docid = e.target.dataset.doc;
+            const month = e.target.dataset.month;
+            const ref = db.collection("iuran").doc(docid);
+            if (e.target.checked) {
+              await ref.update({ [month]: new Date().toISOString() });
+            } else {
+              await ref.update({ [month]: null });
+            }
+            // optionally show feedback
+          });
+        });
+        // nominal change
+        container.querySelectorAll(".iuran-nominal").forEach((inp) => {
+          inp.addEventListener("change", async (e) => {
+            const docid = e.target.dataset.doc;
+            const val = parseInt(e.target.value || 0);
+            await db.collection("iuran").doc(docid).update({ nominal: val });
+          });
+        });
+      }
+
+      /* ========== Ogoh payments ======== */
+      const modalOgoh = new bootstrap.Modal(
+        document.getElementById("modalOgoh")
+      );
+      document.getElementById("btn-add-ogoh").addEventListener("click", () => {
+        document.getElementById("ogoh-id").value = "";
+        document.getElementById("ogoh-nama").value = "";
+        document.getElementById("ogoh-nominal").value = 0;
+        document.getElementById("ogoh-dibayar").value = 0;
+        modalOgoh.show();
+      });
+      document
+        .getElementById("form-ogoh")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const id = document.getElementById("ogoh-id").value;
+          const nama = document.getElementById("ogoh-nama").value.trim();
+          const nominal =
+            parseInt(document.getElementById("ogoh-nominal").value) || 0;
+          const dibayar =
+            parseInt(document.getElementById("ogoh-dibayar").value) || 0;
+          const kurang = Math.max(0, nominal - dibayar);
+          const status = kurang === 0 ? "lunas" : "belum lunas";
+          const payload = {
+            nama,
+            nominal,
+            dibayar,
+            kurang,
+            status,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          };
+          try {
+            await db.collection("ogoh_payments").add(payload);
+            modalOgoh.hide();
+            loadOgoh();
+          } catch (err) {
+            alert("Gagal: " + err.message);
+          }
+        });
+      async function loadOgoh() {
+        const snap = await db
+          .collection("ogoh_payments")
+          .orderBy("createdAt", "desc")
+          .get();
+        dtOgoh.clear().draw();
+        let lunasCount = 0,
+          belumCount = 0,
+          lunasTotal = 0,
+          belumTotal = 0;
+        snap.forEach((doc) => {
+          const d = doc.data();
+          dtOgoh.row
+            .add([
+              d.nama,
+              d.nominal,
+              d.dibayar,
+              d.kurang,
+              d.status,
+              `<button class="btn btn-sm del-ogoh" data-id="${doc.id}">Hapus</button>`,
+            ])
+            .draw(false);
+          if (d.status === "lunas") {
+            lunasCount++;
+            lunasTotal += d.nominal || 0;
+          } else {
+            belumCount++;
+            belumTotal += d.kurang || 0;
+          }
+        });
+        document.getElementById(
+          "summary-ogoh"
+        ).textContent = `Ogoh Lunas: ${lunasCount} (${lunasTotal}) | Belum Lunas: ${belumCount} (${belumTotal})`;
+        $("#tbl-ogoh")
+          .off("click", ".del-ogoh")
+          .on("click", ".del-ogoh", function () {
+            if (confirm("Hapus?"))
+              db.collection("ogoh_payments")
+                .doc($(this).data("id"))
+                .delete()
+                .then(loadOgoh);
+          });
+      }
+      loadOgoh();
+
+      /* ========== Kas (main & ogoh) ========= */
+      const modalKasInst = new bootstrap.Modal(
+        document.getElementById("modalKas")
+      );
+      document
+        .getElementById("btn-add-kas-main")
+        .addEventListener("click", () => {
+          document.getElementById("kas-type").value = "main";
+          document.getElementById("kas-tanggal").valueAsDate = new Date();
+          document.getElementById("kas-bukti").value = "";
+          modalKasInst.show();
+        });
+      document
+        .getElementById("btn-add-kas-ogoh")
+        .addEventListener("click", () => {
+          document.getElementById("kas-type").value = "ogoh";
+          document.getElementById("kas-tanggal").valueAsDate = new Date();
+          document.getElementById("kas-bukti").value = "";
+          modalKasInst.show();
+        });
+      document
+        .getElementById("form-kas")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const type = document.getElementById("kas-type").value;
+          const kategori = document.getElementById("kas-kategori").value;
+          const tgl = document.getElementById("kas-tanggal").value;
+          const uraian = document.getElementById("kas-uraian").value;
+          const nominal =
+            parseInt(document.getElementById("kas-nominal").value) || 0;
+          const fileInp = document.getElementById("kas-bukti");
+          const payload = {
+            kategori,
+            tanggal: tgl ? new Date(tgl) : new Date(),
+            uraian,
+            nominal,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          };
+          try {
+            if (fileInp.files.length > 0) {
+              const file = fileInp.files[0];
+              const path = `${type}_bukti/${Date.now()}_${file.name}`;
+              const snap = await storage.ref(path).put(file);
+              const url = await snap.ref.getDownloadURL();
+              payload.bukti_url = url;
+            }
+            const col = type === "main" ? "kas_main" : "kas_ogoh";
+            await db.collection(col).add(payload);
+            modalKasInst.hide();
+            loadKas();
+          } catch (err) {
+            alert("Gagal simpan kas: " + err.message);
+          }
+        });
+
+      async function loadKas() {
+        // Kas main
+        const snapMain = await db
+          .collection("kas_main")
+          .orderBy("tanggal", "desc")
+          .limit(200)
+          .get();
+        dtKasMain.clear().draw();
+        let totalIn = 0,
+          totalOut = 0;
+        snapMain.forEach((doc) => {
+          const d = doc.data();
+          dtKasMain.row
+            .add([
+              d.tanggal
+                ? new Date(d.tanggal.seconds * 1000).toLocaleDateString()
+                : "",
+              d.kategori,
+              d.uraian,
+              d.nominal,
+              d.bukti_url
+                ? `<a href="${d.bukti_url}" target="_blank">lihat</a>`
+                : "",
+            ])
+            .draw(false);
+          if (d.kategori === "masuk") totalIn += d.nominal || 0;
+          else totalOut += d.nominal || 0;
+        });
+        // Kas ogoh
+        const snapOgoh = await db
+          .collection("kas_ogoh")
+          .orderBy("tanggal", "desc")
+          .limit(200)
+          .get();
+        dtKasOgoh.clear().draw();
+        let totalInOgoh = 0,
+          totalOutOgoh = 0;
+        snapOgoh.forEach((doc) => {
+          const d = doc.data();
+          dtKasOgoh.row
+            .add([
+              d.tanggal
+                ? new Date(d.tanggal.seconds * 1000).toLocaleDateString()
+                : "",
+              d.kategori,
+              d.uraian,
+              d.nominal,
+              d.bukti_url
+                ? `<a href="${d.bukti_url}" target="_blank">lihat</a>`
+                : "",
+            ])
+            .draw(false);
+          if (d.kategori === "masuk") totalInOgoh += d.nominal || 0;
+          else totalOutOgoh += d.nominal || 0;
+        });
+
+        document.getElementById(
+          "summary-kas"
+        ).textContent = `Total Kas Saat Ini: ${
+          totalIn - totalOut + (totalInOgoh - totalOutOgoh)
+        }`;
+      }
+      loadKas();
+
+      /* ========== Public summary load (initial) ========== */
+      async function loadPublicSummary() {
+        // total members
+        const mSnap = await db.collection("members").get();
+        document.getElementById("summary-members").textContent =
+          "Anggota: " + mSnap.size;
+        // populate public members table already done in loadMembers
+        // cash summary done in loadKas
+      }
+      loadPublicSummary();
+    </script>
+  </body>
+</html>

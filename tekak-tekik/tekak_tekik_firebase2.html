@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+
+    <title>Tekak-Tekik (Firebase)</title>
+
+    <!-- Custom fonts for this template-->    
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,300,400,600,700,800,900" rel="stylesheet" />
+    <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" />
+    <link href="css/sb-admin-2.min.css" rel="stylesheet" />
+    <style>
+      #accordionSidebar { display: none !important; }
+      #content-wrapper { margin-left: 0 !important; }
+      .kosong { text-align:center }
+    </style>
+  </head>
+
+  <body id="page-top">
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+      <!-- Content Wrapper -->
+      <div id="content-wrapper" class="d-flex flex-column">
+        <!-- Main Content -->
+        <div id="content">
+          <!-- Topbar -->
+          <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow d-flex justify-content-center">
+            <img src="img/logo.png" width="200px" alt="logo" />
+          </nav>
+          <!-- End of Topbar -->
+
+          <!-- Begin Page Content -->
+          <div class="container-fluid">
+            <!-- Page Heading -->
+            <div class="row">
+              <!-- Total Kas Utama -->
+              <div class="col-12 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                  <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                      <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Kas Utama</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800"><span id="totalKas">-</span></div>
+                      </div>
+                      <div class="col-auto"><i class="fas fa-dollar-sign fa-2x text-gray-300"></i></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Data Iuran -->
+            <div class="card shadow mb-4">
+              <div class="d-block card-header py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h6 class="m-0 font-weight-bold text-primary">Data Iuran</h6>
+                  <div>
+                    <button id="btnLogin" class="btn btn-sm btn-outline-primary">Login Admin</button>
+                    <button id="btnLogout" class="btn btn-sm btn-outline-danger" style="display:none">Logout</button>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-12">
+                    <h5 class="text-center" style="color:black;font-weight:900;font-family:sans-serif;">IURAN ANGGOTA <br/>TEKAK-TEKIK <br/>TAHUN 2025</h5>
+                    <div class="table-responsive">
+                      <table class="table table-bordered" id="dataTableIuran1" width="100%" cellspacing="0">
+                        <thead>
+                          <tr>
+                            <th>Nama</th>
+                            <th>Jan</th>
+                            <th>Feb</th>
+                            <th>Mar</th>
+                            <th>Apr</th>
+                            <th>Mei</th>
+                            <th>Jun</th>
+                            <th>Jul</th>
+                            <th>Ags</th>
+                            <th>Sep</th>
+                            <th>Okt</th>
+                            <th>Nov</th>
+                            <th>Des</th>
+                          </tr>
+                        </thead>
+                        <tbody><tr><td colspan="13" class="kosong">Loading…</td></tr></tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row mt-5">
+                  <div class="col-12">
+                    <h5 class="text-center" style="color:black;font-weight:900;font-family:sans-serif;">IURAN ANGGOTA <br/>TEKAK-TEKIK <br/>TAHUN 2026</h5>
+                    <div class="table-responsive">
+                      <table class="table table-bordered" id="dataTableIuran2" width="100%" cellspacing="0">
+                        <thead>
+                          <tr>
+                            <th>Nama</th>
+                            <th>Jan</th>
+                            <th>Feb</th>
+                            <th>Mar</th>
+                            <th>Apr</th>
+                            <th>Mei</th>
+                            <th>Jun</th>
+                            <th>Jul</th>
+                            <th>Ags</th>
+                            <th>Sep</th>
+                            <th>Okt</th>
+                            <th>Nov</th>
+                            <th>Des</th>
+                          </tr>
+                        </thead>
+                        <tbody><tr><td colspan="13" class="kosong">Loading…</td></tr></tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Pembayaran Ogoh -->
+            <div class="card shadow mb-4">
+              <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Data Pembayaran Ogoh Ogoh</h6></div>
+              <div class="card-body">
+                <h5 class="text-center" style="color:black;font-weight:900;font-family:sans-serif;">PEMBAYARAN <br/>OGOH-OGOH TEKAK-TEKIK <br/>TAHUN 2026</h5>
+                <div class="card border-left-primary shadow h-100 py-2 mb-4"><div class="card-body"><div class="row no-gutters align-items-center"><div class="col mr-2"><div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Pembayaran Ogoh-Ogoh</div><div class="h5 mb-0 font-weight-bold text-gray-800"><span id="totalPembayaranOgoh">-</span></div></div><div class="col-auto"><i class="fas fa-dollar-sign fa-2x text-gray-300"></i></div></div></div></div>
+                <div class="table-responsive"><table class="table table-bordered" id="dataTablePembayaranOgoh" width="100%" cellspacing="0"><thead><tr><th>Nama</th><th>Nominal</th><th>Dibayar</th><th>Kurang</th><th>Status</th></tr></thead><tbody><tr><td colspan="5" class="kosong">Loading…</td></tr></tbody></table></div>
+              </div>
+            </div>
+
+            <!-- Arus Kas Ogoh -->
+            <div class="card shadow mb-4">
+              <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Arus Kas Ogoh Ogoh</h6></div>
+              <div class="card-body">
+                <h5 class="text-center" style="color:black;font-weight:900;font-family:sans-serif;">ARUS KAS MASUK DAN KELUAR <br/>OGOH-OGOH TEKAK-TEKIK <br/>TAHUN 2026</h5>
+                <div class="row mb-4"><div class="col-12 mb-1"><div class="card border-left-success shadow h-100 py-2"><div class="card-body"><div class="row no-gutters align-items-center"><div class="col mr-2"><div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Pemasukan Kas Ogoh-Ogoh</div><div class="h5 mb-0 font-weight-bold text-gray-800"><span id="totalPemasukanOgoh">-</span></div></div><div class="col-auto"><i class="fas fa-dollar-sign fa-2x text-gray-300"></i></div></div></div></div></div><div class="row mb-1"><div class="col-12 mb-1"><div class="card border-left-danger shadow h-100 py-2"><div class="card-body"><div class="row no-gutters align-items-center"><div class="col mr-2"><div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Total Pengeluaran Kas Ogoh-Ogoh</div><div class="h5 mb-0 font-weight-bold text-gray-800"><span id="totalPengeluaranOgoh">-</span></div></div><div class="col-auto"><i class="fas fa-dollar-sign fa-2x text-gray-300"></i></div></div></div></div></div></div>
+                <div class="table-responsive"><table class="table table-bordered" id="dataTableArusKasOgoh" width="100%" cellspacing="0"><thead><tr><th>Tanggal</th><th>Kategori</th><th>Uraian</th><th>Nominal</th><th>Bukti</th></tr></thead><tbody><tr><td colspan="5" class="kosong">Loading…</td></tr></tbody></table></div>
+              </div>
+            </div>
+
+            <!-- SK PDF -->
+            <div class="card shadow mb-4"><div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">SK TEKAK-TEKIK</h6></div><div class="card-body"><iframe src="sk/001_TKTK_SK_XII_2024.pdf" width="100%" height="600px" style="border:none"></iframe></div></div>
+
+          </div>
+          <!-- /.container-fluid -->
+        </div>
+        <!-- End of Main Content -->
+
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white"><div class="container my-auto"><div class="copyright text-center my-auto"><span>Copyright &copy; Tekak-Tekik</span></div></div></footer>
+        <!-- End of Footer -->
+      </div>
+      <!-- End of Content Wrapper -->
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Modals -->
+    <!-- Login Modal -->
+    <div class="modal fade" id="modalLogin" tabindex="-1" aria-hidden="true"><div class="modal-dialog modal-sm modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Login Admin</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><div class="mb-3"><label class="form-label">Email</label><input id="loginEmail" class="form-control" type="email" /></div><div class="mb-3"><label class="form-label">Password</label><input id="loginPassword" class="form-control" type="password" /></div><div id="loginError" class="text-danger small"></div></div><div class="modal-footer"><button id="btnDoLogin" class="btn btn-primary">Login</button></div></div></div></div>
+
+    <!-- Add/Edit Modal (single modal reused) -->
+    <div class="modal fade" id="modalEdit" tabindex="-1" aria-hidden="true"><div class="modal-dialog modal-lg modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 id="modalEditTitle" class="modal-title">Tambah / Ubah</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><form id="formEdit"><div class="row"><div class="col-6 mb-3"><label>Nama</label><input id="f_nama" class="form-control" /></div><div class="col-6 mb-3"><label>Nominal / Keterangan</label><input id="f_nominal" class="form-control" /></div><div class="col-6 mb-3"><label>Tanggal</label><input id="f_tanggal" class="form-control" type="date" /></div><div class="col-6 mb-3"><label>Bukti (URL)</label><input id="f_bukti" class="form-control" /></div></div><input type="hidden" id="f_docId" /></form></div><div class="modal-footer"><button id="btnSaveDoc" class="btn btn-success">Simpan</button></div></div></div></div>
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top"><i class="fas fa-angle-up"></i></a>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="js/sb-admin-2.min.js"></script>
+
+    <!-- Firebase (compat SDK for simpler migration) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+    <!-- Page plugins -->
+    <script src="vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+    <script>
+      // ====== CONFIGURE FIREBASE ======
+      // ganti konfigurasi ini dengan project Firebase kamu
+      const firebaseConfig = {
+        apiKey: "AIzaSyCGu8UVxP4N7nkZNKnB5JwIJO5h8iyL6uU",
+        authDomain: "tekak-tekik.firebaseapp.com",
+        projectId: "tekak-tekik",
+        storageBucket: "tekak-tekik.firebasestorage.app",
+        messagingSenderId: "259929674728",
+        appId: "1:259929674728:web:d336e599aa97a5f36dca5d",
+        measurementId: "G-S04X8Q0HKD",
+      };
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const db = firebase.firestore();
+      const storage = firebase.storage();
+
+      // ====== Simple auth + admin check ======
+      let currentUser = null;
+      let isAdmin = false;
+
+      // elements
+      const btnLogin = document.getElementById("btnLogin");
+      const btnLogout = document.getElementById("btnLogout");
+
+      btnLogin.addEventListener("click", () => $("#modalLogin").modal("show"));
+      btnLogout.addEventListener("click", () => auth.signOut());
+
+      document.getElementById("btnDoLogin").addEventListener("click", async () => {
+        const email = document.getElementById("loginEmail").value.trim();
+        const pwd = document.getElementById("loginPassword").value;
+        const err = document.getElementById("loginError");
+        err.innerText = "";
+        try {
+          await auth.signInWithEmailAndPassword(email, pwd);
+          $("#modalLogin").modal("hide");
+        } catch (e) {
+          err.innerText = e.message;
+        }
+      });
+
+      // on auth change
+      auth.onAuthStateChanged(async (user) => {
+        currentUser = user;
+        if (user) {
+          // check admins collection
+          const doc = await db.collection("admins").doc(user.email).get();
+          isAdmin = doc.exists;
+          btnLogin.style.display = "none";
+          btnLogout.style.display = "inline-block";
+          showToast("Login berhasil");
+          // show admin controls if needed (you can add add-buttons)
+        } else {
+          isAdmin = false;
+          btnLogin.style.display = "inline-block";
+          btnLogout.style.display = "none";
+          showToast("Login keluar");
+        }
+        // re-render (safe because DataTables are initialised once)
+        renderAll();
+      });
+
+      // ====== Utilities ======
+      function formatRupiah(angka) {
+        if (angka == null || angka == undefined || angka === "") return "-";
+        const n = Number(angka);
+        if (isNaN(n)) return angka;
+        return n.toLocaleString("id-ID");
+      }
+      function ceklist(value) {
+        if (
+          value === true ||
+          value === "TRUE" ||
+          value === "true" ||
+          value === "Ya" ||
+          value === "Sudah" ||
+          value === "✓" ||
+          value === "✔️"
+        )
+          return `<i class="fas fa-check text-success"></i>`;
+        else if (
+          value === "FALSE" ||
+          value === false ||
+          value === "Belum" ||
+          value === "Tidak"
+        )
+          return `<i class="fas fa-times text-danger"></i>`;
+        else return "";
+      }
+      function showToast(msg) {
+        console.log(msg);
+      }
+
+      // ====== DataTables language and init (init once) ======
+      const dtLang = {
+        search: "Cari:",
+        lengthMenu: "Tampilkan _MENU_ data",
+        info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+        paginate: { previous: "Sebelumnya", next: "Berikutnya" },
+      };
+
+      // keep references to datatable instances
+      let dtIuran2025, dtIuran2026, dtPembayaranOgoh, dtArusKas;
+
+      $(document).ready(function () {
+        dtIuran2025 = $("#dataTableIuran1").DataTable({ language: dtLang, pageLength: 10 });
+        dtIuran2026 = $("#dataTableIuran2").DataTable({ language: dtLang, pageLength: 10 });
+        dtPembayaranOgoh = $("#dataTablePembayaranOgoh").DataTable({ language: dtLang, pageLength: 10 });
+        dtArusKas = $("#dataTableArusKasOgoh").DataTable({ language: dtLang, pageLength: 10 });
+
+        // initial data load AFTER datatables initialized
+        renderAll();
+      });
+
+      // ====== Render / Read functions (Firestore) using DataTables API safely ======
+      async function renderIuran(tahun) {
+        const dt = tahun == 2025 ? dtIuran2025 : dtIuran2026;
+        // clear before loading
+        dt.clear();
+        try {
+          const snapshot = await db.collection("iuran").where("tahun", "==", tahun).get();
+          if (snapshot.empty) {
+            // add a single row indicating empty (fill columns)
+            dt.row.add(["Data Kosong", "", "", "", "", "", "", "", "", "", "", "", ""]);
+            dt.draw();
+            return;
+          }
+
+          const rows = [];
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            rows.push([
+              data.nama || "",
+              ceklist(data.Januari),
+              ceklist(data.Februari),
+              ceklist(data.Maret),
+              ceklist(data.April),
+              ceklist(data.Mei),
+              ceklist(data.Juni),
+              ceklist(data.Juli),
+              ceklist(data.Agustus),
+              ceklist(data.September),
+              ceklist(data.Oktober),
+              ceklist(data.November),
+              ceklist(data.Desember),
+            ]);
+          });
+
+          dt.rows.add(rows);
+          dt.draw();
+        } catch (e) {
+          console.error(e);
+          dt.clear();
+          dt.row.add(["Gagal memuat data", "", "", "", "", "", "", "", "", "", "", "", ""]);
+          dt.draw();
+        }
+      }
+
+      async function renderPembayaranOgoh() {
+        const dt = dtPembayaranOgoh;
+        dt.clear();
+        try {
+          const snap = await db.collection("pembayaranOgoh").get();
+          if (snap.empty) {
+            dt.row.add(["Data Kosong", "", "", "", ""]);
+            dt.draw();
+            return;
+          }
+          const rows = [];
+          snap.forEach((doc) => {
+            const r = doc.data();
+            const statusClass = r.Status === "Lunas" ? "Lunas" : r.Status || "";
+            rows.push([
+              r.Nama || r.nama || "",
+              r.Nominal || "",
+              r.Dibayar || "",
+              r.Kurang || "",
+              statusClass,
+            ]);
+          });
+          dt.rows.add(rows);
+          dt.draw();
+        } catch (e) {
+          console.error(e);
+          dt.row.add(["Gagal memuat data", "", "", "", ""]);
+          dt.draw();
+        }
+      }
+
+      async function renderArusKas() {
+        const dt = dtArusKas;
+        dt.clear();
+        try {
+          const snap = await db.collection("arusKasOgoh").orderBy("Tanggal", "desc").get();
+          if (snap.empty) {
+            dt.row.add(["Data Kosong", "", "", "", ""]);
+            dt.draw();
+            return;
+          }
+          const rows = [];
+          snap.forEach((doc) => {
+            const r = doc.data();
+            const link = r.Bukti || r.bukti || "";
+            const tombol = link ? `<a href="${link}" target="_blank" class="btn btn-sm btn-primary">Lihat</a>` : "-";
+            rows.push([
+              r.Tanggal || r.tanggal || "",
+              r.KATEGORI || r.kategori || "",
+              r.Uraian || r.uraian || "",
+              `Rp. ${formatRupiah(r.Nominal || r.nominal || 0)}`,
+              tombol,
+            ]);
+          });
+          dt.rows.add(rows);
+          dt.draw();
+        } catch (e) {
+          console.error(e);
+          dt.row.add(["Gagal memuat data", "", "", "", ""]);
+          dt.draw();
+        }
+      }
+
+      async function renderInfoTotals() {
+        try {
+          const doc = await db.collection("info").doc("totals").get();
+          if (doc.exists) {
+            const d = doc.data();
+            document.getElementById("totalKas").innerText = formatRupiah(d.totalKas);
+            document.getElementById("totalPembayaranOgoh").innerText = formatRupiah(d.totalPembayaranOgoh);
+            document.getElementById("totalPemasukanOgoh").innerText = formatRupiah(d.totalPemasukanOgoh);
+            document.getElementById("totalPengeluaranOgoh").innerText = formatRupiah(d.totalPengeluaranOgoh);
+            document.getElementById("totalSaldoOgoh").innerText = formatRupiah(d.totalSaldoOgoh);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      async function renderAll() {
+        await Promise.all([
+          renderIuran(2025),
+          renderIuran(2026),
+          renderPembayaranOgoh(),
+          renderArusKas(),
+          renderInfoTotals(),
+        ]);
+      }
+
+      // ====== CRUD examples (admin only) ======
+      document.getElementById("btnSaveDoc").addEventListener("click", async () => {
+        if (!isAdmin) { alert('Hanya admin yang boleh mengubah data. Silakan login.'); return; }
+        const docId = document.getElementById('f_docId').value;
+        const payload = { nama: document.getElementById('f_nama').value, Nominal: document.getElementById('f_nominal').value, Tanggal: document.getElementById('f_tanggal').value, Bukti: document.getElementById('f_bukti').value };
+        try{
+          if(docId){ await db.collection('arusKasOgoh').doc(docId).update(payload); } else { await db.collection('arusKasOgoh').add(payload); }
+          $('#modalEdit').modal('hide');
+          renderAll();
+        }catch(e){ alert('Gagal menyimpan: '+e.message); }
+      });
+
+      async function openEditModalFor(docId){
+        if(!isAdmin){ alert('Hanya admin.'); return; }
+        const doc = await db.collection('arusKasOgoh').doc(docId).get(); if(!doc.exists) return alert('Tidak ditemukan');
+        const d = doc.data(); document.getElementById('f_docId').value = docId; document.getElementById('f_nama').value = d.nama||d.Nama||''; document.getElementById('f_nominal').value = d.Nominal||d.nominal||''; document.getElementById('f_tanggal').value = d.Tanggal||d.tanggal||''; document.getElementById('f_bukti').value = d.Bukti||d.bukti||''; $('#modalEdit').modal('show');
+      }
+
+      async function deleteDoc(collectionName, docId){ if(!isAdmin){ alert('Hanya admin.'); return; } if(!confirm('Yakin ingin hapus?')) return; try{ await db.collection(collectionName).doc(docId).delete(); renderAll(); }catch(e){ alert('Gagal menghapus: '+e.message); } }
+
+      // Notes: ensure firestore collections exist: iuran, pembayaranOgoh, arusKasOgoh, info(totals), admins (dok id = admin email)
+
+    </script>
+  </body>
+</html>
