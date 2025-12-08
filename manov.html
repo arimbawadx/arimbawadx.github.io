@@ -4,6 +4,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="manifest" id="manifestPlaceholder">
+  <meta name="theme-color" content="#0d6efd">
   <title>Web App Laporan Proyek Renovasi - Offline (PWA)</title>
 
   <!-- Bootstrap CSS -->
@@ -154,6 +156,36 @@
       }
     }
   </style>
+  <!-- PWA Manifest Inline -->
+  <script>
+    const manifestData = {
+      "name": "Manajemen Renov",
+      "short_name": "MANOV",
+      "start_url": ".",
+      "display": "standalone",
+      "background_color": "#0d6efd",
+      "theme_color": "#0d6efd",
+      "orientation": "portrait",
+      "icons": [
+        {
+          "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='192' height='192'><rect width='192' height='192' rx='32' fill='%230d6efd'/><text x='50%' y='55%' font-size='110' font-family='Arial' fill='white' text-anchor='middle' dominant-baseline='middle'>T</text></svg>",
+          "sizes": "192x192",
+          "type": "image/svg+xml",
+          "purpose": "any"
+        },
+        {
+          "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='512' height='512'><rect width='512' height='512' rx='64' fill='%230d6efd'/><text x='50%' y='55%' font-size='260' font-family='Arial' fill='white' text-anchor='middle' dominant-baseline='middle'>T</text></svg>",
+          "sizes": "512x512",
+          "type": "image/svg+xml",
+          "purpose": "any"
+        }
+      ]
+    };
+
+    const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+    const manifestURL = URL.createObjectURL(manifestBlob);
+    document.getElementById("manifestPlaceholder").setAttribute("href", manifestURL);
+  </script>
 </head>
 
 <body>
@@ -1032,9 +1064,6 @@
       renderWorkers(); renderAttendance(); renderSalaries(); renderKasbon(); renderPayments(); renderBahan(); computeUnpaid();
     });
 
-    // Simple PWA service worker via blob
-    const swCode = `self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',e=>{e.waitUntil(clients.claim())});self.addEventListener('fetch',e=>{e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)))})`;
-    if ('serviceWorker' in navigator) { const blob = new Blob([swCode], { type: 'application/javascript' }); const swUrl = URL.createObjectURL(blob); navigator.serviceWorker.register(swUrl).then(() => console.log('SW registered')).catch(() => { }); }
 
     // Install prompt
     let deferredPrompt;
@@ -1090,6 +1119,29 @@
       if (f) importBackupFile(f);
     });
 
+  </script>
+  <script>
+    // Generate service worker from inline script
+    const swCode = `
+self.addEventListener('install', e => {
+  self.skipWaiting();
+});
+self.addEventListener('activate', e => {
+  clients.claim();
+});
+self.addEventListener('fetch', (event) => {
+  event.respondWith(fetch(event.request).catch(() => new Response('Offline')));
+});
+`;
+
+    const swBlob = new Blob([swCode], { type: "text/javascript" });
+    const swURL = URL.createObjectURL(swBlob);
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register(swURL)
+        .then(() => console.log("SW ready"))
+        .catch(err => console.error(err));
+    }
   </script>
 </body>
 
