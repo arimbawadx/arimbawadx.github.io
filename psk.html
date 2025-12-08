@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Kas - Tekak-Tekik</title>
+    <title>Kas - Pemuda Pasek Sekalan</title>
     <link rel="manifest" id="manifestPlaceholder">
     <meta name="theme-color" content="#0d6efd">
 
@@ -40,8 +40,8 @@
     <!-- PWA Manifest Inline -->
     <script>
         const manifestData = {
-            "name": "Kas Tekak-Tekik",
-            "short_name": "KasTekik",
+            "name": "Kas Pemuda Pasek Sekalan",
+            "short_name": "KasPemudaPasekSekalan",
             "start_url": ".",
             "display": "standalone",
             "background_color": "#0d6efd",
@@ -49,13 +49,13 @@
             "orientation": "portrait",
             "icons": [
                 {
-                    "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='192' height='192'><rect width='192' height='192' rx='32' fill='%230d6efd'/><text x='50%' y='55%' font-size='110' font-family='Arial' fill='white' text-anchor='middle' dominant-baseline='middle'>T</text></svg>",
+                    "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='192' height='192'><rect width='192' height='192' rx='32' fill='%230d6efd'/><text x='50%' y='55%' font-size='110' font-family='Arial' fill='white' text-anchor='middle' dominant-baseline='middle'>P</text></svg>",
                     "sizes": "192x192",
                     "type": "image/svg+xml",
                     "purpose": "any"
                 },
                 {
-                    "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='512' height='512'><rect width='512' height='512' rx='64' fill='%230d6efd'/><text x='50%' y='55%' font-size='260' font-family='Arial' fill='white' text-anchor='middle' dominant-baseline='middle'>T</text></svg>",
+                    "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='512' height='512'><rect width='512' height='512' rx='64' fill='%230d6efd'/><text x='50%' y='55%' font-size='260' font-family='Arial' fill='white' text-anchor='middle' dominant-baseline='middle'>P</text></svg>",
                     "sizes": "512x512",
                     "type": "image/svg+xml",
                     "purpose": "any"
@@ -103,8 +103,8 @@
                     <img id="logoImg" src="logo.png" style="width:64px;height:64px;object-fit:contain" />
                 </div>
                 <div class="text-center">
-                    <div class="mb-0">Laporan Arus Kas Ogoh-Ogoh</div>
-                    <div>Tekak-Tekik</div>
+                    <div class="mb-0">Laporan Arus Kas</div>
+                    <div>Pemuda Pemudi Pasek Sekalan</div>
                     <div id="reportYear" class="fw-bold"></div>
                 </div>
                 <!-- <div class="ms-auto">
@@ -367,19 +367,21 @@
                 .sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
 
             // HEADER + LOGO
-            doc.setFontSize(12);
-            // attempt to use logo image from #logoImg (dataURL)
-            try {
-                const logo = document.getElementById('logoImg').src;
-                const logoW = 100;
-                const logoH = 40;
-                doc.addImage(logo, 'PNG', (pageWidth - logoW) / 2, margin, logoW, logoH);
-            } catch (e) { /* ignore */ }
+            // doc.setFontSize(12);
+            // // attempt to use logo image from #logoImg (dataURL)
+            // try {
+            //     const logo = document.getElementById('logoImg').src;
+            //     const logoW = 100;
+            //     const logoH = 40;
+            //     doc.addImage(logo, 'PNG', (pageWidth - logoW) / 2, margin, logoW, logoH);
+            // } catch (e) { /* ignore */ }
 
             doc.setFontSize(14);
             doc.text('Laporan Arus Kas', pageWidth / 2, margin + 80, { align: 'center' });
             doc.setFontSize(14);
-            doc.text(`Ogoh-Ogoh Tahun ${year}`, pageWidth / 2, margin + 100, { align: 'center' });
+            doc.text('Pemuda Pemudi Pasek Sekalan', pageWidth / 2, margin + 80, { align: 'center' });
+            doc.setFontSize(14);
+            doc.text(`Tahun ${year}`, pageWidth / 2, margin + 100, { align: 'center' });
             // doc.text(`Tahun ${year}`, pageWidth / 2, margin + 118, { align: 'center' });
 
             // Prepare table body with formatted tanggal and pills info
@@ -482,7 +484,7 @@
                 }
             }
 
-            doc.save(`laporan-kas-${year}.pdf`);
+            doc.save(`LaporanKasPemudaPemudiPasekSekalan${year}.pdf`);
         }
 
         // EXPORT EXCEL
@@ -502,7 +504,7 @@
             dbKas.forEach(r => (r.bukti || []).forEach(id => fileIds.add(id)));
             for (const id of fileIds) { const fo = await idbGet(id); if (fo) data.files.push({ id: fo.id, name: fo.name, type: fo.type, data: fo.data }); }
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            saveAs(blob, 'backup-db-kas-tktk-' + (new Date().toISOString().slice(0, 10)) + '.json');
+            saveAs(blob, 'backup-db-kas-pemuda-pasek-sekalan-' + (new Date().toISOString().slice(0, 10)) + '.json');
         }
 
         // RESTORE: read JSON, write files to IndexedDB, write metadata to localStorage
