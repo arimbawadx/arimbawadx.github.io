@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Web App Laporan Proyek Renovasi - Offline (PWA)</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- DataTables CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/datatables.net-dt@1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+
+  <!-- Feather Icons -->
+  <script src="https://unpkg.com/feather-icons"></script>
+
+  <style>
+    :root {
+      --brand: #1A73E8;
+      --muted: #6c757d;
+    }
+
+    html,
+    body {
+      height: 100%;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+
+    body {
+      padding-bottom: 120px;
+      background: #f6f8fb;
+      margin: 0
+    }
+
+    /* increased to be safe on mobile */
+    .card {
+      border-radius: 12px;
+    }
+
+    .badge-status-paid {
+      background: #28a745;
+      color: #fff;
+      padding: .35em .5em;
+      border-radius: .25rem
+    }
+
+    .badge-status-unpaid {
+      background: #dc3545;
+      color: #fff;
+      padding: .35em .5em;
+      border-radius: .25rem
+    }
+
+    .table-wrap {
+      overflow: auto
+    }
+
+    /* modern bottom nav */
+    .bottom-nav {
+      position: fixed;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      height: 64px;
+      border-radius: 18px;
+      background: #fff;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, .12);
+      z-index: 1200;
+      padding: 8px
+    }
+
+    .nav-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #7a8794;
+      font-size: 12px;
+      text-decoration: none;
+      border-radius: 12px;
+      padding: 6px;
+      transition: all .15s ease;
+    }
+
+    .nav-btn.active {
+      background: linear-gradient(90deg, rgba(26, 115, 232, .08), rgba(26, 115, 232, .04));
+      color: #1A73E8;
+      box-shadow: 0 4px 12px rgba(26, 115, 232, .08)
+    }
+
+    .nav-btn svg {
+      height: 20px;
+      width: 20px;
+      margin-bottom: 2px
+    }
+
+    .app-view {
+      padding-bottom: 8px
+    }
+
+    .dt-center {
+      text-align: center
+    }
+
+    .simple-modal {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, .45);
+      z-index: 2000
+    }
+
+    .card-small {
+      max-width: 900px;
+      width: 96%
+    }
+
+    pre#reportArea {
+      white-space: pre-wrap;
+      background: #fff;
+      border-radius: 8px;
+      padding: 1rem
+    }
+
+    /* pdf invoice styles will be inline in generated HTML */
+    @media(min-width:768px) {
+      .bottom-nav {
+        display: none
+      }
+    }
+
+    /* small tweaks for DataTables row buttons */
+    table.dataTable td .btn {
+      font-size: 12px;
+      padding: .25rem .45rem
+    }
+
+    /* Fix for mobile: ensure content not hidden under bottom nav */
+    @media(max-width:768px) {
+      .app-view {
+        padding-bottom: 130px !important;
+      }
+
+      /* safe bottom padding so content not covered */
+      .card {
+        margin-bottom: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-light bg-white shadow-sm">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h5">Proyek Renovasi — App</span>
+      <div class="d-flex gap-2 align-items-center">
+        <button id="exportBackupBtn" class="btn btn-outline-secondary btn-sm">Export Backup</button>
+        <label class="btn btn-outline-primary btn-sm mb-0" for="importBackupInput" style="cursor:pointer">Import
+          Backup</label>
+        <input id="importBackupInput" type="file" accept="application/json" style="display:none" />
+        <button id="installBtn" class="btn btn-outline-primary" style="display:none">Install</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid mt-3 mb-5">
+    <div class="row">
+      <div class="col-12">
+        <!-- Workers view -->
+        <div id="view-workers" class="app-view">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="m-0">Tukang</h5>
+            <small class="text-muted">Kelola data tukang</small>
+          </div>
+          <div class="row g-3">
+            <div class="col-12 col-md-4">
+              <form id="formWorker" class="card p-3">
+                <input type="hidden" id="workerId" />
+                <div class="mb-2">
+                  <input id="wName" class="form-control" placeholder="Nama tukang" required />
+                </div>
+                <div class="row g-2 mb-2">
+                  <div class="col-6">
+                    <input id="wFull" class="form-control" type="number" min="0" placeholder="Gaji 8 jam (Rp)"
+                      required />
+                  </div>
+                  <div class="col-6">
+                    <input id="wPart" class="form-control" type="number" min="0" placeholder="Gaji 4 jam (Rp)"
+                      required />
+                  </div>
+                </div>
+                <div class="mb-2">
+                  <select id="wStatus" class="form-select">
+                    <option value="aktif">aktif</option>
+                    <option value="tidak">tidak aktif</option>
+                  </select>
+                </div>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-primary w-100" type="submit">Simpan</button>
+                  <button type="button" id="resetWorker" class="btn btn-outline-secondary">Reset</button>
+                </div>
+              </form>
+            </div>
+
+            <div class="col-12 col-md-8">
+              <div class="card p-3">
+                <h6>Daftar Tukang</h6>
+                <div class="table-wrap mt-2">
+                  <table id="tblWorkers" class="display table w-100">
+                    <thead>
+                      <tr>
+                        <th>Nama</th>
+                        <th>Full</th>
+                        <th>Part</th>
+                        <th>Status</th>
+                        <th class="dt-center">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Attendance -->
+        <div id="view-att" class="app-view" style="display:none">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="m-0">Absensi</h5><small class="text-muted">Buat absensi dan generate gaji</small>
+          </div>
+          <div class="row g-3">
+            <div class="col-12 col-md-4">
+              <form id="formAtt" class="card p-3">
+                <input type="hidden" id="attId" />
+                <div class="mb-2"><input id="attDate" type="date" class="form-control" required /></div>
+                <div class="mb-2"><select id="attWorker" class="form-select"></select></div>
+                <div class="mb-2"><select id="attType" class="form-select">
+                    <option value="fullday">Fullday</option>
+                    <option value="partday">Partday</option>
+                  </select></div>
+                <div class="d-grid"><button class="btn btn-primary" type="submit">Tambah Absensi</button></div>
+              </form>
+              <div class="small-note mt-2">Tekan "Generate Gaji Otomatis" untuk membuat entri gaji dari absensi (akan
+                menambah kolom remaining = nominal).</div>
+              <div class="mt-2"><button id="genSalaries" class="btn btn-outline-success">Generate Gaji Otomatis</button>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-8">
+              <div class="card p-3">
+                <h6>Daftar Absensi</h6>
+                <div class="table-wrap mt-2">
+                  <table id="tblAtt" class="display table w-100">
+                    <thead>
+                      <tr>
+                        <th>Tanggal</th>
+                        <th>Tukang</th>
+                        <th>Kerja</th>
+                        <th class="dt-center">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Salaries -->
+        <div id="view-sal" class="app-view" style="display:none">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="m-0">Gaji</h5><small class="text-muted">Kelola & bayar gaji (mendukung parsial)</small>
+          </div>
+          <div class="card p-3">
+            <div class="d-flex gap-2 mb-2">
+              <button id="refreshSalaries" class="btn btn-primary btn-sm">Refresh</button>
+              <button id="markPaidSelected" class="btn btn-outline-secondary btn-sm">Tandai Dibayarkan (pilih)</button>
+            </div>
+            <div class="table-wrap">
+              <table id="tblSalaries" class="display table w-100">
+                <thead>
+                  <tr>
+                    <th class="dt-center"><input id="selAllSal" type="checkbox" /></th>
+                    <th>Tanggal</th>
+                    <th>Tukang</th>
+                    <th>Kerja</th>
+                    <th>Nominal (Rp)</th>
+                    <th>Sisa</th>
+                    <th>Status</th>
+                    <th class="dt-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kasbon (keterangan not tukang) -->
+        <div id="view-kas" class="app-view" style="display:none">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="m-0">Kasbon</h5><small class="text-muted">Catat kasbon (keterangan, bukti foto)</small>
+          </div>
+          <div class="row g-3">
+            <div class="col-12 col-md-5">
+              <form id="formKasbon" class="card p-3">
+                <input type="hidden" id="kasId" />
+                <div class="mb-2"><input id="kasDate" type="date" class="form-control" required /></div>
+                <div class="mb-2">
+                  <input id="kasNote" class="form-control" placeholder="Keterangan / untuk siapa (opsional)" />
+                </div>
+                <div class="mb-2"><input id="kasAmount" type="number" min="0" class="form-control"
+                    placeholder="Jumlah (Rp)" required /></div>
+                <div class="mb-2"><input id="kasBuktiFile" type="file" accept="image/*" class="form-control" /></div>
+                <div class="d-grid"><button class="btn btn-primary" type="submit">Simpan Kasbon</button></div>
+              </form>
+            </div>
+
+            <div class="col-12 col-md-7">
+              <div class="card p-3">
+                <h6>Daftar Kasbon</h6>
+                <div class="table-wrap mt-2">
+                  <table id="tblKasbon" class="display table w-100">
+                    <thead>
+                      <tr>
+                        <th>Tanggal</th>
+                        <th>Keterangan</th>
+                        <th>Nominal</th>
+                        <th>Sisa</th>
+                        <th>Status</th>
+                        <th class="dt-center">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payments / Serah Terima -->
+        <div id="view-pay" class="app-view" style="display:none">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="m-0">Serah Terima Pembayaran</h5><small class="text-muted">Buat slip & bayar (parsial/total/gaji
+              saja/kasbon saja)</small>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-12 col-md-5">
+              <div class="card p-3">
+                <div class="mb-2 small-note">Akan menghitung semua <strong>gaji belum dibayarkan</strong> &
+                  <strong>kasbon belum dibayarkan</strong> (menggunakan field remaining).
+                </div>
+                <div class="mb-2"><b>Total Gaji Belum Dibayar:</b> <span id="sumUnpaidSalaries">Rp0</span></div>
+                <div class="mb-2"><b>Total Kasbon Belum Dibayar:</b> <span id="sumUnpaidKasbon">Rp0</span></div>
+                <div class="mb-2"><b>Pembayaran Bersih:</b> <span id="netPayment">Rp0</span></div>
+                <div class="d-grid gap-2">
+                  <button id="openPaymentModal" class="btn btn-success">Buat Serah Terima / Pilih Item</button>
+                </div>
+              </div>
+
+              <div class="mt-3 small-note">Di modal, Anda bisa pilih gaji/ kasbon, ubah nominal dibayar tiap baris
+                (mendukung partial). Setelah save, record serah terima disimpan; gunakan tombol PDF untuk cetak slip
+                rapi.</div>
+            </div>
+
+            <div class="col-12 col-md-7">
+              <div class="card p-3">
+                <h6>Daftar Serah Terima</h6>
+                <div class="table-wrap mt-2">
+                  <table id="tblPayments" class="display table w-100">
+                    <thead>
+                      <tr>
+                        <th>Tanggal</th>
+                        <th>Keterangan</th>
+                        <th>Total Gaji</th>
+                        <th>Total Kasbon</th>
+                        <th>Bersih</th>
+                        <th class="dt-center">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bahan -->
+        <div id="view-bahan" class="app-view" style="display:none">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="m-0">Pengeluaran Bahan</h5><small class="text-muted">Kelola pembelian bahan</small>
+          </div>
+          <div class="row g-3">
+            <div class="col-12 col-md-4">
+              <form id="formBahan" class="card p-3">
+                <input type="hidden" id="bahanId" />
+                <div class="mb-2"><input id="bahanDate" type="date" class="form-control" required /></div>
+                <div class="mb-2"><input id="bahanDesc" class="form-control" placeholder="Deskripsi" /></div>
+                <div class="mb-2"><input id="bahanAmount" type="number" min="0" class="form-control"
+                    placeholder="Jumlah (Rp)" required /></div>
+                <div class="d-grid"><button class="btn btn-primary" type="submit">Simpan</button></div>
+              </form>
+            </div>
+
+            <div class="col-12 col-md-8">
+              <div class="card p-3">
+                <h6>Daftar Pembelian Bahan</h6>
+                <div class="table-wrap mt-2">
+                  <table id="tblBahan" class="display table w-100">
+                    <thead>
+                      <tr>
+                        <th>Tanggal</th>
+                        <th>Deskripsi</th>
+                        <th>Jumlah</th>
+                        <th class="dt-center">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+                <div class="mt-2"><b>Total Pengeluaran Bahan:</b> <span id="sumBahan">Rp0</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Report -->
+        <div id="view-report" class="app-view" style="display:none">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="m-0">Laporan Rekapan</h5><small class="text-muted">Export PDF rapi</small>
+          </div>
+          <div class="card p-3">
+            <div class="small-note mb-2">Download / cetak halaman ini jika ingin laporan lengkap.</div>
+            <pre id="reportArea" style="max-height:60vh;overflow:auto"></pre>
+            <div class="d-flex gap-2 mt-2">
+              <button id="refreshReport" class="btn btn-outline-primary">Refresh Laporan</button>
+              <button id="exportReportPdf" class="btn btn-secondary">Export PDF</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom navigation (Feather icons) -->
+  <div class="bottom-nav">
+    <a class="nav-btn active" data-target="workers"><svg data-feather="users"></svg>
+      <div>Tukang</div>
+    </a>
+    <a class="nav-btn" data-target="att"><svg data-feather="clipboard"></svg>
+      <div>Absensi</div>
+    </a>
+    <a class="nav-btn" data-target="sal"><svg data-feather="dollar-sign"></svg>
+      <div>Gaji</div>
+    </a>
+    <a class="nav-btn" data-target="kas"><svg data-feather="credit-card"></svg>
+      <div>Kasbon</div>
+    </a>
+    <a class="nav-btn" data-target="pay"><svg data-feather="file-text"></svg>
+      <div>Serah</div>
+    </a>
+    <a class="nav-btn" data-target="bahan">
+      <svg data-feather="archive"></svg>
+      <div>Bahan</div>
+    </a>
+
+    <a class="nav-btn" data-target="report">
+      <svg data-feather="bar-chart"></svg>
+      <div>Rekap</div>
+    </a>
+  </div>
+
+  <!-- Modal container placeholder -->
+  <div id="modalRoot"></div>
+
+  <!-- Dependencies -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/datatables.net@1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <script>
+    // activate feather icons
+    document.addEventListener("DOMContentLoaded", () => { if (window.feather) feather.replace(); });
+
+    // --- Storage helpers ---
+    const DB = {
+      workers: 'rp_workers',
+      attendance: 'rp_attendance',
+      salaries: 'rp_salaries',
+      kasbon: 'rp_kasbon',
+      payments: 'rp_payments',
+      bahan: 'rp_bahan'
+    };
+    function load(k) { try { return JSON.parse(localStorage.getItem(k) || '[]') } catch (e) { return [] } }
+    function save(k, v) { localStorage.setItem(k, JSON.stringify(v)) }
+    function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6) }
+    function fmt(n) { return 'Rp' + Number(n || 0).toLocaleString('id-ID') }
+
+    // --- UI helpers & navigation ---
+    function showView(name) {
+      document.querySelectorAll('.app-view').forEach(v => v.style.display = 'none');
+      const el = document.getElementById('view-' + name);
+      if (el) el.style.display = 'block';
+      // mark nav active
+      document.querySelectorAll('.nav-btn').forEach(b => { b.classList.toggle('active', b.getAttribute('data-target') === name) });
+      if (name === 'pay') computeUnpaid();
+      if (name === 'report') refreshReport();
+    }
+    document.querySelectorAll('.nav-btn').forEach(n => n.addEventListener('click', () => showView(n.getAttribute('data-target'))));
+    showView('workers');
+
+    // populate selects
+    function populateWorkerSelects() {
+      const w = load(DB.workers);
+      const sel = document.querySelector('#attWorker');
+      if (sel) {
+        sel.innerHTML = '';
+        w.forEach(x => { const o = document.createElement('option'); o.value = x.id; o.textContent = x.name; sel.appendChild(o) })
+      }
+    }
+
+    // DataTables init
+    let dtWorkers, dtAtt, dtSal, dtKas, dtPay, dtBahan;
+    function initTables() {
+      dtWorkers = $('#tblWorkers').DataTable({
+        searching: false, paging: false, info: false, columns: [
+          { data: 'name' }, { data: 'fullDay' }, { data: 'partDay' }, { data: 'status' }, { data: null, orderable: false }
+        ], createdRow: function (row, data) { $(row).find('td').eq(4).html(`<button class="btn btn-sm btn-warning edit-worker" data-id="${data.DT_RowId}">Edit</button> <button class="btn btn-sm btn-danger del-worker" data-id="${data.DT_RowId}">Hapus</button>`) }
+      });
+      dtAtt = $('#tblAtt').DataTable({
+        searching: false, paging: false, info: false, columns: [
+          { data: 'date' }, { data: 'workerName' }, { data: 'type' }, { data: null }
+        ], createdRow: function (row, data) { $(row).find('td').eq(3).html(`<button class="btn btn-sm btn-danger del-att" data-id="${data.DT_RowId}">Hapus</button>`) }
+      });
+      dtSal = $('#tblSalaries').DataTable({
+        searching: false, paging: false, info: false, columns: [
+          { data: null, orderable: false }, { data: 'date' }, { data: 'workerName' }, { data: 'type' }, { data: 'amount' }, { data: 'remaining' }, { data: 'status' }, { data: null }
+        ], createdRow: function (row, data) {
+          $(row).find('td').eq(0).html(`<input type="checkbox" class="sel-sal" data-id="${data.DT_RowId}">`);
+          const actions = data.raw && data.raw.paid ? `<button class="btn btn-sm btn-warning undo-sal" data-id="${data.DT_RowId}">Urungkan</button>` : `<button class="btn btn-sm btn-success pay-sal" data-id="${data.DT_RowId}">Tandai Dibayar</button>`;
+          $(row).find('td').eq(7).html(actions);
+        }
+      });
+      dtKas = $('#tblKasbon').DataTable({
+        searching: false, paging: false, info: false, columns: [
+          { data: 'date' }, { data: 'note' }, { data: 'amount' }, { data: 'remaining' }, { data: 'status' }, { data: null }
+        ], createdRow: function (row, data) {
+          $(row).find('td').eq(2).html(data.amount);
+          $(row).find('td').eq(5).html(`<button class="btn btn-sm btn-primary edit-kas" data-id="${data.DT_RowId}">Edit</button> <button class="btn btn-sm btn-danger del-kas" data-id="${data.DT_RowId}">Hapus</button>`);
+        }
+      });
+      dtPay = $('#tblPayments').DataTable({
+        searching: false, paging: false, info: false, columns: [
+          { data: 'date' }, { data: 'note' }, { data: 'totalSalaries' }, { data: 'totalKasbon' }, { data: 'netPayment' }, { data: null }
+        ], createdRow: function (row, data) {
+          $(row).find('td').eq(5).html(`<button class="btn btn-sm btn-success lunas-pay" data-id="${data.DT_RowId}">Lunaskan</button> <button class="btn btn-sm btn-warning undo-pay" data-id="${data.DT_RowId}">Urungkan</button> <button class="btn btn-sm btn-secondary pdf-pay" data-id="${data.DT_RowId}">PDF</button> <button class="btn btn-sm btn-danger del-pay" data-id="${data.DT_RowId}">Hapus</button>`);
+        }
+      });
+      dtBahan = $('#tblBahan').DataTable({
+        searching: false, paging: false, info: false, columns: [
+          { data: 'date' }, { data: 'desc' }, { data: 'amount' }, { data: null }
+        ], createdRow: function (row, data) {
+          $(row).find('td').eq(3).html(`<button class="btn btn-sm btn-warning edit-bahan" data-id="${data.DT_RowId}">Edit</button> <button class="btn btn-sm btn-danger del-bahan" data-id="${data.DT_RowId}">Hapus</button>`);
+        }
+      });
+    }
+
+    // Renderers
+    function renderWorkers() {
+      const rows = load(DB.workers);
+      dtWorkers.clear();
+      rows.forEach(r => dtWorkers.row.add({ name: r.name, fullDay: fmt(r.fullDay), partDay: fmt(r.partDay), status: r.status, DT_RowId: r.id, raw: r }));
+      dtWorkers.draw();
+      populateWorkerSelects();
+    }
+    function renderAttendance() {
+      const rows = load(DB.attendance);
+      const workers = load(DB.workers).reduce((a, b) => { a[b.id] = b.name; return a }, {});
+      dtAtt.clear();
+      rows.forEach(r => dtAtt.row.add({ date: r.date, workerName: workers[r.workerId] || '-', type: r.type, DT_RowId: r.id, raw: r }));
+      dtAtt.draw();
+    }
+    function renderSalaries() {
+      const rows = load(DB.salaries);
+      const workers = load(DB.workers).reduce((a, b) => { a[b.id] = b.name; return a }, {});
+      dtSal.clear();
+      rows.forEach(s => dtSal.row.add({ date: s.date, workerName: workers[s.workerId] || '-', type: s.type, amount: fmt(s.amount), remaining: fmt(s.remaining), status: (s.paid ? '<span class="badge-status-paid">Lunas</span>' : '<span class="badge-status-unpaid">Belum</span>'), DT_RowId: s.id, raw: s }));
+      dtSal.draw();
+    }
+    function renderKasbon() {
+      const rows = load(DB.kasbon);
+      dtKas.clear();
+      rows.forEach(k => dtKas.row.add({ date: k.date, note: k.note || '', amount: fmt(k.amount), remaining: fmt(k.remaining), status: (k.paid ? '<span class="badge-status-paid">Lunas</span>' : '<span class="badge-status-unpaid">Belum</span>'), DT_RowId: k.id, raw: k }));
+      dtKas.draw();
+    }
+    function renderPayments() {
+      const rows = load(DB.payments);
+      dtPay.clear();
+      rows.forEach(p => dtPay.row.add({ date: p.date, note: p.note, totalSalaries: fmt(p.totalSalaries), totalKasbon: fmt(p.totalKasbon), netPayment: fmt(p.netPayment), DT_RowId: p.id, raw: p }));
+      dtPay.draw();
+    }
+    function renderBahan() {
+      const rows = load(DB.bahan);
+      dtBahan.clear();
+      rows.forEach(b => dtBahan.row.add({ date: b.date, desc: b.desc, amount: fmt(b.amount), DT_RowId: b.id, raw: b }));
+      dtBahan.draw();
+      document.getElementById('sumBahan').textContent = fmt(rows.reduce((s, x) => s + Number(x.amount), 0));
+    }
+
+    // --- Workers CRUD ---
+    $('#formWorker').on('submit', function (e) {
+      e.preventDefault();
+      const id = $('#workerId').val() || uid();
+      const w = { id, name: $('#wName').val(), fullDay: Number($('#wFull').val()), partDay: Number($('#wPart').val()), status: $('#wStatus').val() };
+      let arr = load(DB.workers); const idx = arr.findIndex(x => x.id == id); if (idx >= 0) arr[idx] = w; else arr.push(w);
+      save(DB.workers, arr);
+      this.reset(); $('#workerId').val(''); renderWorkers(); alert('Tukang tersimpan');
+    });
+    $('#resetWorker').on('click', function () { $('#formWorker')[0].reset(); $('#workerId').val('') });
+    $('#tblWorkers tbody').on('click', '.edit-worker', function () { const id = $(this).data('id'); const w = load(DB.workers).find(x => x.id == id); if (!w) return; $('#workerId').val(w.id); $('#wName').val(w.name); $('#wFull').val(w.fullDay); $('#wPart').val(w.partDay); $('#wStatus').val(w.status); showView('workers'); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    $('#tblWorkers tbody').on('click', '.del-worker', function () { if (!confirm('Hapus tukang ini?')) return; const id = $(this).data('id'); let arr = load(DB.workers); arr = arr.filter(x => x.id != id); save(DB.workers, arr); renderWorkers(); alert('Terhapus') });
+
+    // --- Attendance ---
+    $('#formAtt').on('submit', function (e) { e.preventDefault(); const a = { id: uid(), date: $('#attDate').val(), workerId: $('#attWorker').val(), type: $('#attType').val() }; let arr = load(DB.attendance); arr.push(a); save(DB.attendance, arr); this.reset(); renderAttendance(); alert('Absensi tersimpan'); });
+
+    $('#tblAtt tbody').on('click', '.del-att', function () { if (!confirm('Hapus absensi?')) return; const id = $(this).data('id'); let arr = load(DB.attendance); arr = arr.filter(x => x.id != id); save(DB.attendance, arr); renderAttendance(); alert('Terhapus'); });
+
+    // --- Generate salaries from attendance (with remaining) ---
+    $('#genSalaries').on('click', function () {
+      const att = load(DB.attendance); let sal = load(DB.salaries); const workers = load(DB.workers).reduce((a, b) => { a[b.id] = b; return a }, {});
+      att.forEach(a => {
+        if (!sal.find(s => s.date == a.date && s.workerId == a.workerId)) {
+          const amount = a.type == 'fullday' ? (workers[a.workerId]?.fullDay || 0) : (workers[a.workerId]?.partDay || 0);
+          sal.push({ id: uid(), date: a.date, workerId: a.workerId, type: a.type, amount: Number(amount), remaining: Number(amount), paid: false });
+        }
+      });
+      save(DB.salaries, sal); renderSalaries(); alert('Generate selesai');
+    });
+
+    // salaries actions
+    $('#refreshSalaries').on('click', renderSalaries);
+    $('#selAllSal').on('change', function () { $('.sel-sal').prop('checked', this.checked) });
+    $('#tblSalaries tbody').on('click', '.pay-sal', function () {
+      const id = $(this).data('id'); // mark fully paid
+      let sal = load(DB.salaries); sal.forEach(s => { if (s.id == id) { s.remaining = 0; s.paid = true } }); save(DB.salaries, sal); renderSalaries(); alert('Ditandai dibayar');
+    });
+    $('#tblSalaries tbody').on('click', '.undo-sal', function () { const id = $(this).data('id'); let sal = load(DB.salaries); sal.forEach(s => { if (s.id == id) { s.paid = false; s.remaining = s.amount } }); save(DB.salaries, sal); renderSalaries(); alert('Dibatalkan'); });
+    $('#markPaidSelected').on('click', function () { const ids = Array.from(document.querySelectorAll('.sel-sal:checked')).map(i => i.dataset.id); if (!ids.length) { alert('Pilih minimal 1 gaji'); return } let sal = load(DB.salaries); sal.forEach(s => { if (ids.includes(s.id)) { s.remaining = 0; s.paid = true } }); save(DB.salaries, sal); renderSalaries(); alert('Beberapa gaji ditandai dibayar'); });
+
+    // --- Kasbon CRUD (keterangan & bukti image), with remaining support ---
+    $('#formKasbon').on('submit', function (e) {
+      e.preventDefault(); const id = $('#kasId').val() || uid(); const file = $('#kasBuktiFile')[0].files[0]; if (file) { const reader = new FileReader(); reader.onload = function (ev) { saveKasbonWithBukti(id, ev.target.result) }; reader.readAsDataURL(file); } else saveKasbonWithBukti(id, ''); function saveKasbonWithBukti(id, b64) {
+        const kExisting = load(DB.kasbon); const idx = kExisting.findIndex(x => x.id == id); const k = {
+          id, date: $('#kasDate').val(), note: $('#kasNote').val(), amount: Number($('#kasAmount').val()), remaining: Number($('#kasId').val() ? ($('#kasAmount').val()) : $('#kasAmount').val()), // if edit will override below
+          bukti: b64, paid: false
+        }; // if editing, keep previous remaining if present
+        if (idx >= 0) {
+          kExisting[idx].date = k.date; kExisting[idx].note = k.note; // only update amount & remaining if changed - keep previous remaining proportionally
+          const old = kExisting[idx];
+          // if editing and original amount changed, adjust remaining proportionally if not fully paid
+          if (!old.paid) {
+            const delta = Number($('#kasAmount').val()) - old.amount;
+            k.remaining = Math.max(0, old.remaining + delta);
+          } else {
+            k.remaining = 0;
+            k.paid = true;
+          }
+          kExisting[idx] = Object.assign({}, old, k);
+        } else {
+          k.remaining = Number($('#kasAmount').val());
+          kExisting.push(k);
+        }
+        save(DB.kasbon, kExisting); $('#formKasbon')[0].reset(); $('#kasId').val(''); renderKasbon(); alert('Kasbon tersimpan');
+      }
+    });
+
+    // edit & delete kasbon
+    $('#tblKasbon tbody').on('click', '.edit-kas', function () { const id = $(this).data('id'); const k = load(DB.kasbon).find(x => x.id == id); if (!k) return; $('#kasId').val(k.id); $('#kasDate').val(k.date); $('#kasNote').val(k.note || ''); $('#kasAmount').val(k.amount); showView('kas'); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    $('#tblKasbon tbody').on('click', '.del-kas', function () { if (!confirm('Hapus kasbon?')) return; const id = $(this).data('id'); let arr = load(DB.kasbon); arr = arr.filter(x => x.id != id); save(DB.kasbon, arr); renderKasbon(); alert('Terhapus'); });
+
+    // --- Payments (serah terima) dynamic modal & actions ---
+    function computeUnpaid() { const sal = load(DB.salaries).filter(s => s.remaining > 0); const kas = load(DB.kasbon).filter(k => k.remaining > 0); const totalS = sal.reduce((a, b) => a + Number(b.remaining), 0); const totalK = kas.reduce((a, b) => a + Number(b.remaining), 0); document.getElementById('sumUnpaidSalaries').textContent = fmt(totalS); document.getElementById('sumUnpaidKasbon').textContent = fmt(totalK); document.getElementById('netPayment').textContent = fmt(Math.max(0, totalS - totalK)); return { salUnpaid: sal, kasUnpaid: kas, totalS, totalK }; }
+
+    // Open payment modal
+    $('#openPaymentModal').on('click', function () {
+      const c = computeUnpaid();
+      const sal = c.salUnpaid; const kas = c.kasUnpaid;
+      const modal = document.createElement('div'); modal.className = 'simple-modal'; const card = document.createElement('div'); card.className = 'card p-3 card-small';
+      let html = `<h5>Serah Terima - Pilih Item & Nominal</h5><div class="small-note mb-2">Ubah nominal dibayar tiap baris (bisa partial). Pilih mode cepat: bayar gaji saja / kasbon saja / semua / custom.</div>`;
+      html += `<div class="d-flex gap-2 mb-2"><button id="payModeAll" class="btn btn-sm btn-outline-primary">Bayar Semua</button><button id="payModeGaji" class="btn btn-sm btn-outline-success">Bayar Gaji Saja</button><button id="payModeKas" class="btn btn-sm btn-outline-warning">Bayar Kasbon Saja</button><button id="payModeCancel" class="btn btn-sm btn-secondary">Batal</button></div>`;
+      html += `<div style="max-height:320px;overflow:auto">`;
+      html += `<h6>Gaji (belum lunas)</h6>`;
+      if (sal.length === 0) html += `<div class="p-2 text-muted">Tidak ada gaji belum lunas</div>`;
+      else {
+        html += `<table class="table table-sm"><thead><tr><th>#</th><th>Tanggal</th><th>Tukang</th><th>Jumlah</th><th>Sisa</th><th>Bayar</th></tr></thead><tbody>`;
+        const workers = load(DB.workers).reduce((a, b) => { a[b.id] = b.name; return a }, {});
+        sal.forEach((s, i) => html += `<tr><td><input type="checkbox" class="sel-pay-sal" data-id="${s.id}" checked></td><td>${s.date}</td><td>${workers[s.workerId] || '-'}</td><td>${fmt(s.amount)}</td><td>${fmt(s.remaining)}</td><td><input class="form-control form-control-sm pay-input-sal" data-id="${s.id}" value="${s.remaining}" type="number" min="0" max="${s.remaining}" /></td></tr>`);
+        html += `</tbody></table>`;
+      }
+      html += `<h6>Kasbon (belum lunas)</h6>`;
+      if (kas.length === 0) html += `<div class="p-2 text-muted">Tidak ada kasbon belum lunas</div>`;
+      else {
+        html += `<table class="table table-sm"><thead><tr><th>#</th><th>Tanggal</th><th>Keterangan</th><th>Jumlah</th><th>Sisa</th><th>Bayar</th></tr></thead><tbody>`;
+        kas.forEach((k, i) => html += `<tr><td><input type="checkbox" class="sel-pay-kas" data-id="${k.id}" checked></td><td>${k.date}</td><td>${k.note || '-'}</td><td>${fmt(k.amount)}</td><td>${fmt(k.remaining)}</td><td><input class="form-control form-control-sm pay-input-kas" data-id="${k.id}" value="${k.remaining}" type="number" min="0" max="${k.remaining}" /></td></tr>`);
+        html += `</tbody></table>`;
+      }
+      html += `</div>`;
+      html += `<div class="d-flex gap-2 mt-2"><button id="savePay" class="btn btn-primary">Simpan Serah Terima (Simpan & Cetak PDF)</button><button id="savePayNoPdf" class="btn btn-outline-primary">Simpan (tanpa cetak)</button><button id="closeModal" class="btn btn-secondary">Tutup</button></div>`;
+      card.innerHTML = html; modal.appendChild(card); document.getElementById('modalRoot').appendChild(modal);
+
+      // mode buttons
+      $('#payModeCancel').on('click', () => { modal.remove(); });
+      $('#payModeAll').on('click', () => {
+        document.querySelectorAll('.sel-pay-sal,.sel-pay-kas').forEach(ch => ch.checked = true);
+        document.querySelectorAll('.pay-input-sal,.pay-input-kas').forEach(inp => { inp.value = Number(inp.max || inp.value) });
+      });
+      $('#payModeGaji').on('click', () => { document.querySelectorAll('.sel-pay-sal').forEach(ch => ch.checked = true); document.querySelectorAll('.sel-pay-kas').forEach(ch => ch.checked = false); });
+      $('#payModeKas').on('click', () => { document.querySelectorAll('.sel-pay-kas').forEach(ch => ch.checked = true); document.querySelectorAll('.sel-pay-sal').forEach(ch => ch.checked = false); });
+
+      function collectAndSave(doPdf) {
+        // collect selected with amounts (ensure numeric)
+        const salSelected = Array.from(document.querySelectorAll('.sel-pay-sal:checked')).map(cb => {
+          const id = cb.dataset.id;
+          const input = document.querySelector(`.pay-input-sal[data-id="${id}"]`);
+          const val = Math.max(0, Number(input.value || 0));
+          return { id, paidAmount: val };
+        });
+        const kasSelected = Array.from(document.querySelectorAll('.sel-pay-kas:checked')).map(cb => {
+          const id = cb.dataset.id;
+          const input = document.querySelector(`.pay-input-kas[data-id="${id}"]`);
+          const val = Math.max(0, Number(input.value || 0));
+          return { id, paidAmount: val };
+        });
+        if (salSelected.length === 0 && kasSelected.length === 0) { alert('Pilih minimal 1 item untuk diserahkan'); return; }
+        // build payment record with details
+        const salaries = load(DB.salaries);
+        const kasbon = load(DB.kasbon);
+        const hari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+        const bulan = [
+          "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+          "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+        ];
+
+        const salaryDetails = salSelected.map(s => {
+          const orig = salaries.find(x => x.id == s.id);
+          const d = new Date(orig.date);
+          return { id: s.id, date: `${hari[d.getDay()]}, ${d.getDate()} ${bulan[d.getMonth()]} ${d.getFullYear()}`, workerName: (load(DB.workers).find(w => w.id == orig.workerId) || {}).name || '-', shiff: orig.type, originalAmount: orig.amount, paidAmount: s.paidAmount };
+        });
+        const kasDetails = kasSelected.map(k => {
+          const orig = kasbon.find(x => x.id == k.id);
+          const d = new Date(orig.date);
+          return { id: k.id, date: `${hari[d.getDay()]}, ${d.getDate()} ${bulan[d.getMonth()]} ${d.getFullYear()}`, note: orig.note || '', originalAmount: orig.amount, paidAmount: k.paidAmount };
+        });
+        // compute totals
+        const totalSalaries = salaryDetails.reduce((a, b) => a + Number(b.paidAmount || 0), 0);
+        const totalKasbon = kasDetails.reduce((a, b) => a + Number(b.paidAmount || 0), 0);
+        const netPayment = Math.max(0, totalSalaries - totalKasbon);
+        const note = prompt('Keterangan serah terima (opsional)', 'Serah terima pembayaran') || '';
+        const p = { id: uid(), date: new Date().toISOString().slice(0, 10), note, totalSalaries, totalKasbon, netPayment, salaryDetails, kasDetails };
+        // save record
+        let payments = load(DB.payments); payments.unshift(p); save(DB.payments, payments);
+        // apply payments to underlying items: decrease remaining, mark paid if <=0
+        let salArr = load(DB.salaries);
+        salaryDetails.forEach(d => {
+          const s = salArr.find(x => x.id == d.id);
+          if (s) {
+            s.remaining = Math.max(0, Number(s.remaining) - Number(d.paidAmount));
+            if (s.remaining <= 0) s.paid = true;
+          }
+        });
+        save(DB.salaries, salArr);
+        let kasArr = load(DB.kasbon);
+        kasDetails.forEach(d => {
+          const k = kasArr.find(x => x.id == d.id);
+          if (k) {
+            k.remaining = Math.max(0, Number(k.remaining) - Number(d.paidAmount));
+            if (k.remaining <= 0) k.paid = true;
+          }
+        });
+        save(DB.kasbon, kasArr);
+        renderSalaries(); renderKasbon(); renderPayments(); computeUnpaid();
+        modal.remove();
+        alert('Serah terima tersimpan.');
+        if (doPdf) generatePaymentPDF(p);
+      }
+
+      $('#savePay').on('click', () => collectAndSave(true));
+      $('#savePayNoPdf').on('click', () => collectAndSave(false));
+      $('#closeModal').on('click', () => modal.remove());
+    });
+
+    // payments table actions: lunas (mark all items in record as paid fully), undo, pdf, delete
+    $('#tblPayments tbody').on('click', '.lunas-pay', function () {
+      const id = $(this).data('id'); const p = load(DB.payments).find(x => x.id == id); if (!p) return;
+      let salArr = load(DB.salaries); p.salaryDetails.forEach(d => { const s = salArr.find(x => x.id == d.id); if (s) { s.remaining = 0; s.paid = true } }); save(DB.salaries, salArr);
+      let kasArr = load(DB.kasbon); p.kasDetails.forEach(d => { const k = kasArr.find(x => x.id == d.id); if (k) { k.remaining = 0; k.paid = true } }); save(DB.kasbon, kasArr);
+      renderSalaries(); renderKasbon(); alert('Semua item pada serah terima sudah ditandai lunas.');
+    });
+
+    $('#tblPayments tbody').on('click', '.undo-pay', function () {
+      const id = $(this).data('id'); const p = load(DB.payments).find(x => x.id == id); if (!p) return;
+      // reverse by adding back paidAmount into remaining (but not exceeding original amount)
+      let salArr = load(DB.salaries);
+      p.salaryDetails.forEach(d => { const s = salArr.find(x => x.id == d.id); if (s) { s.remaining = Math.min(s.amount, Number(s.remaining) + Number(d.paidAmount)); s.paid = s.remaining <= 0 ? true : false } });
+      save(DB.salaries, salArr);
+      let kasArr = load(DB.kasbon);
+      p.kasDetails.forEach(d => { const k = kasArr.find(x => x.id == d.id); if (k) { k.remaining = Math.min(k.amount, Number(k.remaining) + Number(d.paidAmount)); k.paid = k.remaining <= 0 ? true : false } });
+      save(DB.kasbon, kasArr);
+      renderSalaries(); renderKasbon(); alert('Status serah terima berhasil diurungkan');
+    });
+
+    $('#tblPayments tbody').on('click', '.del-pay', function () {
+      if (!confirm('Hapus serah terima ini? (tidak akan memengaruhi status pembayaran sebelumnya)')) return;
+      const id = $(this).data('id'); let arr = load(DB.payments); arr = arr.filter(x => x.id != id); save(DB.payments, arr); renderPayments(); alert('Dihapus');
+    });
+
+    // PDF generation for a payment record
+    function generatePaymentPDF(p) {
+      // Pastikan fungsi fmt, load, DB tersedia di konteks Anda
+      // const fmt = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(num); 
+      // const load = (dbName) => JSON.parse(localStorage.getItem(dbName) || '[]');
+
+      // style 3 - premium fintech
+      const companyName = 'Proyek Renovasi';
+      // Gunakan satu kontainer utama untuk seluruh konten PDF
+      const contentHtml = `<div style="max-width:800px;width:100%;margin:0 auto;font-family:Arial, sans-serif;color:#222;padding:10px;">
+        <!-- Header Section -->
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div><h2 style="margin:0;color:#1A73E8">${companyName}</h2><div style="font-size:12px;color:#666">Slip Serah Terima</div></div>
+          <div style="text-align:right;font-size:12px;color:#666">Tanggal: ${p.date}<br/>No: ${p.id}</div>
+        </div>
+        <hr style="border:none;border-top:6px solid #e9f2ff;margin:12px 0">
+
+        <!-- Body Content -->
+        <div style="background:#fff;padding:10px;border-radius:6px">
+          <div style="display:flex;justify-content:space-between;flex-wrap:wrap"><div><strong>Keterangan:</strong> ${p.note || '-'}</div><div style="margin-top:6px"><strong>Total Dibayar:</strong> <span style="font-size:18px;color:#1A73E8">${fmt(p.netPayment)}</span></div></div>
+          <hr/>
+
+          ${p.salaryDetails && p.salaryDetails.length ? `
+          <h5 style="margin:6px 0">Detail Gaji</h5>
+          <!-- Tambahkan style 'page-break-inside:avoid' untuk tabel agar tidak terpotong di tengah halaman jika memungkinkan -->
+          <table style="width:100%;border-collapse:collapse;font-size:12px;page-break-inside:avoid;"><thead><tr style="background:#f6f8fb"><th style="padding:8px;border:1px solid #eee;text-align:left">Tanggal</th><th style="padding:8px;border:1px solid #eee;text-align:left">Tukang</th><th style="padding:8px;border:1px solid #eee;text-align:left">Shift</th><th style="padding:8px;border:1px solid #eee;text-align:right">Nominal</th><th style="padding:8px;border:1px solid #eee;text-align:right">Dibayar</th></tr></thead><tbody>
+          ${p.salaryDetails.map(d => `
+            <tr><td style="padding:6px;border:1px solid #eee">${d.date}</td><td style="padding:6px;border:1px solid #eee">${d.workerName}</td><td style="padding:6px;border:1px solid #eee">${(load(DB.salaries).find(w => w.id == d.id) || {}).type || '-'}</td><td style="padding:6px;border:1px solid #eee;text-align:right">${fmt(d.originalAmount)}</td><td style="padding:6px;border:1px solid #eee;text-align:right">${fmt(d.paidAmount)}</td></tr>
+          `).join('')}
+          </tbody></table><br/>` : ''}
+
+          ${p.kasDetails && p.kasDetails.length ? `
+          <h5 style="margin:6px 0">Detail Kasbon</h5>
+          <table style="width:100%;border-collapse:collapse;font-size:12px;page-break-inside:avoid;"><thead><tr style="background:#f6f8fb"><th style="padding:8px;border:1px solid #eee;text-align:left">Tanggal</th><th style="padding:8px;border:1px solid #eee;text-align:left">Keterangan</th><th style="padding:8px;border:1px solid #eee;text-align:right">Nominal</th><th style="padding:8px;border:1px solid #eee;text-align:right">Dibayar</th></tr></thead><tbody>
+          ${p.kasDetails.map(d => `
+            <tr><td style="padding:6px;border:1px solid #eee">${d.date}</td><td style="padding:6px;border:1px solid #eee">${d.note || ''}</td><td style="padding:6px;border:1px solid #eee;text-align:right">${fmt(d.originalAmount)}</td><td style="padding:6px;border:1px solid #eee;text-align:right">${fmt(d.paidAmount)}</td></tr>
+          `).join('')}
+          </tbody></table><br/>` : ''}
+
+          <!-- NEW: Show unpaid obligations summary -->
+          ${(load(DB.salaries).filter(s => s.remaining > 0).length || load(DB.kasbon).filter(k => k.remaining > 0).length) ? (() => {
+          const unpaidSalaries = load(DB.salaries).filter(s => s.remaining > 0);
+          const unpaidKasbon = load(DB.kasbon).filter(k => k.remaining > 0);
+          const totalUnpaidS = unpaidSalaries.reduce((a, b) => a + Number(b.remaining), 0);
+          const totalUnpaidK = unpaidKasbon.reduce((a, b) => a + Number(b.remaining), 0);
+          return `<div style="margin-top:10px;padding:8px;border-radius:6px;background:#fff9f0;border:1px solid #fde5c6;page-break-inside:avoid;"><strong>Sisa Kewajiban Belum Lunas</strong><br/>
+              ${unpaidSalaries.length ? `<div style="margin-top:8px"><strong>Gaji (${unpaidSalaries.length}):</strong> ${fmt(totalUnpaidS)}</div>` : ''}
+              ${unpaidKasbon.length ? `<div style="margin-top:4px"><strong>Kasbon (${unpaidKasbon.length}):</strong> ${fmt(totalUnpaidK)}</div>` : ''}
+              <div style="margin-top:8px;font-weight:700">Total Sisa: ${fmt(totalUnpaidS + totalUnpaidK)}</div></div><br/>`;
+        })() : ''}
+
+          <!-- Totals -->
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding:8px;background:#f1f7ff;border-radius:6px;page-break-inside:avoid;">
+            <div style="font-size:13px;color:#555">Total Gaji: ${fmt(p.totalSalaries)}</div>
+            <div style="font-size:13px;color:#555">Total Kasbon: ${fmt(p.totalKasbon)}</div>
+            <div style="font-weight:700;font-size:16px;color:#0b63d6">Pembayaran Bersih: ${fmt(p.netPayment)}</div>
+          </div>
+
+          <!-- Signature block -->
+          <div style="margin-top:40px; page-break-inside:avoid;">
+            <div style="display:flex;justify-content:space-between;flex-wrap:wrap">
+              <div style="text-align:center;width:45%">
+                <div style="height:70px"></div>
+                <div style="border-top:2px solid #000; width:100%; margin-bottom:4px;"></div>
+                <div>Penerima</div>
+              </div>
+              <div style="text-align:center;width:45%">
+                <div style="height:70px"></div>
+                <div style="border-top:2px solid #000; width:100%; margin-bottom:4px;"></div>
+                <div>Penyerah</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Footer -->
+        <div style="margin-top:12px;font-size:11px;color:#777;page-break-inside:avoid;">Dicetak dari Aplikasi - Data tersimpan lokal</div>
+    </div>`;
+
+      const wrapper = document.createElement('div');
+      // Hanya perlu 1 wrapper, tidak perlu style tambahan karena konten sudah diatur
+      wrapper.innerHTML = contentHtml;
+      document.body.appendChild(wrapper);
+
+      // export with improved canvas options and pagebreak handling
+      setTimeout(() => {
+        html2pdf().from(wrapper).set({
+          margin: 10,
+          filename: `slip_serah_terima_${p.date}.pdf`,
+          // Opsi untuk menghindari pemotongan konten visual (seperti grafik/tabel kompleks)
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            logging: false, // Matikan logging jika tidak diperlukan
+            scrollY: 0,     // Hindari masalah posisi scroll
+            scrollHeight: wrapper.scrollHeight // Pastikan seluruh konten ditangkap
+          },
+          jsPDF: {
+            unit: 'mm',
+            format: 'a4',
+            orientation: 'portrait'
+          },
+          // Penanganan pemotongan halaman yang lebih baik
+          pagebreak: {
+            // Gunakan 'css' mode yang mengandalkan CSS 'page-break-inside: avoid'
+            // Ini lebih modern dan efektif daripada 'avoid-all' atau 'legacy'
+            mode: 'css'
+          }
+        }).save().then(() => wrapper.remove());
+      }, 500); // Mengurangi timeout menjadi 500ms (biasanya cukup)
+    }
+
+
+    // view PDF from payments list
+    $('#tblPayments tbody').on('click', '.pdf-pay', function () {
+      const id = $(this).data('id'); const p = load(DB.payments).find(x => x.id == id); if (!p) return; generatePaymentPDF(p);
+    });
+
+    // --- Bahan CRUD ---
+    $('#formBahan').on('submit', function (e) { e.preventDefault(); const id = $('#bahanId').val() || uid(); const b = { id, date: $('#bahanDate').val(), desc: $('#bahanDesc').val(), amount: Number($('#bahanAmount').val()) }; let arr = load(DB.bahan); const idx = arr.findIndex(x => x.id == id); if (idx >= 0) arr[idx] = b; else arr.push(b); save(DB.bahan, arr); this.reset(); $('#bahanId').val(''); renderBahan(); alert('Tersimpan'); });
+    $('#tblBahan tbody').on('click', '.edit-bahan', function () { const id = $(this).data('id'); const b = load(DB.bahan).find(x => x.id == id); if (!b) return; $('#bahanId').val(b.id); $('#bahanDate').val(b.date); $('#bahanDesc').val(b.desc); $('#bahanAmount').val(b.amount); showView('bahan'); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    $('#tblBahan tbody').on('click', '.del-bahan', function () { if (!confirm('Hapus bahan?')) return; const id = $(this).data('id'); let arr = load(DB.bahan); arr = arr.filter(x => x.id != id); save(DB.bahan, arr); renderBahan(); alert('Terhapus'); });
+
+    // --- Reports & Export PDF (summary) ---
+    function refreshReport() {
+      const workers = load(DB.workers);
+      const att = load(DB.attendance);
+      const sal = load(DB.salaries);
+      const kas = load(DB.kasbon);
+      const bahan = load(DB.bahan);
+      const payments = load(DB.payments);
+
+      let txt = 'REKAP DATA PROYEK RENOVASI\\n\\n';
+      txt += `TUKANG (${workers.length}):\\n` + (workers.length ? workers.map(w => `- ${w.name} (Full: ${fmt(w.fullDay)}, Part: ${fmt(w.partDay)}, ${w.status})`).join('\\n') : '- kosong -') + '\\n\\n';
+      txt += `ABSENSI (${att.length}):\\n` + (att.length ? att.map(a => `- ${a.date} | ${(load(DB.workers).find(w => w.id == a.workerId) || {}).name || a.workerId} | ${a.type}`).join('\\n') : '- kosong -') + '\\n\\n';
+      txt += `GAJI (${sal.length}):\\n` + (sal.length ? sal.map(s => `- ${s.date} | ${(load(DB.workers).find(w => w.id == s.workerId) || {}).name || s.workerId} | ${s.type} | ${fmt(s.amount)} | Sisa ${fmt(s.remaining)} | ${s.paid ? 'Lunas' : 'Belum'}`).join('\\n') : '- kosong -') + '\\n\\n';
+      txt += `KASBON (${kas.length}):\\n` + (kas.length ? kas.map(k => `- ${k.date} | ${k.note || ''} | ${fmt(k.amount)} | Sisa ${fmt(k.remaining)} | ${k.paid ? 'Lunas' : 'Belum'}`).join('\\n') : '- kosong -') + '\\n\\n';
+      // Ensure BAHAN included in text report (fix for missing)
+      txt += `BAHAN (${bahan.length}) TOTAL: ${fmt(bahan.reduce((s, x) => s + Number(x.amount), 0))}\\n` + (bahan.length ? bahan.map(b => `- ${b.date} | ${b.desc} | ${fmt(b.amount)}`).join('\\n') : '- kosong -') + '\\n\\n';
+      txt += `SERAH TERIMA (${payments.length}):\\n` + (payments.length ? payments.map(p => `- ${p.date} | ${p.note || ''} | Total Gaji ${fmt(p.totalSalaries)} | Total Kasbon ${fmt(p.totalKasbon)} | Bersih ${fmt(p.netPayment)}`).join('\\n') : '- kosong -') + '\\n';
+      document.getElementById('reportArea').textContent = txt;
+    }
+
+    // Export report PDF (improved layout)
+    $('#exportReportPdf').on('click', function () {
+      const workers = load(DB.workers);
+      const att = load(DB.attendance);
+      const sal = load(DB.salaries);
+      const kas = load(DB.kasbon);
+      const bahan = load(DB.bahan);
+      const payments = load(DB.payments);
+
+      const header = `<div style="max-width:820px;width:100%;margin:0 auto;font-family:Arial, sans-serif;color:#222"><div style="display:flex;justify-content:space-between;align-items:center"><div><h2 style="margin:0;color:#1A73E8">Proyek Renovasi</h2><div style="font-size:12px;color:#666">Laporan Rekapan</div></div><div style="text-align:right;font-size:12px;color:#666">Tanggal: ${new Date().toISOString().slice(0, 10)}</div></div><hr/>`;
+      const footer = `<div style="margin-top:18px;font-size:12px;color:#666">Dicetak dari aplikasi - Rekap lengkap tersimpan lokal.</div></div>`;
+      const tableRows = (cols, rowsHtml) => `<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:8px"><thead><tr style="background:#f1f3f5">${cols.map(c => `<th style="padding:6px;border:1px solid #eee;text-align:left">${c}</th>`).join('')}</tr></thead><tbody>${rowsHtml.join('')}</tbody></table>`;
+
+      const tukangRows = workers.map(w => `<tr><td style="padding:6px;border:1px solid #eee">${w.name}</td><td style="padding:6px;border:1px solid #eee">${fmt(w.fullDay)}</td><td style="padding:6px;border:1px solid #eee">${fmt(w.partDay)}</td><td style="padding:6px;border:1px solid #eee">${w.status}</td></tr>`);
+
+      const workersById = load(DB.workers).reduce((a, b) => { a[b.id] = b; return a; }, {});
+      const attRows = att.map(a => `<tr><td style="padding:6px;border:1px solid #eee">${a.date}</td><td style="padding:6px;border:1px solid #eee">${workersById[a.workerId]?.name || a.workerId}</td><td style="padding:6px;border:1px solid #eee">${a.type}</td></tr>`);
+
+      const salRows = sal.map(s => `<tr><td style="padding:6px;border:1px solid #eee">${s.date}</td><td style="padding:6px;border:1px solid #eee">${workersById[s.workerId]?.name || '-'}</td><td style="padding:6px;border:1px solid #eee;text-align:right">${fmt(s.amount)}</td><td style="padding:6px;border:1px solid #eee;text-align:right">${fmt(s.remaining)}</td><td style="padding:6px;border:1px solid #eee">${s.paid ? 'Lunas' : 'Belum'}</td></tr>`);
+
+      const kasRows = kas.map(k => `<tr><td style="padding:6px;border:1px solid #eee">${k.date}</td><td style="padding:6px;border:1px solid #eee">${k.note || ''}</td><td style="padding:6px;border:1px solid #eee;text-align:right">${fmt(k.amount)}</td><td style="padding:6px;border:1px solid #eee;text-align:right">${fmt(k.remaining)}</td><td style="padding:6px;border:1px solid #eee">${k.paid ? 'Lunas' : 'Belum'}</td></tr>`);
+
+      const bahanRows = bahan.map(b => `<tr><td style="padding:6px;border:1px solid #eee">${b.date}</td><td style="padding:6px;border:1px solid #eee">${b.desc}</td><td style="padding:6px;border:1px solid #eee;text-align:right">${fmt(b.amount)}</td></tr>`);
+
+      const payRows = payments.map(p => `<tr><td style="padding:6px;border:1px solid #eee">${p.date}</td><td style="padding:6px;border:1px solid #eee">${p.note || ''}</td><td style="padding:6px;border:1px solid #eee;text-align:right">${fmt(p.totalSalaries)}</td><td style="padding:6px;border:1px solid #eee;text-align:right">${fmt(p.totalKasbon)}</td><td style="padding:6px;border:1px solid #eee;text-align:right">${fmt(p.netPayment)}</td></tr>`);
+
+      const html = header
+        + `<h4 style="margin:6px 0">Tukang (${workers.length})</h4>` + (workers.length ? tableRows(["Nama", "Full", "Part", "Status"], tukangRows) : `<div style="padding:8px;border:1px solid #eee">Tidak ada tukang</div>`)
+        + `<h4 style="margin:6px 0">Absensi (${att.length})</h4>` + (att.length ? tableRows(["Tanggal", "Tukang", "Kerja"], attRows) : `<div style="padding:8px;border:1px solid #eee">Tidak ada absensi</div>`)
+        + `<h4 style="margin:6px 0">Gaji (${sal.length})</h4>` + (sal.length ? tableRows(["Tanggal", "Tukang", "Nominal", "Sisa", "Status"], salRows) : `<div style="padding:8px;border:1px solid #eee">Tidak ada data gaji</div>`)
+        + `<h4 style="margin:6px 0">Kasbon (${kas.length})</h4>` + (kas.length ? tableRows(["Tanggal", "Keterangan", "Nominal", "Sisa", "Status"], kasRows) : `<div style="padding:8px;border:1px solid #eee">Tidak ada kasbon</div>`)
+        + `<h4 style="margin:6px 0">Bahan (${bahan.length}) - Total: ${fmt(bahan.reduce((s, x) => s + Number(x.amount), 0))}</h4>` + (bahan.length ? tableRows(["Tanggal", "Deskripsi", "Jumlah"], bahanRows) : `<div style="padding:8px;border:1px solid #eee">Tidak ada pembelian bahan</div>`)
+        + `<h4 style="margin:6px 0">Serah Terima (${payments.length})</h4>` + (payments.length ? tableRows(["Tanggal", "Keterangan", "Total Gaji", "Total Kasbon", "Bersih"], payRows) : `<div style="padding:8px;border:1px solid #eee">Tidak ada serah terima</div>`)
+        + footer;
+
+      const wrapper = document.createElement('div'); wrapper.innerHTML = html; document.body.appendChild(wrapper);
+      html2pdf().from(wrapper).set({
+        margin: 10,
+        filename: `laporan_rekap_${new Date().toISOString().slice(0, 10)}.pdf`,
+        html2canvas: { scale: 2, useCORS: true, allowTaint: true }
+      }).save().then(() => wrapper.remove());
+    });
+
+    $('#refreshReport').on('click', refreshReport);
+
+    // Init
+    $(document).ready(function () {
+      initTables(); populateWorkerSelects();
+      // initialize default data structures (if not present) - ensure salaries & kasbon have remaining if old data lacks it
+      if (!localStorage.getItem(DB.workers)) save(DB.workers, []);
+      if (!localStorage.getItem(DB.attendance)) save(DB.attendance, []);
+      if (!localStorage.getItem(DB.salaries)) save(DB.salaries, []);
+      if (!localStorage.getItem(DB.kasbon)) save(DB.kasbon, []);
+      if (!localStorage.getItem(DB.payments)) save(DB.payments, []);
+      if (!localStorage.getItem(DB.bahan)) save(DB.bahan, []);
+      // migrate old salaries/kasbon: add remaining field if missing
+      const salaries = load(DB.salaries).map(s => { if (typeof s.remaining === 'undefined') { s.remaining = Number(s.amount); s.paid = s.remaining <= 0 ? true : false } return s }); save(DB.salaries, salaries);
+      const kasbon = load(DB.kasbon).map(k => { if (typeof k.remaining === 'undefined') { k.remaining = Number(k.amount); k.paid = k.remaining <= 0 ? true : false } return k }); save(DB.kasbon, kasbon);
+
+      renderWorkers(); renderAttendance(); renderSalaries(); renderKasbon(); renderPayments(); renderBahan(); computeUnpaid();
+    });
+
+    // Simple PWA service worker via blob
+    const swCode = `self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',e=>{e.waitUntil(clients.claim())});self.addEventListener('fetch',e=>{e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)))})`;
+    if ('serviceWorker' in navigator) { const blob = new Blob([swCode], { type: 'application/javascript' }); const swUrl = URL.createObjectURL(blob); navigator.serviceWorker.register(swUrl).then(() => console.log('SW registered')).catch(() => { }); }
+
+    // Install prompt
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; document.getElementById('installBtn').style.display = 'inline-block'; document.getElementById('installBtn').onclick = async () => { deferredPrompt.prompt(); const choice = await deferredPrompt.userChoice; deferredPrompt = null; document.getElementById('installBtn').style.display = 'none'; } });
+
+    // ------------------------------
+    // Backup: Export & Import (JSON)
+    // ------------------------------
+    function exportBackup() {
+      const data = {
+        workers: load(DB.workers),
+        attendance: load(DB.attendance),
+        salaries: load(DB.salaries),
+        kasbon: load(DB.kasbon),
+        payments: load(DB.payments),
+        bahan: load(DB.bahan)
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "backup_renovasi_" + new Date().toISOString().slice(0, 10) + ".json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+    function importBackupFile(file) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (!confirm('Impor backup akan menggantikan data saat ini. Lanjutkan?')) return;
+          if (data.workers !== undefined) save(DB.workers, data.workers);
+          if (data.attendance !== undefined) save(DB.attendance, data.attendance);
+          if (data.salaries !== undefined) save(DB.salaries, data.salaries);
+          if (data.kasbon !== undefined) save(DB.kasbon, data.kasbon);
+          if (data.payments !== undefined) save(DB.payments, data.payments);
+          if (data.bahan !== undefined) save(DB.bahan, data.bahan);
+          alert('Backup berhasil dipulihkan. Halaman akan dimuat ulang untuk menerapkan perubahan.');
+          location.reload();
+        } catch (err) {
+          alert('Gagal membaca file backup: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // UI bindings for backup buttons
+    document.getElementById('exportBackupBtn').addEventListener('click', exportBackup);
+    document.getElementById('importBackupInput').addEventListener('change', function (e) {
+      const f = e.target.files[0];
+      if (f) importBackupFile(f);
+    });
+
+  </script>
+</body>
+
+</html>
