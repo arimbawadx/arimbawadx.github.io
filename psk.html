@@ -258,7 +258,7 @@
             // map untuk DataTable (format tanggal + satu kolom nominal tiap sisi)
             const dtRows = rows.map(r => ({
                 id: r.id,
-                tanggal: formatTanggalIndo(r.tanggal),
+                tanggal: r.tanggal,
                 kategori: r.kategori,
                 uraian: r.uraian,
                 pemasukan: Number(r.pemasukan || 0),
