@@ -884,7 +884,7 @@
           ${p.salaryDetails && p.salaryDetails.length ? `
           <h5 style="margin:6px 0">Detail Gaji</h5>
           <!-- Tambahkan style 'page-break-inside:avoid' untuk tabel agar tidak terpotong di tengah halaman jika memungkinkan -->
-          <table style="width:100%;border-collapse:collapse;font-size:12px;page-break-inside:avoid;"><thead><tr style="background:#f6f8fb"><th style="padding:8px;border:1px solid #eee;text-align:left">Tanggal</th><th style="padding:8px;border:1px solid #eee;text-align:left">Tukang</th><th style="padding:8px;border:1px solid #eee;text-align:left">Shift</th><th style="padding:8px;border:1px solid #eee;text-align:right">Nominal</th><th style="padding:8px;border:1px solid #eee;text-align:right">Dibayar</th></tr></thead><tbody>
+          <table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr style="background:#f6f8fb"><th style="padding:8px;border:1px solid #eee;text-align:left">Tanggal</th><th style="padding:8px;border:1px solid #eee;text-align:left">Tukang</th><th style="padding:8px;border:1px solid #eee;text-align:left">Shift</th><th style="padding:8px;border:1px solid #eee;text-align:right">Nominal</th><th style="padding:8px;border:1px solid #eee;text-align:right">Dibayar</th></tr></thead><tbody>
           ${p.salaryDetails.map(d => `
             <tr><td style="padding:6px;border:1px solid #eee">${d.date}</td><td style="padding:6px;border:1px solid #eee">${d.workerName}</td><td style="padding:6px;border:1px solid #eee">${(load(DB.salaries).find(w => w.id == d.id) || {}).type || '-'}</td><td style="padding:6px;border:1px solid #eee;text-align:right">${fmt(d.originalAmount)}</td><td style="padding:6px;border:1px solid #eee;text-align:right">${fmt(d.paidAmount)}</td></tr>
           `).join('')}
@@ -892,7 +892,7 @@
 
           ${p.kasDetails && p.kasDetails.length ? `
           <h5 style="margin:6px 0">Detail Kasbon</h5>
-          <table style="width:100%;border-collapse:collapse;font-size:12px;page-break-inside:avoid;"><thead><tr style="background:#f6f8fb"><th style="padding:8px;border:1px solid #eee;text-align:left">Tanggal</th><th style="padding:8px;border:1px solid #eee;text-align:left">Keterangan</th><th style="padding:8px;border:1px solid #eee;text-align:right">Nominal</th><th style="padding:8px;border:1px solid #eee;text-align:right">Dibayar</th></tr></thead><tbody>
+          <table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr style="background:#f6f8fb"><th style="padding:8px;border:1px solid #eee;text-align:left">Tanggal</th><th style="padding:8px;border:1px solid #eee;text-align:left">Keterangan</th><th style="padding:8px;border:1px solid #eee;text-align:right">Nominal</th><th style="padding:8px;border:1px solid #eee;text-align:right">Dibayar</th></tr></thead><tbody>
           ${p.kasDetails.map(d => `
             <tr><td style="padding:6px;border:1px solid #eee">${d.date}</td><td style="padding:6px;border:1px solid #eee">${d.note || ''}</td><td style="padding:6px;border:1px solid #eee;text-align:right">${fmt(d.originalAmount)}</td><td style="padding:6px;border:1px solid #eee;text-align:right">${fmt(d.paidAmount)}</td></tr>
           `).join('')}
@@ -904,21 +904,21 @@
           const unpaidKasbon = load(DB.kasbon).filter(k => k.remaining > 0);
           const totalUnpaidS = unpaidSalaries.reduce((a, b) => a + Number(b.remaining), 0);
           const totalUnpaidK = unpaidKasbon.reduce((a, b) => a + Number(b.remaining), 0);
-          return `<div style="margin-top:10px;padding:8px;border-radius:6px;background:#fff9f0;border:1px solid #fde5c6;page-break-inside:avoid;"><strong>Sisa Kewajiban Belum Lunas</strong><br/>
+          return `<div style="margin-top:10px;padding:8px;border-radius:6px;background:#fff9f0;border:1px solid #fde5c6;"><strong>Sisa Kewajiban Belum Lunas</strong><br/>
               ${unpaidSalaries.length ? `<div style="margin-top:8px"><strong>Gaji (${unpaidSalaries.length}):</strong> ${fmt(totalUnpaidS)}</div>` : ''}
               ${unpaidKasbon.length ? `<div style="margin-top:4px"><strong>Kasbon (${unpaidKasbon.length}):</strong> ${fmt(totalUnpaidK)}</div>` : ''}
               <div style="margin-top:8px;font-weight:700">Total Sisa: ${fmt(totalUnpaidS + totalUnpaidK)}</div></div><br/>`;
         })() : ''}
 
           <!-- Totals -->
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding:8px;background:#f1f7ff;border-radius:6px;page-break-inside:avoid;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding:8px;background:#f1f7ff;border-radius:6px;">
             <div style="font-size:13px;color:#555">Total Gaji: ${fmt(p.totalSalaries)}</div>
             <div style="font-size:13px;color:#555">Total Kasbon: ${fmt(p.totalKasbon)}</div>
             <div style="font-weight:700;font-size:16px;color:#0b63d6">Pembayaran Bersih: ${fmt(p.netPayment)}</div>
           </div>
 
           <!-- Signature block -->
-          <div style="margin-top:40px; page-break-inside:avoid;">
+          <div style="margin-top:40px; ">
             <div style="display:flex;justify-content:space-between;flex-wrap:wrap">
               <div style="text-align:center;width:45%">
                 <div style="height:70px"></div>
@@ -934,7 +934,7 @@
           </div>
         </div>
         <!-- Footer -->
-        <div style="margin-top:12px;font-size:11px;color:#777;page-break-inside:avoid;">Dicetak dari Aplikasi - Data tersimpan lokal</div>
+        <div style="margin-top:12px;font-size:11px;color:#777;">Dicetak dari Aplikasi - Data tersimpan lokal</div>
     </div>`;
 
       const wrapper = document.createElement('div');
