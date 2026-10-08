@@ -354,17 +354,51 @@ $('#bPdf').onclick = () => {
   const all = rows(), a = $('#d1').value, b = $('#d2').value, list = filtered(all);
   const awal = a ? all.filter(t => t.tanggal < a).reduce((s, t) => s + (t.jenis === 'Masuk' ? t.jumlah : -t.jumlah), 0) : 0;
   const tm = list.filter(t => t.jenis === 'Masuk').reduce((s, t) => s + t.jumlah, 0), tk = list.filter(t => t.jenis === 'Keluar').reduce((s, t) => s + t.jumlah, 0);
+  
+  // PERBAIKAN: Susun HTML khusus untuk lampiran Bukti Foto
+  const lampiran = list.filter(t => t.fileId);
+  const htmlLampiran = lampiran.length ? `
+    <div style="page-break-before:always; text-align:center;">
+      <h2 style="border-bottom:3px solid #1e40af; padding-bottom:8px; margin-bottom:14px; color:#1e40af;">LAMPIRAN BUKTI TRANSAKSI</h2>
+      ${lampiran.map((t, i) => `
+        <div style="margin-top:20px; border:1px solid #cbd5e1; padding:10px; break-inside:avoid; border-radius:8px;">
+          <p style="margin:0 0 10px;"><b>Lampiran #${i+1}:</b> ${tgl(t.tanggal)} -${esc(t.keterangan)}</p>
+          <img src="https://drive.google.com/uc?export=view&id=${encodeURIComponent(t.fileId)}" style="max-width:90%; max-height:400px; border:1px solid #cbd5e1; border-radius:6px; object-fit:contain;">
+        </div>
+      `).join('')}
+    </div>
+  ` : '';
+
   const w = window.open('', '_blank'); if (!w) return toast('Izinkan pop-up untuk ekspor');
   w.document.write(`<!doctype html><meta charset="utf-8"><title>ArusKas_${esc(ent.nama)}</title><style>
 body{font:12px system-ui,Arial;color:#0f172a;margin:24px}.kop{text-align:center;border-bottom:3px solid #1e40af;padding-bottom:8px;margin-bottom:14px}.kop h1{margin:0;font-size:20px;color:#1e40af;text-transform:uppercase}.kop p{margin:3px 0;color:#64748b}
 table{width:100%;border-collapse:collapse;margin-top:10px}th{background:#2563eb;color:#fff}th,td{border:1px solid #cbd5e1;padding:6px 8px}td.r{text-align:right}tfoot td{background:#e6efff;font-weight:700}tr{break-inside:avoid}</style>
 <div class="kop"><h1>${esc(ent.kopJudul)}</h1><p>${esc(ent.kopSub)}</p></div>
-<div><b>Catatan:</b> ${esc(ent.nama)}<br><b>Periode:</b> ${a ? tgl(a) : 'Awal'} s/d ${b ? tgl(b) : 'Akhir'}</div>
+<div style="margin-bottom:15px; font-size:13px;"><b>Catatan:</b> ${esc(ent.nama)}<br><b>Periode:</b> ${a ? tgl(a) : 'Awal'} s/d ${b ? tgl(b) : 'Akhir'}</div>
 <table><thead><tr><th>Tanggal</th><th>Keterangan</th><th>Kas masuk</th><th>Kas keluar</th><th>Saldo</th></tr></thead><tbody>
-${a ? `<tr><td>-</td><td><i>Saldo sebelumnya</i></td><td></td><td></td><td class="r">${fmt(awal)}</td></tr>` : ''}
+${a ? `<tr><td>-</td><td><i>Saldo sebelumnya</i></td><td></td><td></td><td class="r"><b>${fmt(awal)}</b></td></tr>` : ''}
 ${list.map(t => `<tr><td>${tgl(t.tanggal)}</td><td>${esc(t.keterangan)}</td><td class="r">${t.jenis === 'Masuk' ? fmt(t.jumlah) : '-'}</td><td class="r">${t.jenis === 'Keluar' ? fmt(t.jumlah) : '-'}</td><td class="r">${fmt(t.saldo)}</td></tr>`).join('')}
-</tbody><tfoot><tr><td colspan="2" style="text-align:center">TOTAL</td><td class="r">${fmt(tm)}</td><td class="r">${fmt(tk)}</td><td class="r">${fmt(awal + tm - tk)}</td></tr></tfoot></table>`);
-  w.document.close(); w.onload = () => w.print(); setTimeout(() => w.print(), 600);
+</tbody><tfoot><tr><td colspan="2" style="text-align:center">TOTAL SALDO AKHIR</td><td class="r">${fmt(tm)}</td><td class="r">${fmt(tk)}</td><td class="r">${fmt(awal + tm - tk)}</td></tr></tfoot></table>
+${htmlLampiran}`); // HTML lampiran disisipkan di sini
+  w.document.close(); 
+  
+  // PERBAIKAN: Tunggu semua gambar selesai diunduh sebelum memicu fungsi Cetak PDF
+  const imgs = w.document.querySelectorAll('img');
+  let loaded = 0;
+  const doPrint = () => { w.print(); };
+  
+  if (imgs.length === 0) {
+    setTimeout(doPrint, 500); // Jika tak ada foto, langsung cetak
+  } else {
+    imgs.forEach(img => {
+      if (img.complete) { loaded++; } else {
+        img.onload = () => { loaded++; if(loaded === imgs.length) setTimeout(doPrint, 300); };
+        img.onerror = () => { loaded++; if(loaded === imgs.length) setTimeout(doPrint, 300); };
+      }
+    });
+    if (loaded === imgs.length) setTimeout(doPrint, 300);
+    setTimeout(doPrint, 4000); // Fallback: Cetak otomatis maksimal jika setelah 4 detik ada gambar yg gagal muat
+  }
 };
 
 /* ---------- Login / sesi ---------- */
