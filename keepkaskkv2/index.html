@@ -410,7 +410,9 @@ $('#bAddEnt').onclick = () => openEnt('');
 function openEnt(id) {
   const e = S.ents.find(x => x.id === id); editEnt = e ? e.id : '';
   $('#dEntT').textContent = e ? 'Ubah Catatan' : 'Catatan Baru';
-  $('#eN').value = e?.nama \vert{}\vert{} ''; $('#eJ').value = e?.kopJudul || 'LAPORAN KAS'; $('#eS').value = e?.kopSub || '';
+  $('#eN').value = e?.nama || ''; 
+  $('#eJ').value = e?.kopJudul || 'LAPORAN KAS'; 
+  $('#eS').value = e?.kopSub || '';
   $('#dEnt').showModal();
 }
 $('#fEnt').onsubmit = e => {
