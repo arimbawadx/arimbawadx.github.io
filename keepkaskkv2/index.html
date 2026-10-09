@@ -205,7 +205,7 @@ dialog::backdrop { background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); }
 <script>
 'use strict';
 // MASUKKAN URL EXEC API GOOGLE APPS SCRIPT V4 ANDA DI SINI
-const API = 'https://script.google.com/macros/s/AKfycbxPCN7Slsb70dO3hX6nte4spSuvXG4-oXhwpmNalvplZjlJUnPJ_pG3GDY8yC7u-7thmQ/exec'; 
+const API = 'https://script.google.com/macros/s/AKfycbzIQygUeUiUWC-fgdeO3j3t_o_88kYsUyI8Qee0Ssuo9qWlqx856EPsUE81hRjiBlIH6Q/exec'; 
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -214,6 +214,18 @@ const fmt = n => (n < 0 ? '-' : '') + 'Rp ' + Math.abs(Math.round(n)).toString()
 const BLN = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
 const tglFormat = s => { if(!s) return ''; const [y, m, d] = String(s).split('-'); return `${+d} ${BLN[m - 1]} ${y}`; };
 const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+
+/* --- FUNGSI TOAST YANG SEBELUMNYA HILANG --- */
+let tT; 
+function toast(m) { 
+  const t = $('#toast'); 
+  if(!t) return; 
+  t.textContent = m; 
+  t.classList.add('show'); 
+  clearTimeout(tT); 
+  tT = setTimeout(() => t.classList.remove('show'), 2500); 
+}
+/* ------------------------------------------- */
 
 /* --- BULLETPROOF SYNC ENGINE (ANTI-LAG) --- */
 let S = { token: '', ents: [], txs: [], q: [], active: '', last: 0 };
