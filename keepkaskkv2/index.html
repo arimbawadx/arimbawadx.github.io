@@ -392,13 +392,29 @@ $('#bDelTx').onclick = () => { if (confirm('Hapus transaksi ini?')) { $('#dTx').
 /* --- Resize Gambar di HP --- */
 function shrink(file) { 
   return new Promise((ok, no) => {
+    // Jika bukan gambar (misal file PDF di-upload tak sengaja), kembalikan Base64 langsung
+    if (!file.type.startsWith('image/')) {
+      const r = new FileReader();
+      r.onload = e => ok({ name: file.name, mime: file.type, data: e.target.result.split(',')[1] });
+      r.onerror = no;
+      r.readAsDataURL(file);
+      return;
+    }
+
+    // Jika Gambar, Kecilkan ukurannya agar ringan
     const img = new Image();
     img.onload = () => {
-      const k = Math.min(1, 1024 / Math.max(img.width, img.height)), c = document.createElement('canvas');
-      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      const k = Math.min(1, 800 / Math.max(img.width, img.height)); // Max resolusi 800px
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width * k); 
+      c.height = Math.round(img.height * k);
       c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
       URL.revokeObjectURL(img.src);
-      ok({ name: file.name.replace(/\.\w+$/, '') + '.jpg', mime: 'image/jpeg', data: c.toDataURL('image/jpeg', 0.7).split(',')[1] });
+      ok({ 
+        name: file.name.replace(/\.\w+$/, '') + '.jpg', 
+        mime: 'image/jpeg', 
+        data: c.toDataURL('image/jpeg', 0.6).split(',')[1] // Kualitas 60%
+      });
     };
     img.onerror = no; img.src = URL.createObjectURL(file);
   });
@@ -422,27 +438,36 @@ $('#fEnt').onsubmit = e => {
 };
 
 /* --- Cetak PDF Modern (Dijamin Muncul Foto) --- */
-$('#bPdf').onclick = () => {
+$('#bPdf').onclick = async () => {
   const ent = S.ents.find(e => e.id === S.active); if (!ent) return;
   const all = rows(), a = $('#d1').value, b = $('#d2').value, list = filtered(all);
   const awal = a ? all.filter(t => t.tanggal < a).reduce((s, t) => s + (t.jenis === 'Masuk' ? t.jumlah : -t.jumlah), 0) : 0;
   const tm = list.filter(t => t.jenis === 'Masuk').reduce((s, t) => s + t.jumlah, 0), tk = list.filter(t => t.jenis === 'Keluar').reduce((s, t) => s + t.jumlah, 0);
   
-  // Ambil gambar dari Google Drive (Berkat ANYONE_WITH_LINK di Backend)
   const lampiran = list.filter(t => t.fileId);
-  const htmlLampiran = lampiran.length ? `
-    <div style="page-break-before:always; padding-top:20px;">
-      <h3 style="border-bottom:2px solid #2563eb; padding-bottom:8px; color:#1e40af; text-align:center;">LAMPIRAN BUKTI TRANSAKSI</h3>
-      ${lampiran.map((t, i) => `
+  toast('Menyusun PDF... (Mohon tunggu, memproses ' + lampiran.length + ' foto)');
+  
+  // FUNGSI INJECTOR GAMBAR (Ambil foto sebagai Base64 sebelum masuk HTML Print)
+  let htmlLampiran = '';
+  if (lampiran.length > 0) {
+    htmlLampiran += `<div style="page-break-before:always; padding-top:20px;">
+      <h3 style="border-bottom:2px solid #2563eb; padding-bottom:8px; color:#1e40af; text-align:center;">LAMPIRAN BUKTI TRANSAKSI</h3>`;
+    
+    for (let i = 0; i < lampiran.length; i++) {
+      const t = lampiran[i];
+      // Jika Anda memakai link gambar Google Drive lama (karena migrasi data)
+      const imgSrc = 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(t.fileId) + '&sz=w800'; 
+      
+      htmlLampiran += `
         <div style="margin:20px auto; border:1px solid #e2e8f0; padding:15px; border-radius:12px; text-align:center; break-inside:avoid; max-width:600px;">
-          <p style="margin:0 0 10px; font-weight:600; font-size:14px; color:#333;">Lampiran #${i+1}: ${tglFormat(t.tanggal)} -${esc(t.keterangan)}</p>
-          <img src="https://drive.google.com/uc?export=view&id=${encodeURIComponent(t.fileId)}" style="max-width:100%; max-height:400px; border-radius:8px; object-fit:contain;">
-        </div>
-      `).join('')}
-    </div>
-  ` : '';
+          <p style="margin:0 0 10px; font-weight:600; font-size:14px; color:#333;">Lampiran #${i+1}: ${tglFormat(t.tanggal)} - ${esc(t.keterangan)}</p>
+          <img src="${imgSrc}" style="max-width:100%; max-height:400px; border-radius:8px; object-fit:contain;" crossorigin="anonymous">
+        </div>`;
+    }
+    htmlLampiran += `</div>`;
+  }
 
-  const w = window.open('', '_blank'); if (!w) return toast('Harap Izinkan Pop-Up browser Anda!');
+  const w = window.open('', '_blank'); if (!w) return alert('Harap Izinkan Pop-Up browser Anda!');
   w.document.write(`<!doctype html><title>ArusKas_${esc(ent.nama)}</title><style>
 body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; color:#1e293b; margin:20px;}
 .kop{text-align:center; border-bottom:3px solid #1e40af; padding-bottom:12px; margin-bottom:20px;}
@@ -459,7 +484,7 @@ ${list.map(t => `<tr><td>${tglFormat(t.tanggal)}</td><td>${esc(t.keterangan)}</t
 ${htmlLampiran}`);
   w.document.close(); 
   
-  // Smart Print (Tunggu Foto)
+  // Smart Print Terjamin
   const imgs = w.document.querySelectorAll('img');
   let loaded = 0;
   const doPrint = () => { if(!w.printed){ w.printed=true; w.print(); } };
@@ -472,7 +497,8 @@ ${htmlLampiran}`);
       else { img.onload = img.onerror = () => { loaded++; if(loaded === imgs.length) setTimeout(doPrint, 300); }; }
     });
     if (loaded === imgs.length) setTimeout(doPrint, 300);
-    setTimeout(doPrint, 6000); // Paksa print setelah 6 detik jika gagal muat dari server Google
+    // Timeout maksimal menunggu foto Google Drive (Diperpanjang agar tidak di-bypass terlalu cepat)
+    setTimeout(doPrint, 8000); 
   }
 };
 
