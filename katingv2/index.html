@@ -5,23 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Sistem ERP POS V3</title>
+<title>ERP POS Sistem</title>
 <link id="dynamic-favicon" rel="icon" type="image/png" href="">
 <link id="dynamic-manifest" rel="manifest" href="">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<!-- Memuat CSS Terpisah -->
 <link rel="stylesheet" href="style.css">
-<!-- Library Cetak PDF Mobile Friendly -->
+<!-- Library untuk cetak PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
-<div id="saasLockScreen"><i class="fa-solid fa-lock text-danger mb-4" style="font-size:4rem"></i><h1 class="h2 fw-bold">Akses Ditangguhkan</h1><p class="text-white-50 mb-4">Masa sewa/lisensi aplikasi berakhir.</p><button onclick="bukaAdminPanel()" class="btn btn-sm btn-outline-light"><i class="fa-solid fa-key"></i> Vendor Login</button></div>
+<div id="saasLockScreen"><i class="fa-solid fa-lock text-danger mb-4" style="font-size:4rem"></i><h1 class="h2 fw-bold">Akses Sistem Ditangguhkan</h1><p class="text-white-50 mb-4" style="max-width:28rem">Masa sewa/lisensi aplikasi Anda telah berakhir. Silakan hubungi Vendor.</p><button onclick="bukaAdminPanel()" class="btn btn-sm btn-outline-light"><i class="fa-solid fa-key"></i> Vendor Login</button></div>
+<div id="printArea" style="display:none"></div>
 <div id="toast"></div>
 
+<!-- Elemen Hidden untuk Output Cetak PDF (Laporan & Banner) -->
+<div id="pdfTarget" style="display:none; padding:30px; background:white; color:black; font-family:sans-serif;"></div>
+
 <div class="d-flex" style="height:100dvh">
-  <!-- SIDEBAR DESKTOP -->
   <nav id="side" class="d-none d-md-flex flex-column">
     <div class="brand"><img id="sideLogo" src="" class="logo" style="object-fit:cover" onerror="this.style.display='none'"><b>ERP POS</b></div>
     <button class="nav-btn active" data-tab="pos" onclick="nav('pos')"><i class="fa-solid fa-cash-register fa-lg"></i><span>Kasir POS</span></button>
@@ -32,9 +36,8 @@
   </nav>
 
   <div class="flex-grow-1 d-flex flex-column" style="min-width:0">
-    <!-- HEADER -->
-    <header class="d-flex align-items-center justify-content-between px-3 px-md-4 pb-2 bg-white border-bottom pt-3">
-      <div class="d-flex align-items-center gap-2"><h1 id="pageTitle" class="h5 fw-bold mb-0" style="color:var(--c7)">Aplikasi Kasir</h1></div>
+    <header class="d-flex align-items-center justify-content-between px-3 px-md-4 pb-2 bg-white border-bottom" style="padding-top:calc(.5rem + env(safe-area-inset-top))">
+      <div class="d-flex align-items-center gap-2"><h1 id="pageTitle" class="h4 fw-bold mb-0" style="color:var(--c7)">Kasir</h1></div>
       <div class="d-flex align-items-center gap-2">
         <span id="syncStatus" class="badge rounded-pill border bg-light text-dark fw-bold"></span>
         <button class="iconbtn" title="Super Admin" onclick="bukaAdminPanel()"><i class="fa-solid fa-shield-halved"></i></button>
@@ -43,39 +46,34 @@
     </header>
 
     <main id="main" class="flex-grow-1 overflow-auto p-3 p-md-4"><div class="mx-auto" style="max-width:1280px">
-      
       <!-- 1. POS -->
       <section id="pos" class="tab-panel active">
-        <div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
-            <div class="d-flex gap-2 align-items-center">
-                <i class="fa-solid fa-bell-concierge" style="color:var(--c4)"></i>
-                <select id="posPanggilBooking" class="form-select form-select-sm w-auto fw-bold" onchange="loadBookingKeCart(this.value)"><option value="">Panggil Antrean...</option></select>
-            </div>
-            <button onclick="bukaRiwayatPOS()" class="btn btn-sm btn-outline-primary bg-white fw-bold"><i class="fa-solid fa-clock-rotate-left me-1"></i> Riwayat Transaksi</button>
-        </div>
+        <div class="d-flex justify-content-end mb-3"><button onclick="bukaRiwayatPOS()" class="btn btn-sm btn-outline-primary bg-white"><i class="fa-solid fa-clock-rotate-left me-1"></i> Riwayat &amp; Void</button></div>
         <div class="row g-3 g-lg-4">
           <div class="col-lg-8">
-            <input type="text" id="searchKatalog" class="form-control mb-3 py-2" placeholder="Cari Produk & Layanan..." onkeyup="cariKatalog()">
+            <div class="tint p-3 d-flex align-items-center gap-3 mb-3"><i class="fa-solid fa-bell-concierge fs-3" style="color:var(--c4)"></i><div class="flex-grow-1"><label class="form-label">Panggil Antrean Booking (Opsional)</label><select id="posPanggilBooking" class="form-select form-select-sm" onchange="loadBookingKeCart(this.value)"><option value="">-- Pilih Antrean --</option></select></div></div>
+            <input type="text" id="searchKatalog" class="form-control mb-3" placeholder="Cari Produk/Layanan..." onkeyup="cariKatalog()">
             <div class="row g-2 g-md-3" id="katalogContainer"></div>
           </div>
           <div class="col-lg-4"><div class="sticky-lg-top" style="top:0"><div class="offcanvas-lg offcanvas-end" tabindex="-1" id="cartPanel">
-            <div class="offcanvas-header border-bottom"><h5 class="offcanvas-title fw-bold">Pesanan Kasir</h5><button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#cartPanel"></button></div>
-            <div class="offcanvas-body d-flex flex-column h-100">
-              <div class="mb-3">
-                <label class="form-label d-flex justify-content-between"><span>Pelanggan</span><span id="cartCount" class="badge" style="background:var(--c1);color:var(--c5)">0 Item</span></label>
-                <select id="posPelanggan" class="form-select mb-2 fw-semibold" onchange="toggleGuestInput()"></select>
-                <input type="text" id="posGuestName" class="form-control mb-2" placeholder="Ketik Nama Pelanggan Guest...">
-                <div id="infoDiskon" class="small fw-bold text-success" style="display:none;"></div>
-                <input type="hidden" id="posRefBookingId" value="">
-              </div>
-              <div id="cartItems" class="flex-grow-1 overflow-auto mb-3" style="min-height:10rem"></div>
+            <div class="offcanvas-header border-bottom"><h5 class="offcanvas-title fw-bold">Pesanan</h5><button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#cartPanel"></button></div>
+            <div class="offcanvas-body">
+              <div class="d-none d-lg-flex justify-content-between align-items-center mb-3"><h5 class="fw-bold mb-0">Pesanan</h5></div>
+              <div class="d-flex justify-content-between align-items-center mb-2"><span class="form-label mb-0">Pelanggan</span><span id="cartCount" class="badge" style="background:var(--c1);color:var(--c5)">0 Item</span></div>
+              
+              <!-- PERBAIKAN: Input nama khusus jika bukan member (Guest) -->
+              <select id="posPelanggan" class="form-select mb-2 fw-semibold" onchange="cekGuestPOS()"></select>
+              <input type="text" id="posGuestName" class="form-control mb-3" placeholder="Atas nama siapa? (Guest)">
+              <input type="hidden" id="posRefBookingId" value="">
+              
+              <div id="cartItems" class="mb-3"></div>
               <div class="border-top pt-3">
                 <div class="row g-2 mb-2">
                   <div class="col-6"><select id="metodeBayar" class="form-select form-select-sm fw-semibold"><option value="Cash">Tunai</option><option value="QRIS">QRIS</option><option value="Transfer">Transfer</option></select></div>
                   <div class="col-6"><select id="statusBayar" class="form-select form-select-sm fw-bold text-success"><option value="Lunas">LUNAS</option><option value="Belum Bayar">PIUTANG</option></select></div>
                 </div>
-                <div class="d-flex justify-content-between align-items-end mb-3"><span class="fw-semibold" style="color:var(--c4)">Total Akhir</span><span id="totalPrice" class="serif fw-bold fs-3" style="color:var(--c6)">Rp 0</span></div>
-                <button onclick="prosesCheckout()" class="btn btn-primary w-100 py-3 fw-bold fs-5 shadow-sm">BAYAR &amp; STRUK</button>
+                <div class="d-flex justify-content-between align-items-end mb-3"><span class="fw-semibold" style="color:var(--c4)">Total</span><span id="totalPrice" class="serif fw-bold fs-2" style="color:var(--c6)">Rp 0</span></div>
+                <button onclick="prosesCheckout()" class="btn btn-primary w-100 py-3">BAYAR &amp; STRUK</button>
               </div>
             </div>
           </div></div></div>
@@ -84,25 +82,37 @@
 
       <!-- 2. BOOKING -->
       <section id="booking" class="tab-panel"><div class="cardx p-3 p-md-4">
-        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-            <h2 class="h5 fw-bold mb-0">Antrean & Booking</h2>
-            <button class="btn btn-sm btn-outline-primary fw-bold" onclick="showModalBooking()"><i class="fa-solid fa-plus"></i> Tambah Antrean</button>
-        </div>
+        <h2 class="h5 fw-bold mb-3">Kelola Antrean (Booking)</h2>
+        <!-- PERBAIKAN: bLayanan kini pakai Select, bPelanggan pakai input list agar bebas ketik/pilih -->
+        <form id="formBooking" class="tint p-3 mb-4" onsubmit="simpanBooking(event)">
+            <input type="hidden" id="bIdValue">
+            <div class="row g-2">
+                <div class="col-sm-6 col-lg-3"><input type="datetime-local" id="bWaktu" required class="form-control"></div>
+                <div class="col-sm-6 col-lg-3"><input type="text" id="bPelanggan" list="listPelangganBooking" placeholder="Nama Pelanggan" required class="form-control"><datalist id="listPelangganBooking"></datalist></div>
+                <div class="col-sm-6 col-lg-3"><select id="bLayanan" required class="form-select"><option value="">-- Pilih Layanan --</option></select></div>
+                <div class="col-sm-6 col-lg-3 d-flex gap-2">
+                    <button type="submit" id="btnSimpanB" class="btn btn-primary flex-grow-1">Simpan</button>
+                    <button type="button" id="btnBatalB" onclick="batalEditBooking()" class="btn btn-secondary" style="display:none"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+        </form>
         <div class="row g-3" id="listBooking"></div>
       </div></section>
 
-      <!-- 3. CRM MEMBER -->
+      <!-- 3. CRM -->
       <section id="crm" class="tab-panel"><div class="cardx p-3 p-md-4">
-        <h2 class="h5 fw-bold mb-3">Database Pelanggan & Member</h2>
-        <form class="tint p-3 mb-4" onsubmit="tambahMember(event)">
+        <h2 class="h5 fw-bold mb-3">Kelola Member &amp; Pelanggan</h2>
+        <!-- PERBAIKAN: mLevel bisa diketik dinamis, no WA opsional, tambah status -->
+        <form id="formMember" class="tint p-3 mb-4" onsubmit="simpanMember(event)">
             <input type="hidden" id="mIdValue">
             <div class="row g-2">
                 <div class="col-sm-6 col-lg-3"><input type="text" id="mNama" placeholder="Nama Lengkap (Wajib)" required class="form-control"></div>
-                <div class="col-sm-6 col-lg-3"><input type="tel" id="mHP" placeholder="No WhatsApp (Opsional)" class="form-control"></div>
-                <div class="col-sm-6 col-lg-3"><select id="mLevel" class="form-select"><option value="Bronze">Bronze (Member Baru)</option><option value="Gold">Gold (VIP)</option></select></div>
-                <div class="col-sm-6 col-lg-3 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary flex-grow-1" id="btnSimpanM">Simpan</button>
-                    <button type="button" class="btn btn-secondary" id="btnBatalM" onclick="batalEditMember()" style="display:none;"><i class="fa-solid fa-x"></i></button>
+                <div class="col-sm-6 col-lg-3"><input type="tel" id="mHP" placeholder="No WA (Opsional)" class="form-control"></div>
+                <div class="col-sm-6 col-lg-2"><input type="text" id="mLevel" list="listLevel" placeholder="Tipe (Cth: Gold)" class="form-control"><datalist id="listLevel"><option value="Bronze"><option value="Gold"></datalist></div>
+                <div class="col-sm-6 col-lg-2"><select id="mStatus" class="form-select"><option value="Aktif">Aktif</option><option value="Nonaktif">Nonaktif</option><option value="Blacklist">Blacklist</option></select></div>
+                <div class="col-sm-12 col-lg-2 d-flex gap-2">
+                    <button type="submit" id="btnSimpanM" class="btn btn-primary flex-grow-1">Simpan</button>
+                    <button type="button" id="btnBatalM" onclick="batalEditMember()" class="btn btn-secondary" style="display:none"><i class="fa-solid fa-xmark"></i></button>
                 </div>
             </div>
         </form>
@@ -111,47 +121,62 @@
 
       <!-- 4. AKUNTING -->
       <section id="akunting" class="tab-panel">
-        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-            <h2 class="h5 fw-bold mb-0">Dasbor Keuangan</h2>
-            <div class="d-flex flex-wrap gap-2">
-                <button class="btn btn-sm btn-danger fw-bold shadow-sm" onclick="showModalTutupBuku()"><i class="fa-solid fa-lock"></i> Siklus Tutup Buku</button>
-                <button class="btn btn-sm text-white fw-bold shadow-sm" style="background:#047857" onclick="cetakLaporanLabaRugi()"><i class="fa-solid fa-file-pdf"></i> Laporan PDF</button>
-            </div>
-        </div>
         <div class="row g-3 mb-3">
-          <div class="col-md-4"><div class="cardx p-3 h-100"><div class="small fw-bold" style="color:var(--c4)">Pendapatan Berjalan</div><div class="fs-4 fw-black fw-bold text-success" id="dashPendapatan">Rp 0</div></div></div>
-          <div class="col-md-4"><div class="cardx p-3 h-100"><div class="small fw-bold" style="color:var(--c4)">Beban/Biaya Berjalan</div><div class="fs-4 fw-bold text-danger" id="dashBeban">Rp 0</div></div></div>
-          <div class="col-md-4"><div class="p-3 h-100 text-white shadow-sm" style="background:var(--c7);border-radius:1.25rem"><div class="small fw-bold" style="color:var(--c3)">LABA/RUGI BERSIH</div><div class="fs-3 fw-bold" id="dashLaba">Rp 0</div><div class="border-top mt-3 pt-2" style="border-color:var(--c5)!important"><div style="font-size:.65rem;color:var(--c3)" class="fw-bold text-uppercase">Modal Disetor / Laba Ditahan</div><div class="fw-bold" id="dashModal">Rp 0</div></div></div></div>
+          <div class="col-md-4"><div class="cardx p-3 h-100"><div class="small fw-bold" style="color:var(--c4)">Pendapatan Jasa</div><div class="fs-4 fw-black fw-bold text-success" id="dashPendapatan">Rp 0</div></div></div>
+          <div class="col-md-4"><div class="cardx p-3 h-100"><div class="small fw-bold" style="color:var(--c4)">Beban/Pengeluaran</div><div class="fs-4 fw-bold text-danger" id="dashBeban">Rp 0</div></div></div>
+          <div class="col-md-4"><div class="p-3 h-100 text-white" style="background:var(--c7);border-radius:1.25rem">
+              <div class="d-flex justify-content-between align-items-start">
+                  <div><div class="small fw-bold" style="color:var(--c3)">LABA / RUGI BERSIH</div><div class="fs-3 fw-bold" id="dashLaba">Rp 0</div></div>
+                  <!-- PERBAIKAN: Tombol Tutup Buku -->
+                  <button class="btn btn-sm btn-outline-light" onclick="prosesTutupBuku()"><i class="fa-solid fa-lock"></i> Tutup Buku</button>
+              </div>
+              <div class="border-top mt-3 pt-2" style="border-color:var(--c5)!important"><div style="font-size:.65rem;color:var(--c3)" class="fw-bold text-uppercase">Modal Disetor / Ditahan</div><div class="fw-bold" id="dashModal">Rp 0</div></div>
+          </div></div>
         </div>
         <div class="row g-3">
-          <div class="col-lg-4"><div class="cardx p-3"><h3 class="h6 fw-bold mb-3">Input Jurnal Manual</h3><form onsubmit="simpanJurnalManual(event)" class="d-grid gap-2"><input type="date" id="jTgl" required class="form-control"><select id="jJenisKas" onchange="gantiJenisJurnal()" class="form-select fw-bold"><option value="Pengeluaran">BIAYA / BEBAN</option><option value="Pemasukan">PENDAPATAN LAIN</option><option value="Modal">MODAL</option></select><input type="text" id="jAkunLawan" placeholder="Nama Akun (Misal: Beban Listrik)" required class="form-control"><input type="text" id="jKet" placeholder="Keterangan Detail" required class="form-control"><input type="number" id="jNominal" placeholder="Nominal Rp" required min="1" class="form-control fw-bold"><button type="submit" class="btn" style="background:var(--c7);color:#fff">Catat Jurnal</button></form></div></div>
-          <div class="col-lg-8"><div class="cardx p-3"><div class="d-flex flex-wrap justify-content-between gap-2 border-bottom pb-3 mb-3"><div><h3 class="h6 fw-bold mb-0">Buku Besar (Ledger)</h3><small class="text-muted">Klik ID untuk buka setruk.</small></div><input type="text" id="searchLedger" class="form-control form-control-sm w-auto" placeholder="Cari Jurnal..." onkeyup="filterTabel('searchLedger','tabelJurnal')"></div><div class="table-responsive" style="max-height:50vh"><table class="table table-hover align-middle mb-0"><thead style="position:sticky;top:0;z-index:2"><tr><th>Tgl</th><th>Ref/Ket</th><th>Debit</th><th>Kredit</th><th class="text-end">Nominal</th><th class="text-center">Aksi</th></tr></thead><tbody id="tabelJurnal"></tbody></table></div></div></div>
+          <div class="col-lg-4"><div class="cardx p-3 p-md-4"><h3 class="h6 fw-bold mb-3">Input Kas Manual</h3>
+            <form id="formJurnal" onsubmit="simpanJurnalManual(event)" class="d-grid gap-2"><input type="hidden" id="jIdValue"><input type="date" id="jTgl" required class="form-control"><select id="jJenisKas" onchange="gantiJenisJurnal()" class="form-select fw-bold"><option value="Pengeluaran">BIAYA / BEBAN</option><option value="Pemasukan">PENDAPATAN LAIN</option><option value="Modal">MODAL</option></select><select id="jAkunLawan" class="form-select"></select><input type="text" id="jKet" placeholder="Keterangan" required class="form-control"><input type="number" id="jNominal" placeholder="Nominal Rp" required min="1" class="form-control fw-bold"><div class="d-flex gap-2"><button type="submit" id="btnSimpanJ" class="btn flex-grow-1" style="background:var(--c7);color:#fff">Catat Jurnal</button><button type="button" id="btnBatalJ" onclick="batalEditJurnal()" class="btn btn-secondary" style="display:none"><i class="fa-solid fa-xmark"></i></button></div></form>
+          </div></div>
+          <div class="col-lg-8"><div class="cardx p-3 p-md-4"><div class="d-flex flex-column flex-md-row justify-content-between gap-2 border-bottom pb-3 mb-3"><div><h3 class="h6 fw-bold mb-0">Buku Besar (Ledger)</h3><small class="text-muted">Klik ID Transaksi untuk lacak nota.</small></div><div class="d-flex gap-2"><input type="text" id="searchLedger" class="form-control form-control-sm" placeholder="Cari Jurnal..." onkeyup="filterTabel('searchLedger','tabelJurnal')"><button onclick="cetakLaporanLabaRugi()" class="btn btn-sm btn-outline-primary text-nowrap"><i class="fa-solid fa-print"></i> Laporan Laba Rugi</button></div></div>
+            <!-- PERBAIKAN: Menambahkan white-space nowrap agar tidak terpotong di HP -->
+            <div class="table-responsive" style="max-height:50vh; overflow-x:auto;">
+              <table class="table table-hover align-middle mb-0" style="white-space: nowrap;">
+                <thead style="position:sticky;top:0;z-index:2"><tr><th>Tgl</th><th>Ref/Ket</th><th>Debit</th><th>Kredit</th><th class="text-end">Nominal</th><th class="text-center">Aksi</th></tr></thead><tbody id="tabelJurnal"></tbody>
+              </table>
+            </div>
+          </div></div>
         </div>
       </section>
 
       <!-- 5. MASTER -->
       <section id="master" class="tab-panel"><div class="cardx p-3 p-md-4">
-        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-            <h2 class="h5 fw-bold mb-0">Data Produk & Layanan</h2>
-            <button class="btn btn-sm btn-outline-danger fw-bold" onclick="cetakKatalogPDF()"><i class="fa-solid fa-file-pdf"></i> Cetak Katalog Banner</button>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="h5 fw-bold mb-0">Data Produk &amp; Layanan</h2>
+            <!-- PERBAIKAN: Tombol Cetak Katalog Banner -->
+            <button onclick="cetakKatalogBanner()" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-file-pdf"></i> Banner Katalog</button>
         </div>
         <form id="formProduk" class="tint p-3 mb-4" onsubmit="simpanProduk(event)"><input type="hidden" id="pIdValue">
             <div class="row g-2 align-items-end">
-                <div class="col-lg-3"><label class="form-label">Nama Produk/Layanan</label><input type="text" id="pNama" required class="form-control"></div>
-                <div class="col-sm-4 col-lg-2"><label class="form-label">Kategori</label><input type="text" id="pKategori" placeholder="Cth: Minuman" required class="form-control"></div>
-                <div class="col-sm-4 col-lg-2"><label class="form-label">Harga (Rp)</label><input type="number" id="pHarga" required min="0" class="form-control"></div>
-                <div class="col-sm-4 col-lg-3"><label class="form-label">Keterangan Detail</label><input type="text" id="pKet" placeholder="Opsional..." class="form-control"></div>
-                <div class="col-lg-2 d-flex gap-2"><button type="submit" id="btnSimpanP" class="btn btn-primary flex-grow-1">Simpan</button><button type="button" id="btnBatalP" onclick="batalEditProduk()" class="btn btn-secondary" style="display:none"><i class="fa-solid fa-x"></i></button></div>
+                <div class="col-lg-3"><label class="form-label">Nama Layanan</label><input type="text" id="pNama" required class="form-control"></div>
+                <!-- PERBAIKAN: Kategori Dinamis pakai datalist -->
+                <div class="col-sm-6 col-lg-2"><label class="form-label">Kategori</label><input type="text" id="pKategori" list="listKatProd" required class="form-control"><datalist id="listKatProd"></datalist></div>
+                <div class="col-sm-6 col-lg-2"><label class="form-label">Harga (Rp)</label><input type="number" id="pHarga" required min="0" class="form-control"></div>
+                <!-- PERBAIKAN: Tambah field Keterangan -->
+                <div class="col-lg-3"><label class="form-label">Keterangan Detail</label><input type="text" id="pKet" placeholder="Opsional..." class="form-control"></div>
+                <div class="col-lg-2 d-flex gap-2"><button type="submit" id="btnSimpanP" class="btn btn-primary flex-grow-1">Simpan</button><button type="button" id="btnBatalP" onclick="batalEditProduk()" class="btn btn-secondary" style="display:none"><i class="fa-solid fa-xmark"></i></button></div>
             </div>
         </form>
-        <input type="text" id="searchProduk" class="form-control mb-3" style="max-width:100%" placeholder="Ketik pencarian produk..." onkeyup="filterTabel('searchProduk','tabelProduk')">
-        <div class="table-responsive"><table class="table table-hover align-middle" style="white-space:nowrap;"><thead><tr><th>ID</th><th>Nama</th><th>Kategori</th><th>Harga</th><th>Keterangan</th><th class="text-center">Aksi</th></tr></thead><tbody id="tabelProduk"></tbody></table></div>
+        <input type="text" id="searchProduk" class="form-control mb-3" style="max-width:22rem" placeholder="Cari Produk..." onkeyup="filterTabel('searchProduk','tabelProduk')">
+        <div class="table-responsive" style="overflow-x:auto;">
+            <table class="table table-hover align-middle" style="white-space: nowrap;">
+                <thead><tr><th>ID</th><th>Nama</th><th>Kategori</th><th>Harga</th><th>Keterangan</th><th class="text-center">Aksi</th></tr></thead><tbody id="tabelProduk"></tbody>
+            </table>
+        </div>
       </div></section>
     </div></main>
   </div>
 </div>
 
-<!-- BOTTOM NAV MOBILE -->
 <nav id="bnav" class="d-md-none">
   <button class="nav-btn active" data-tab="pos" onclick="nav('pos')"><i class="fa-solid fa-cash-register"></i><span>Kasir</span></button>
   <button class="nav-btn" data-tab="booking" onclick="nav('booking')"><i class="fa-solid fa-calendar-check"></i><span>Antrean</span></button>
@@ -159,53 +184,31 @@
   <button class="nav-btn" data-tab="akunting" onclick="nav('akunting')"><i class="fa-solid fa-calculator"></i><span>Akunting</span></button>
   <button class="nav-btn" data-tab="master" onclick="nav('master')"><i class="fa-solid fa-database"></i><span>Master</span></button>
 </nav>
+<button id="cartBar" class="d-lg-none" onclick="toggleCart(true)"><span><i class="fa-solid fa-bag-shopping me-2"></i><span id="cartBarCount">0 Item</span></span><span>Lihat Pesanan &middot; <span id="cartBarTotal">Rp 0</span></span></button>
 
-<!-- CART POPUP BUTTON MOBILE -->
-<button id="cartBar" class="d-lg-none" onclick="toggleCart(true)">
-    <span><i class="fa-solid fa-bag-shopping me-2"></i><span id="cartBarCount">0 Item</span></span>
-    <span>Lihat Pesanan &middot; <span id="cartBarTotal">Rp 0</span></span>
-</button>
+<!-- MODALS -->
+<div class="modal fade" id="modalStruk" tabindex="-1"><div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down"><div class="modal-content"><div class="modal-header"><h5 class="modal-title fw-bold"><i class="fa-solid fa-receipt me-2" style="color:var(--c4)"></i>Struk Transaksi</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="row g-3">
+    <!-- PERBAIKAN: Layout canvas struk diubah agar bisa vertical memanjang ke bawah -->
+    <div class="col-md-6"><div class="tint p-3 d-flex justify-content-center align-items-start overflow-auto" style="height:60dvh"><img id="strukImg" alt="Membuat struk..." style="max-width:100%;box-shadow:0 8px 24px -8px rgba(0,0,0,.2)"></div></div>
+    <div class="col-md-6 d-grid gap-2 align-content-start"><div><label class="form-label">No. WhatsApp pelanggan (opsional)</label><input type="tel" id="strukWA" class="form-control" placeholder="08xx / 628xx"></div><button class="btn py-3" style="background:var(--c7);color:#fff" onclick="strukCetakBT()"><i class="fa-solid fa-print me-2"></i>Cetak Thermal (Bluetooth)</button><button class="btn btn-outline-primary py-3 bg-white" onclick="strukSimpan()"><i class="fa-solid fa-image me-2"></i>Simpan JPG</button><button class="btn text-white py-3" style="background:#25D366" onclick="strukWA()"><i class="fa-brands fa-whatsapp me-2 fs-5"></i>Kirim WA Direct</button><button class="btn btn-link text-muted" data-bs-dismiss="modal">Selesai</button></div>
+</div></div></div></div></div>
 
-<!-- SEMUA MODAL -->
-<!-- Modal Struk -->
-<div class="modal fade" id="modalStruk" tabindex="-1"><div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down"><div class="modal-content"><div class="modal-header"><h5 class="modal-title fw-bold"><i class="fa-solid fa-receipt me-2" style="color:var(--c4)"></i>Struk Kasir</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="row g-3"><div class="col-md-6"><div class="tint p-3 d-flex justify-content-center align-items-start overflow-auto" style="min-height:12rem"><img id="strukImg" alt="Membuat struk..." style="max-width:100%;box-shadow:0 8px 24px -8px rgba(0,0,0,.3)"></div></div><div class="col-md-6 d-grid gap-2 align-content-start"><div><label class="form-label">No WhatsApp Pelanggan (Otomatis jika Member)</label><input type="tel" id="strukWA" class="form-control" placeholder="628xxx"></div><button class="btn py-3" style="background:var(--c7);color:#fff" onclick="strukCetakBT()"><i class="fa-solid fa-print me-2"></i>Cetak Thermal Bluetooth</button><button class="btn btn-outline-primary py-3 bg-white fw-bold" onclick="strukSimpan()"><i class="fa-solid fa-download me-2"></i>Simpan Gambar JPG</button><button class="btn text-white py-3 fw-bold" style="background:#25D366" onclick="strukWA()"><i class="fa-brands fa-whatsapp me-2 fs-5"></i>Kirim Langsung ke WA</button></div></div></div></div></div></div>
+<div class="modal fade" id="modalRiwayat" tabindex="-1"><div class="modal-dialog modal-xl modal-dialog-scrollable modal-fullscreen-md-down"><div class="modal-content"><div class="modal-header"><h5 class="modal-title fw-bold"><i class="fa-solid fa-clock-rotate-left me-2" style="color:var(--c4)"></i>Riwayat &amp; Void Transaksi</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><input type="text" id="searchRiwayat" class="form-control mb-3" placeholder="Cari Transaksi..." onkeyup="filterTabel('searchRiwayat','tabelRiwayatPOS')"><div class="table-responsive" style="overflow-x:auto;"><table class="table table-hover align-middle" style="white-space:nowrap;"><thead><tr><th>ID/Tgl</th><th>Pelanggan</th><th>Total</th><th>Status</th><th class="text-center">Aksi &amp; Struk</th></tr></thead><tbody id="tabelRiwayatPOS"></tbody></table></div></div></div></div></div>
 
-<!-- Modal Riwayat POS -->
-<div class="modal fade" id="modalRiwayat" tabindex="-1"><div class="modal-dialog modal-xl modal-dialog-scrollable modal-fullscreen-md-down"><div class="modal-content"><div class="modal-header"><h5 class="modal-title fw-bold"><i class="fa-solid fa-clock-rotate-left me-2" style="color:var(--c4)"></i>Riwayat Transaksi & Void</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><input type="text" id="searchRiwayat" class="form-control mb-3" placeholder="Pencarian ID, Nama, atau Status..." onkeyup="filterTabel('searchRiwayat','tabelRiwayatPOS')"><div class="table-responsive"><table class="table table-hover align-middle" style="white-space:nowrap;"><thead><tr><th>ID/Tgl</th><th>Pelanggan</th><th>Total</th><th>Status</th><th class="text-center">Aksi & Struk</th></tr></thead><tbody id="tabelRiwayatPOS"></tbody></table></div></div></div></div></div>
-
-<!-- Modal Setting Vendor (White-label) -->
-<div class="modal fade" id="modalAdmin" tabindex="-1" style="z-index:99999"><div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><div><h5 class="modal-title fw-bold"><i class="fa-solid fa-crown text-warning"></i> Pengaturan Global & Lisensi</h5><small class="text-muted">White-label identitas perusahaan.</small></div><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body d-grid gap-3">
-  <div><label class="form-label">Nama Perusahaan (Tampil di Struk & PDF):</label><input type="text" id="admAppName" class="form-control"></div>
-  <div><label class="form-label">Alamat Lengkap:</label><input type="text" id="admAlamat" class="form-control"></div>
-  <div><label class="form-label">No Telepon Bisnis:</label><input type="text" id="admTelp" class="form-control"></div>
-  <div><label class="form-label">URL Logo Perusahaan (PNG):</label><input type="text" id="admAppIcon" class="form-control"></div>
-  <div class="row g-2"><div class="col-6"><label class="form-label">Diskon CRM Bronze (%)</label><input type="number" id="admDiskonB" class="form-control"></div><div class="col-6"><label class="form-label">Diskon CRM Gold (%)</label><input type="number" id="admDiskonG" class="form-control"></div></div>
-  <div class="row g-2"><div class="col-4"><label class="form-label">Warna Utama</label><input type="color" id="admColorPrimary" class="form-control form-control-color w-100"></div><div class="col-4"><label class="form-label">Warna Latar</label><input type="color" id="admColorLight" class="form-control form-control-color w-100"></div><div class="col-4"><label class="form-label">Teks Gelap</label><input type="color" id="admColorDark" class="form-control form-control-color w-100"></div></div>
-  <button onclick="updateVendorTheme()" class="btn btn-outline-primary fw-bold mb-3"><i class="fa-solid fa-save"></i> Simpan Pengaturan Global</button>
+<div class="modal fade" id="modalAdmin" tabindex="-1" style="z-index:99999"><div class="modal-dialog modal-dialog-centered modal-sm"><div class="modal-content"><div class="modal-header"><div><h5 class="modal-title fw-bold"><i class="fa-solid fa-crown text-warning"></i> Vendor Dashboard</h5><small class="text-muted">Pengaturan White-label & SaaS</small></div><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body d-grid gap-3">
+  <div><label class="form-label">Nama Aplikasi Klien:</label><input type="text" id="admAppName" class="form-control"></div>
+  <div><label class="form-label">URL Logo Klien (PNG):</label><input type="text" id="admAppIcon" class="form-control"></div>
+  <div class="row g-2"><div class="col-4"><label class="form-label">Primary</label><input type="color" id="admColorPrimary" class="form-control form-control-color w-100"></div><div class="col-4"><label class="form-label">Light</label><input type="color" id="admColorLight" class="form-control form-control-color w-100"></div><div class="col-4"><label class="form-label">Dark</label><input type="color" id="admColorDark" class="form-control form-control-color w-100"></div></div>
+  <button onclick="updateVendorTheme()" class="btn btn-outline-primary mb-3">Terapkan Tema UI</button>
   <hr class="m-0">
-  <div class="p-3 bg-light rounded border border-danger">
-      <h6 class="fw-bold text-danger"><i class="fa-solid fa-key"></i> Perbarui Lisensi / Masa Aktif</h6>
-      <label class="form-label mt-2">Masa Aktif Baru S/D:</label><input type="date" id="adminNewDate" class="form-control mb-2 fw-bold">
-      <label class="form-label">PIN Admin Saat Ini (Wajib):</label><input type="password" id="adminCurrentPin" class="form-control text-center mb-2 fw-bold">
-      <label class="form-label">Ubah PIN Admin (Opsional):</label><input type="password" id="adminNewPin" class="form-control mb-2">
-      <button onclick="updateSaaS()" class="btn btn-danger w-100 fw-bold">Perbarui Sistem</button>
-  </div>
+  <div><label class="form-label">Perpanjang Masa Aktif S/D:</label><input type="date" id="adminNewDate" class="form-control fw-bold"></div>
+  <div><label class="form-label">Ubah PIN Admin (opsional):</label><input type="password" id="adminNewPin" class="form-control"></div>
+  <div><label class="form-label">PIN Admin Saat Ini (Wajib):</label><input type="password" id="adminCurrentPin" class="form-control text-center fw-bold"></div>
+  <button onclick="updateSaaS()" class="btn" style="background:var(--c7);color:#fff">Perbarui Lisensi</button>
 </div></div></div></div>
-
-<!-- Modal Tutup Buku -->
-<div class="modal fade" id="modalTutupBuku" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content border-danger"><div class="modal-header bg-danger text-white"><h5 class="modal-title fw-bold"><i class="fa-solid fa-lock"></i> Tutup Buku Akhir Bulan</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body text-center">
-    <i class="fa-solid fa-scale-balanced fs-1 text-danger mb-3"></i>
-    <p class="mb-4">Tutup buku akan merekapitulasi seluruh Pendapatan dan Beban saat ini, lalu menyimpannya ke <b>Modal/Laba Ditahan</b>. Pastikan seluruh transaksi periode ini sudah benar.</p>
-    <div class="d-flex justify-content-between mb-2"><span>Total Pendapatan:</span><b id="tbPendapatan" class="text-success">Rp 0</b></div>
-    <div class="d-flex justify-content-between mb-2"><span>Total Beban:</span><b id="tbBeban" class="text-danger">Rp 0</b></div>
-    <div class="d-flex justify-content-between mb-4 border-top pt-2 fs-5"><span>Laba/Rugi Bersih:</span><b id="tbLaba">Rp 0</b></div>
-    <button onclick="prosesTutupBuku()" class="btn btn-danger w-100 py-3 fw-bold fs-5">EKSEKUSI TUTUP BUKU SEKARANG</button>
-</div></div></div></div>
-
-<!-- Elemen Hidden untuk Cetak PDF (Laporan & Katalog & ID Card) -->
-<div id="printTarget" style="display:none; padding:40px; background:white; color:black; font-family:sans-serif;"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Memuat Javascript Terpisah -->
 <script src="script.js"></script>
 </body>
 </html>
