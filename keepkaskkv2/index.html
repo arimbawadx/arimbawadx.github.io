@@ -416,7 +416,7 @@ $('#bAddEnt').onclick = () => { editEntId = ''; $('#fEnt').reset(); $('#dEntT').
 function openEnt(id) {
   const e = S.ents.find(x => x.id === id); editEntId = e ? e.id : '';
   $('#dEntT').textContent = 'Ubah Catatan';
-  $('#eN').value = e?.nama \vert{}\vert{} ''; $('#eJ').value = e?.kopJudul || 'LAPORAN KAS'; $('#eS').value = e?.kopSub || '';
+  $('#eN').value = e?.nama || ''; $('#eJ').value = e?.kopJudul || 'LAPORAN KAS'; $('#eS').value = e?.kopSub || '';
   $('#dEnt').showModal();
 }
 $('#fEnt').onsubmit = e => {
