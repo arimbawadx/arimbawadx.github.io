@@ -1,7 +1,7 @@
 // =============================================================
 // KONFIGURASI API DAN PWA (BASE V1 + PATCHES)
 // =============================================================
-const GAS_URL = "MASUKKAN_URL_WEB_APP_ANDA_DISINI";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbz5Oo_cKb8MQsnBQrRR79Td9-ibc_ZzkaWGQjr5oNNJVxvyGW5LUW19bsXhNnMChz7t/exec";
 
 if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js'); }
 
