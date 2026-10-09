@@ -205,7 +205,7 @@ dialog::backdrop { background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); }
 <script>
 'use strict';
 // MASUKKAN URL EXEC API GOOGLE APPS SCRIPT V4 ANDA DI SINI
-const API = 'https://script.google.com/macros/s/AKfycbzIQygUeUiUWC-fgdeO3j3t_o_88kYsUyI8Qee0Ssuo9qWlqx856EPsUE81hRjiBlIH6Q/exec'; 
+const API = 'https://script.google.com/macros/s/AKfycbwLZceJY-BE2GLp462KPIHy9BbkYNALYkryBpcxgcq3dii5cS-zLV9lShNuy6L3hGQ7fw/exec'; 
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -438,12 +438,13 @@ $('#fEnt').onsubmit = e => {
   if (!editEntId) S.active = id; $('#dEnt').close(); toast('Catatan Disimpan!');
 };
 
-/* --- Cetak PDF Menggunakan Thumbnail Drive API --- */
+/* --- Cetak PDF 100% Anti Gagal (Bypass Google Drive Cors/Cookies) --- */
 $('#bPdf').onclick = () => {
   const ent = S.ents.find(e => e.id === S.active); if (!ent) return;
   const a = $('#d1').value, b = $('#d2').value, q = $('#q').value.trim().toLowerCase();
-  
-  if(S.q.length > 0) return alert('Masih ada ' + S.q.length + ' transaksi diantrean yang belum tersinkron. Harap tunggu proses sinkronisasi selesai sebelum mengekspor PDF agar foto terupdate.');
+
+  // Pastikan tidak ada antrean sebelum print (agar semua localBase64 yang tertunda sempat masuk ke server)
+  if(S.q.length > 0) return alert('Masih ada ' + S.q.length + ' transaksi diantrean yang belum tersinkron. Tunggu sampai tulisan di atas berubah menjadi "Tersinkron" agar semua foto siap.');
 
   const allTx = getCalculatedRows();
   const allFilteredByQ = allTx.filter(t => !q || String(t.keterangan).toLowerCase().includes(q));
@@ -452,8 +453,9 @@ $('#bPdf').onclick = () => {
   const awal = a ? allFilteredByQ.filter(t => t.tanggal < a).reduce((s, t) => s + (t.jenis === 'Masuk' ? t.jumlah : -t.jumlah), 0) : 0;
   const tm = list.filter(t => t.jenis === 'Masuk').reduce((s, t) => s + t.jumlah, 0), tk = list.filter(t => t.jenis === 'Keluar').reduce((s, t) => s + t.jumlah, 0);
   
-  const lampiran = list.filter(t => t.fileId);
-  toast('Menyusun PDF... (' + lampiran.length + ' foto)');
+  // Ambil transaksi yang benar-benar memiliki data Base64 (baik dari server maupun input lokal yang baru)
+  const lampiran = list.filter(t => t.serverBase64 || t.localBase64);
+  toast('Menyusun PDF... (' + lampiran.length + ' foto diproses)');
   
   let htmlLampiran = '';
   if (lampiran.length > 0) {
@@ -461,11 +463,14 @@ $('#bPdf').onclick = () => {
       <h3 style="border-bottom:2px solid #2563eb; padding-bottom:8px; color:#1e40af; text-align:center;">LAMPIRAN BUKTI TRANSAKSI</h3>`;
     for (let i = 0; i < lampiran.length; i++) {
       const t = lampiran[i];
-      const imgSrc = 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(t.fileId) + '&sz=w800'; 
+      // JIKA punya gambar lokal pakai itu. Jika tidak, pakai data Base64 yang dikirim Server. 
+      // Keduanya BUKAN URL, melainkan string gambar asli (data:image/jpeg;base64,....)
+      const imgSrc = t.localBase64 ? t.localBase64 : t.serverBase64; 
+      
       htmlLampiran += `
         <div style="margin:20px auto; border:1px solid #e2e8f0; padding:15px; border-radius:12px; text-align:center; break-inside:avoid; max-width:600px;">
           <p style="margin:0 0 10px; font-weight:600; font-size:14px; color:#333;">Lampiran #${i+1}: ${tglFormat(t.tanggal)} - ${esc(t.keterangan)}</p>
-          <img src="${imgSrc}" style="max-width:100%; max-height:400px; border-radius:8px; object-fit:contain;" crossorigin="anonymous">
+          <img src="${imgSrc}" style="max-width:100%; max-height:400px; border-radius:8px; object-fit:contain;">
         </div>`;
     }
     htmlLampiran += `</div>`;
@@ -488,6 +493,7 @@ ${list.map(t => `<tr><td>${tglFormat(t.tanggal)}</td><td>${esc(t.keterangan)}</t
 ${htmlLampiran}`);
   w.document.close(); 
   
+  // PDF Jauh Lebih Cepat Karena Tidak Download Apapun Lagi!
   const imgs = w.document.querySelectorAll('img'); let loaded = 0;
   const doPrint = () => { if(!w.printed){ w.printed=true; w.print(); } };
   
@@ -495,10 +501,10 @@ ${htmlLampiran}`);
   else {
     imgs.forEach(img => {
       if (img.complete) loaded++; 
-      else { img.onload = img.onerror = () => { loaded++; if(loaded === imgs.length) setTimeout(doPrint, 300); }; }
+      else { img.onload = img.onerror = () => { loaded++; if(loaded === imgs.length) setTimeout(doPrint, 200); }; }
     });
-    if (loaded === imgs.length) setTimeout(doPrint, 300);
-    setTimeout(doPrint, 8000); 
+    if (loaded === imgs.length) setTimeout(doPrint, 200);
+    setTimeout(doPrint, 3000); // Batas aman diperpendek jadi 3 detik
   }
 };
 
