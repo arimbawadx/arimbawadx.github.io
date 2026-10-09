@@ -6,14 +6,12 @@
 <meta name="mobile-web-app-capable" content="yes">
 <title>ERP Enterprise</title>
 <link id="dynamic-favicon" rel="icon" type="image/png" href="">
-<link id="dynamic-manifest" rel="manifest" href="">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--bs-primary:#774a2e;--bs-body-bg:#fdfaf6;--bs-body-color:#2f1b11;--bs-body-font-family:'Plus Jakarta Sans',sans-serif;--c1:#f8f1e8;--c2:#efe3d3;--c3:#d9bda3;--c4:#a97650;--c5:#774a2e;--c6:#5f3b25;--c7:#2f1b11}
-html,body{height:100%;overflow:hidden}
-h1,h2,h3,h4,h5,.serif{font-family:'Playfair Display',Georgia,serif}
+html,body{height:100%;overflow:hidden} h1,h2,h3,h4,h5,.serif{font-family:'Playfair Display',Georgia,serif}
 .btn-primary{background-color:var(--c5);border-color:var(--c5)} .btn-primary:hover{background-color:var(--c6);border-color:var(--c6)}
 .btn-outline-primary{color:var(--c5);border-color:var(--c3)} .btn-outline-primary:hover{background-color:var(--c5);color:#fff}
 .btn{border-radius:.85rem;font-weight:700}
@@ -47,7 +45,7 @@ main#main{padding-bottom:110px} @media(min-width:768px){main#main{padding-bottom
 @media(min-width:768px){#cartBar{left:auto;right:24px;width:26rem;bottom:24px}}
 #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:7.5rem;z-index:3000;background:var(--c7);color:#fff;font-size:.85rem;font-weight:600;padding:.8rem 1.2rem;border-radius:1rem;display:none}
 @media(min-width:768px){#toast{bottom:2rem}}
-.table thead th{background:var(--c1);color:var(--c4);font-size:.75rem;font-weight:700;border:0} .table td{font-size:.8rem}
+.table thead th{background:var(--c1);color:var(--c4);font-size:.75rem;font-weight:700;border:0;white-space:nowrap} .table td{font-size:.8rem}
 .modal-content{border-radius:1.5rem;border:0} #saasLockScreen{position:fixed;inset:0;background:var(--c7);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;color:#fff;padding:1.5rem;text-align:center}
 @media print{
   body *{visibility:hidden} #printArea,#printArea *{visibility:visible} #printArea{position:absolute;left:0;top:0;width:100%} 
@@ -139,7 +137,7 @@ main#main{padding-bottom:110px} @media(min-width:768px){main#main{padding-bottom
           <div class="row g-2 align-items-end">
             <div class="col-md-3"><label class="form-label">Nama Lengkap (Wajib)</label><input type="text" id="mNama" required class="form-control"></div>
             <div class="col-md-2"><label class="form-label">No WA (Opsional)</label><input type="tel" id="mHP" class="form-control"></div>
-            <div class="col-md-2"><label class="form-label">Tipe/Level (Opsional)</label><select id="mLevel" class="form-select"></select></div>
+            <div class="col-md-2"><label class="form-label">Tipe/Level</label><select id="mLevel" class="form-select"></select></div>
             <div class="col-md-2"><label class="form-label">Status</label><select id="mStatus" class="form-select"><option value="Aktif">Aktif</option><option value="Nonaktif">Nonaktif</option><option value="Blacklist">Blacklist</option></select></div>
             <div class="col-md-3 d-flex gap-2"><button type="submit" class="btn btn-primary flex-grow-1" id="btnSimpanM">Simpan</button><button type="button" class="btn btn-secondary" id="btnBatalM" onclick="batalEditM()" style="display:none"><i class="fa-solid fa-xmark"></i></button></div>
           </div>
@@ -159,7 +157,7 @@ main#main{padding-bottom:110px} @media(min-width:768px){main#main{padding-bottom
             <form onsubmit="simpanJurnalManual(event)" class="d-grid gap-2"><input type="hidden" id="jIdValue"><input type="date" id="jTgl" required class="form-control"><select id="jJenisKas" onchange="gantiJenisJurnal()" class="form-select fw-bold"><option value="Pengeluaran">BIAYA / BEBAN</option><option value="Pemasukan">PENDAPATAN LAIN</option><option value="Modal">MODAL</option></select><select id="jAkunLawan" class="form-select"></select><input type="text" id="jKet" placeholder="Keterangan" required class="form-control"><input type="number" id="jNominal" placeholder="Nominal Rp" required min="1" class="form-control fw-bold"><div class="d-flex gap-2"><button type="submit" class="btn flex-grow-1" style="background:var(--c7);color:#fff" id="btnSimpanJ">Catat</button><button type="button" class="btn btn-secondary" id="btnBatalJ" onclick="batalEditJ()" style="display:none"><i class="fa-solid fa-xmark"></i></button></div></form>
             <hr><button class="btn btn-warning w-100 fw-bold shadow-sm" onclick="prosesTutupBuku()"><i class="fa-solid fa-book-journal-whills me-2"></i>TUTUP BUKU</button><small class="text-muted mt-2 d-block text-center" style="font-size:0.7rem">Nihilkan saldo Laba/Rugi ke Modal</small>
           </div></div>
-          <div class="col-lg-8"><div class="cardx p-3 p-md-4"><div class="d-flex flex-column flex-md-row justify-content-between gap-2 border-bottom pb-3 mb-3"><div><h3 class="h6 fw-bold mb-0">Buku Besar (Ledger)</h3><small class="text-muted">Klik ID [TX...] untuk lacak nota.</small></div><div class="d-flex gap-2"><input type="text" id="searchLedger" class="form-control form-control-sm" placeholder="Cari Jurnal..." onkeyup="filterTabel('searchLedger','tabelJurnal')"><button onclick="cetakLaporanAkuntansiLengkap()" class="btn btn-sm btn-outline-primary text-nowrap"><i class="fa-solid fa-print"></i> PDF Resmi</button></div></div><div class="table-responsive" style="max-height:50vh"><table class="table table-hover align-middle mb-0"><thead style="position:sticky;top:0"><tr><th>Tgl</th><th>Ref/Ket</th><th>Debit</th><th>Kredit</th><th class="text-end">Nominal</th><th></th></tr></thead><tbody id="tabelJurnal"></tbody></table></div></div></div>
+          <div class="col-lg-8"><div class="cardx p-3 p-md-4"><div class="d-flex flex-column flex-md-row justify-content-between gap-2 border-bottom pb-3 mb-3"><div><h3 class="h6 fw-bold mb-0">Buku Besar (Ledger)</h3><small class="text-muted">Klik ID [TX...] untuk lacak nota.</small></div><div class="d-flex gap-2"><input type="text" id="searchLedger" class="form-control form-control-sm" placeholder="Cari Jurnal..." onkeyup="filterTabel('searchLedger','tabelJurnal')"><button onclick="cetakLaporanAkuntansiLengkap()" class="btn btn-sm btn-outline-primary text-nowrap"><i class="fa-solid fa-print"></i> PDF Resmi</button></div></div><div class="table-responsive" style="max-height:50vh"><table class="table table-hover align-middle mb-0"><thead style="position:sticky;top:0"><tr><th>Tgl</th><th>Ref/Ket</th><th>Debit</th><th>Kredit</th><th class="text-end">Nominal</th><th>Aksi</th></tr></thead><tbody id="tabelJurnal"></tbody></table></div></div></div>
         </div>
       </section>
 
@@ -176,7 +174,7 @@ main#main{padding-bottom:110px} @media(min-width:768px){main#main{padding-bottom
             <div class="table-responsive"><table class="table table-hover align-middle"><thead><tr><th>ID</th><th>Nama</th><th>Kategori</th><th>Harga</th><th>Ket</th><th class="text-center">Aksi</th></tr></thead><tbody id="tabelProduk"></tbody></table></div>
           </div>
           <div class="tab-pane fade" id="tabLevel">
-            <form class="tint p-3 mb-4" onsubmit="simpanLevel(event)"><input type="hidden" id="lIdValue"><div class="row g-2 align-items-end"><div class="col-md-4"><label class="form-label">Nama Level (Mis: Gold, VIP)</label><input type="text" id="lNama" required class="form-control"></div><div class="col-md-4"><label class="form-label">Diskon % (Opsional)</label><input type="number" id="lDiskon" min="0" max="100" class="form-control"></div><div class="col-md-2 d-flex gap-2"><button type="submit" id="btnSimpanL" class="btn btn-primary flex-grow-1">Simpan</button><button type="button" id="btnBatalL" onclick="batalEditL()" class="btn btn-secondary" style="display:none"><i class="fa-solid fa-xmark"></i></button></div></div></form>
+            <form class="tint p-3 mb-4" onsubmit="simpanLevel(event)"><input type="hidden" id="lIdValue"><div class="row g-2 align-items-end"><div class="col-md-4"><label class="form-label">Nama Level (Mis: Gold)</label><input type="text" id="lNama" required class="form-control"></div><div class="col-md-4"><label class="form-label">Diskon % (Opsional)</label><input type="number" id="lDiskon" min="0" max="100" class="form-control"></div><div class="col-md-2 d-flex gap-2"><button type="submit" id="btnSimpanL" class="btn btn-primary flex-grow-1">Simpan</button></div></div></form>
             <div class="table-responsive"><table class="table table-hover align-middle"><thead><tr><th>ID Level</th><th>Nama Level</th><th>Diskon</th><th class="text-center">Aksi</th></tr></thead><tbody id="tabelLevel"></tbody></table></div>
           </div>
         </div>
@@ -186,7 +184,7 @@ main#main{padding-bottom:110px} @media(min-width:768px){main#main{padding-bottom
 </div>
 
 <!-- MODALS -->
-<div class="modal fade" id="modalStruk" tabindex="-1"><div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down"><div class="modal-content"><div class="modal-header"><h5 class="modal-title fw-bold"><i class="fa-solid fa-receipt me-2" style="color:var(--c4)"></i>Struk Transaksi</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="row g-3"><div class="col-md-6"><div class="tint p-3 d-flex justify-content-center align-items-start overflow-auto" style="height:60dvh"><img id="strukImg" alt="Membuat struk..." style="width:100%;max-width:380px;border-radius:.5rem;box-shadow:0 8px 24px -8px rgba(0,0,0,.2)"></div></div><div class="col-md-6 d-grid gap-2 align-content-start"><div><label class="form-label">No. WhatsApp pelanggan</label><input type="tel" id="strukWA" class="form-control" placeholder="08xx / 628xx"></div><button class="btn py-3" style="background:var(--c7);color:#fff" onclick="strukCetakBT()"><i class="fa-solid fa-print me-2"></i>Cetak Thermal (Bluetooth)</button><button class="btn btn-outline-primary py-3 bg-white" onclick="strukSimpan()"><i class="fa-solid fa-image me-2"></i>Simpan JPG</button><button class="btn text-white py-3" style="background:#25D366" onclick="strukWA()"><i class="fa-brands fa-whatsapp me-2 fs-5"></i>Kirim Langsung (wa.me)</button></div></div></div></div></div></div>
+<div class="modal fade" id="modalStruk" tabindex="-1"><div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down"><div class="modal-content"><div class="modal-header"><h5 class="modal-title fw-bold"><i class="fa-solid fa-receipt me-2" style="color:var(--c4)"></i>Struk Transaksi</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="row g-3"><div class="col-md-6"><div class="tint p-3 d-flex justify-content-center overflow-auto" style="height:60vh; align-items:flex-start;"><img id="strukImg" alt="Membuat struk..." style="width:100%;max-width:340px;height:auto;border-radius:.5rem;box-shadow:0 8px 24px -8px rgba(0,0,0,.2)"></div></div><div class="col-md-6 d-grid gap-2 align-content-start"><div><label class="form-label">No. WhatsApp pelanggan</label><input type="tel" id="strukWA" class="form-control" placeholder="08xx / 628xx"></div><button class="btn py-3" style="background:var(--c7);color:#fff" onclick="strukCetakBT()"><i class="fa-solid fa-print me-2"></i>Cetak Thermal (Bluetooth)</button><button class="btn btn-outline-primary py-3 bg-white" onclick="strukSimpan()"><i class="fa-solid fa-image me-2"></i>Simpan JPG</button><button class="btn text-white py-3" style="background:#25D366" onclick="strukWA()"><i class="fa-brands fa-whatsapp me-2 fs-5"></i>Kirim WA (Direct)</button></div></div></div></div></div></div>
 <div class="modal fade" id="modalPilihLayanan" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title fw-bold">Pilih Layanan</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><input type="text" id="searchCbProd" class="form-control mb-3" placeholder="Cari..." onkeyup="filterCb()"><div id="cbLayananContainer" class="d-grid gap-2"></div></div><div class="modal-footer"><button type="button" class="btn btn-primary w-100" onclick="terapkanLayananB()">Terapkan</button></div></div></div></div>
 <div class="modal fade" id="modalKartuMember" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title fw-bold">Kartu Member Digital</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body text-center"><canvas id="canvasMemberCard" style="max-width:100%;border-radius:12px;box-shadow:0 8px 16px rgba(0,0,0,0.3)"></canvas><div class="mt-4 d-grid gap-2"><button class="btn btn-dark" onclick="downloadKartuMember()"><i class="fa-solid fa-download me-2"></i>Unduh JPG</button></div></div></div></div></div>
 <div class="modal fade" id="modalRiwayat" tabindex="-1"><div class="modal-dialog modal-xl modal-dialog-scrollable modal-fullscreen-md-down"><div class="modal-content"><div class="modal-header"><h5 class="modal-title fw-bold"><i class="fa-solid fa-clock-rotate-left me-2" style="color:var(--c4)"></i>Riwayat &amp; Void</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><input type="text" id="searchRiwayat" class="form-control mb-3" placeholder="Cari Transaksi..." onkeyup="filterTabel('searchRiwayat','tabelRiwayatPOS')"><div class="table-responsive"><table class="table table-hover align-middle"><thead><tr><th>ID/Tgl</th><th>Pelanggan</th><th>Total</th><th>Status</th><th class="text-center">Aksi &amp; Struk</th></tr></thead><tbody id="tabelRiwayatPOS"></tbody></table></div></div></div></div></div>
@@ -200,12 +198,7 @@ main#main{padding-bottom:110px} @media(min-width:768px){main#main{padding-bottom
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// =============================================================
-// KONFIGURASI API DAN PWA
-// =============================================================
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxTLbPFw9XyiX4rE1QX9s7wxaXlAoCITbHhgDN98gQM9aoQRlPumUXTUWmpz04A5afp/exec";
-
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxQ7nAU-5Z_Z5jPZ0NsazPAK2d48PKkZlkOuyJyCYCBulwqlu03vQs-8rR3AM9FwhYJ/exec";
 
 async function apiGet(action, params = "") { let res = await fetch(`${GAS_URL}?action=${action}${params}`); return await res.json(); }
 async function apiPost(action, payload) { let res = await fetch(`${GAS_URL}?action=${action}`, { method:'POST', body:JSON.stringify(payload) }); return await res.json(); }
@@ -216,12 +209,9 @@ function applyVendorTheme(c) {
   const root = document.documentElement; root.style.setProperty('--c5', c.colorPrimary); root.style.setProperty('--c1', c.colorLight); root.style.setProperty('--c7', c.colorDark); root.style.setProperty('--bs-primary', c.colorPrimary);
 }
 
-// =============================================================
-// LOGIKA APLIKASI
-// =============================================================
 var TOKO = { nama: 'ERP Enterprise', alamat: 'Terima Kasih Atas Kunjungan Anda' };
 var Q = "'", db = { produk:[], booking:[], member:[], akuntansi:[], transaksi:[], level:[] }, cart = [], syncing = false, syncQueue = [], curTab = 'pos', SC = null;
-try { syncQueue = JSON.parse(localStorage.getItem('erpSyncQueue_v9')) || []; } catch(e){}
+try { syncQueue = JSON.parse(localStorage.getItem('erpSyncQueue_v9_1')) || []; } catch(e){}
 
 function g(id) { return document.getElementById(id); }
 function formatRp(n) { return new Intl.NumberFormat('id-ID', { style:'currency', currency:'IDR', minimumFractionDigits:0 }).format(n); }
@@ -274,8 +264,8 @@ function loadBookingKeCart(idBk) {
   if(!idBk) { g('posRefBookingId').value=''; return; }
   var bk = db.booking.find(b=>b.id===idBk); if(!bk) return;
   g('posPelanggan').value = bk.pelanggan; g('posRefBookingId').value = bk.id;
-  cart = []; // Reset cart
-  var lay = bk.layanan.split(', ');
+  cart = []; // Reset cart, isi dari booking
+  var lay = (bk.layanan || '').split(', ');
   lay.forEach(l => { var p = db.produk.find(x => x.nama === l); if(p) addToCart(p.id); });
 }
 
@@ -300,9 +290,7 @@ function cetakStrukUlang(id) { var t=db.transaksi.find(x=>x.id===id); if(t){ hid
 
 function drawStruk(tx, hd) {
   var items = parseItems(tx.detail);
-  var S=2, W=420, L=40, R=W-40, CX=W/2;
-  var rowH = 22, headerH = 260, footerH = 150, H = headerH + (items.length * rowH) + footerH;
-  
+  var S=2, W=420, L=40, R=W-40, CX=W/2, rowH = 25, headerH = 260, footerH = 150, H = headerH + (items.length * rowH) + footerH;
   var c = document.createElement('canvas'); c.width = W*S; c.height = H*S;
   var ctx = c.getContext('2d'); ctx.scale(S,S); ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
   
@@ -311,17 +299,13 @@ function drawStruk(tx, hd) {
   
   var cy = 40; ctx.fillStyle='var(--c5)'; ctx.beginPath(); ctx.arc(CX,cy+22,22,0,7); ctx.fill();
   txt(TOKO.nama.charAt(0).toUpperCase(), CX, cy+30, 'bold 22px serif', '#fff', 'center');
-  cy+=70; txt(TOKO.nama, CX, cy, 'bold 24px serif', '#2f1b11', 'center');
-  cy+=20; txt(TOKO.alamat, CX, cy, '12px sans-serif', '#8a7566', 'center');
-  cy+=30; txt(hd, CX, cy, 'bold 14px sans-serif', '#5f3b25', 'center'); cy+=15;
-  dashed(cy); cy+=20;
+  cy+=70; txt(TOKO.nama, CX, cy, 'bold 24px serif', '#2f1b11', 'center'); cy+=20; txt(TOKO.alamat, CX, cy, '12px sans-serif', '#8a7566', 'center');
+  cy+=30; txt(hd, CX, cy, 'bold 14px sans-serif', '#5f3b25', 'center'); cy+=15; dashed(cy); cy+=20;
   
   txt('No: '+tx.id, L, cy, '12px sans-serif', '#3b2f2a'); txt(new Date(tx.tgl).toLocaleDateString('id-ID'), R, cy, '12px sans-serif', '#3b2f2a', 'right'); cy+=18;
-  txt('Plg: '+tx.pelanggan, L, cy, '12px sans-serif', '#3b2f2a'); txt(tx.metode, R, cy, '12px sans-serif', '#3b2f2a', 'right'); cy+=15;
-  dashed(cy); cy+=20;
+  txt('Plg: '+tx.pelanggan, L, cy, '12px sans-serif', '#3b2f2a'); txt(tx.metode, R, cy, '12px sans-serif', '#3b2f2a', 'right'); cy+=15; dashed(cy); cy+=20;
   
-  items.forEach(it => { txt(it.n, L, cy, '600 13px sans-serif', '#2f1b11'); txt('x'+it.q, R, cy, 'bold 13px sans-serif', '#774a2e', 'right'); cy+=rowH; });
-  dashed(cy); cy+=30;
+  items.forEach(it => { txt(it.n, L, cy, '600 13px sans-serif', '#2f1b11'); txt('x'+it.q, R, cy, 'bold 13px sans-serif', '#774a2e', 'right'); cy+=rowH; }); dashed(cy); cy+=30;
   
   txt('TOTAL', L, cy, '600 14px sans-serif', '#8a7566'); txt(formatRp(tx.total), R, cy, 'bold 24px serif', '#5f3b25', 'right'); cy+=35;
   txt(tx.status.toUpperCase(), CX, cy, 'bold 15px sans-serif', tx.status==='Lunas'?'#047857':'#b91c1c', 'center'); cy+=40;
@@ -339,7 +323,9 @@ function strukSimpan() { if(!SC || !SC.cv) return; SC.cv.toBlob(b => { var a=doc
 function strukWA() {
   var no = normWA(g('strukWA').value); if(!no) return toast('Isi no WA valid');
   var text = encodeURIComponent(`Halo ${SC.tx.pelanggan},\nBerikut struk pembayaran ${SC.tx.id} di ${TOKO.nama} sebesar ${formatRp(SC.tx.total)}.\nTerima Kasih!`);
-  window.open(`https://wa.me/${no}?text=${text}`, '_blank');
+  // Menggunakan direct link klik agar tidak terblokir popup blocker browser
+  var a = document.createElement('a'); a.href = `https://wa.me/${no}?text=${text}`; a.target = '_blank';
+  document.body.appendChild(a); a.click(); a.remove();
 }
 
 var BT = { dev:null, ch:null };
@@ -352,9 +338,17 @@ async function btConnect() {
 }
 async function btSend(ch, data) { for(let i=0; i<data.length; i+=100) { let p=Uint8Array.from(data.slice(i,i+100)); if(ch.properties.writeWithoutResponse) await ch.writeValueWithoutResponse(p); else await ch.writeValue(p); await new Promise(r=>setTimeout(r,30)); } }
 function escPos(tx, hd) {
-  var W=32, o=[]; function raw(...a){o.push(...a);} function line(s){ for(let i=0;i<s.length;i++) o.push(s.charCodeAt(i)); o.push(10); } 
-  function sep(){line('-'.repeat(W));} 
-  function row(l,r){ l=String(l).substring(0, 20); r=String(r); let sp = Math.max(1, W - l.length - r.length); line(l + ' '.repeat(sp) + r); }
+  var W=32, o=[]; function raw(...a){o.push(...a);} function line(s){ for(let i=0;i<s.length;i++) o.push(s.charCodeAt(i)); o.push(10); } function sep(){line('-'.repeat(W));} 
+  
+  // FIX WIDTH PADDING THERMAL PRINTER
+  function row(l,r){ 
+    r = String(r); 
+    var maxL = W - r.length - 1; 
+    if(maxL < 1) maxL = 1; 
+    l = String(l).substring(0, maxL); 
+    var sp = W - l.length - r.length; 
+    line(l + ' '.repeat(sp) + r); 
+  }
   
   raw(27,64, 27,97,1, 29,33,17); line(TOKO.nama); raw(29,33,0); line(hd); raw(27,97,0); sep();
   row('No', tx.id); row('Plg', tx.pelanggan); sep();
@@ -380,8 +374,7 @@ function renderBooking() {
   g('listBooking').innerHTML = act.map(b => `<div class="col-md-6"><div class="cardx p-3 border-start border-4 border-primary"><div class="d-flex justify-content-between"><div class="fw-bold">${esc(b.pelanggan)}</div><div><button class="btn btn-sm text-primary p-0 me-2" ${oc('editBooking',b.id)}><i class="fa-solid fa-pen"></i></button><button class="btn btn-sm text-danger p-0" ${oc('hapusBooking',b.id)}><i class="fa-solid fa-trash"></i></button></div></div><div class="small fw-bold text-primary">${new Date(b.waktu).toLocaleString('id-ID')}</div><div class="small text-muted mt-2"><i class="fa-solid fa-bell-concierge me-1"></i>${esc(b.layanan)}</div></div></div>`).join('') || '<p class="text-muted">Kosong.</p>';
 }
 function bukaPilihLayanan() {
-  var arr = g('bLayananData').value ? g('bLayananData').value.split(', ') : []; cbLayananTemp = arr;
-  filterCb(); showM('modalPilihLayanan');
+  cbLayananTemp = g('bLayananData').value ? g('bLayananData').value.split(', ') : []; filterCb(); showM('modalPilihLayanan');
 }
 function filterCb() {
   var q = g('searchCbProd').value.toLowerCase();
@@ -397,7 +390,7 @@ function terapkanLayananB() {
 }
 function simpanBooking(e) {
   e.preventDefault(); var idEdit = g('bIdValue').value, pel = g('bPelanggan').value, wak = g('bWaktu').value, lay = g('bLayananData').value;
-  var hp = ""; var m = db.member.find(x=>x.nama === pel); if(m) hp = m.hp; // auto get hp jika dia member
+  var hp = ""; var m = db.member.find(x=>x.nama === pel); if(m) hp = m.hp; // auto get hp jika member
   if(idEdit) {
     var i = db.booking.findIndex(x=>x.id===idEdit); if(i>-1) db.booking[i] = {id:idEdit, waktu:wak, pelanggan:pel, hp:hp, layanan:lay, status:'Menunggu'};
     addToQueue('Booking','UPDATE',idEdit,[idEdit, wak, pel, hp, lay, 'Menunggu']);
@@ -407,7 +400,16 @@ function simpanBooking(e) {
   }
   batalEditB(); renderAll();
 }
-function editBooking(id) { var b=db.booking.find(x=>x.id===id); if(b){ g('bIdValue').value=b.id; g('bWaktu').value=b.waktu; g('bPelanggan').value=b.pelanggan; g('bLayananData').value=b.layanan; g('bLayananShow').value=b.layanan?b.layanan.split(',').length+' Layanan':''; g('btnSimpanB').innerText='Update'; g('btnBatalB').style.display='block'; g('bWaktu').scrollIntoView(); } }
+function editBooking(id) { 
+  var b=db.booking.find(x=>x.id===id); 
+  if(b){ 
+    g('bIdValue').value=b.id; 
+    // Format Waktu for datetime-local (YYYY-MM-DDTHH:mm)
+    var w = new Date(b.waktu); var wStr = new Date(w.getTime() - (w.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+    g('bWaktu').value=wStr; g('bPelanggan').value=b.pelanggan; g('bLayananData').value=b.layanan; g('bLayananShow').value=b.layanan?b.layanan.split(',').length+' Layanan':''; 
+    g('btnSimpanB').innerText='Update'; g('btnBatalB').style.display='block'; g('bWaktu').scrollIntoView(); 
+  } 
+}
 function batalEditB() { g('bIdValue').value=''; g('bWaktu').value=''; g('bPelanggan').value=''; g('bLayananData').value=''; g('bLayananShow').value=''; g('btnSimpanB').innerText='Simpan'; g('btnBatalB').style.display='none'; }
 function hapusBooking(id) { if(confirm('Hapus antrean?')) { db.booking=db.booking.filter(b=>b.id!==id); addToQueue('Booking','DELETE',id,null); renderAll(); } }
 
@@ -434,7 +436,8 @@ function renderMember() {
   g('dlPelanggan').innerHTML = db.member.filter(m=>m.status==='Aktif').map(m => `<option value="${esc(m.nama)}">${esc(m.hp)}</option>`).join('');
   g('listMemberTbl').innerHTML = db.member.map(m => {
     var bg = m.status==='Aktif'?'bg-success':(m.status==='Blacklist'?'bg-dark':'bg-secondary');
-    return `<tr><td><b>${esc(m.id)}</b><br><small class="text-muted">${new Date(m.tgldaftar).toLocaleDateString('id-ID')}</small></td><td class="fw-bold">${esc(m.nama)}<br><small class="text-muted fw-normal">${esc(m.hp)}</small></td><td>${esc(m.level)||'-'}</td><td><span class="badge ${bg}">${m.status}</span></td><td class="text-center"><button class="btn btn-sm btn-outline-primary" title="Kartu" ${oc('cetakKartuMember',m.id)}><i class="fa-regular fa-id-card"></i></button> <button class="btn btn-sm btn-outline-dark" title="Edit" ${oc('editMember',m.id)}><i class="fa-solid fa-pen"></i></button></td></tr>`;
+    var tgld = m.tgldaftar ? new Date(m.tgldaftar).toLocaleDateString('id-ID') : '-';
+    return `<tr><td><b>${esc(m.id)}</b><br><small class="text-muted">${tgld}</small></td><td class="fw-bold">${esc(m.nama)}<br><small class="text-muted fw-normal">${esc(m.hp)}</small></td><td>${esc(m.level)||'-'}</td><td><span class="badge ${bg}">${m.status}</span></td><td class="text-center"><button class="btn btn-sm btn-outline-primary" title="Kartu" ${oc('cetakKartuMember',m.id)}><i class="fa-regular fa-id-card"></i></button> <button class="btn btn-sm btn-outline-dark" title="Edit" ${oc('editMember',m.id)}><i class="fa-solid fa-pen"></i></button></td></tr>`;
   }).join('');
 }
 function editMember(id) { var m=db.member.find(x=>x.id===id); if(m){ g('mIdValue').value=m.id; g('mNama').value=m.nama; g('mHP').value=m.hp; g('mLevel').value=m.level; g('mStatus').value=m.status; g('btnSimpanM').innerText='Update'; g('btnBatalM').style.display='block'; g('mNama').scrollIntoView(); } }
@@ -443,24 +446,17 @@ function batalEditM() { g('mIdValue').value=''; g('mNama').value=''; g('mHP').va
 function cetakKartuMember(id) {
   var m = db.member.find(x=>x.id===id); if(!m) return;
   var c = g('canvasMemberCard'); c.width = 600; c.height = 360; var ctx = c.getContext('2d');
-  
-  // BG Gradient
   var gr = ctx.createLinearGradient(0,0,600,360); gr.addColorStop(0,'var(--c7)'); gr.addColorStop(1,'var(--c5)');
   ctx.fillStyle=gr; ctx.beginPath(); ctx.roundRect(0,0,600,360,20); ctx.fill();
-  
-  // Decoration
   ctx.fillStyle='rgba(255,255,255,0.1)'; ctx.beginPath(); ctx.arc(500,-50,200,0,2*Math.PI); ctx.fill();
   
-  // Text
   ctx.fillStyle='#fff'; ctx.font='bold 24px serif'; ctx.fillText(TOKO.nama, 40, 50);
   ctx.font='bold 16px sans-serif'; ctx.textAlign='right'; ctx.fillText('MEMBER CARD', 560, 50);
   
-  ctx.textAlign='left';
-  ctx.font='bold 28px monospace'; ctx.letterSpacing='4px'; ctx.fillText(m.id.match(/.{1,4}/g).join(' '), 40, 200);
-  ctx.letterSpacing='0px';
-  ctx.font='14px sans-serif'; ctx.fillText('MEMBER SEJAK', 40, 250); ctx.font='bold 18px sans-serif'; ctx.fillText(new Date(m.tgldaftar).getFullYear(), 40, 275);
+  ctx.textAlign='left'; ctx.font='bold 28px monospace'; ctx.letterSpacing='4px'; ctx.fillText(m.id.match(/.{1,4}/g).join(' '), 40, 200); ctx.letterSpacing='0px';
+  var thn = m.tgldaftar ? new Date(m.tgldaftar).getFullYear() : new Date().getFullYear();
+  ctx.font='14px sans-serif'; ctx.fillText('MEMBER SEJAK', 40, 250); ctx.font='bold 18px sans-serif'; ctx.fillText(thn, 40, 275);
   ctx.font='14px sans-serif'; ctx.fillText('NAMA', 200, 250); ctx.font='bold 20px sans-serif'; ctx.fillText(m.nama.toUpperCase(), 200, 275);
-  
   if(m.level) { ctx.fillStyle='#f59e0b'; ctx.font='bold 22px sans-serif'; ctx.textAlign='right'; ctx.fillText(m.level.toUpperCase(), 560, 320); }
   showM('modalKartuMember');
 }
@@ -479,7 +475,7 @@ function simpanJurnalManual(e) {
   }
   batalEditJ(); renderAll(); toast('Tersimpan');
 }
-function editJurnal(id) { var j=db.akuntansi.find(x=>x.id===id); if(j && j.tipe==='Manual'){ g('jIdValue').value=j.id; g('jTgl').value=j.tgl.split('T')[0]; g('jKet').value=j.ket; g('jNominal').value=j.nominal; g('btnSimpanJ').innerText='Update'; g('btnBatalJ').style.display='block'; } else toast('Hanya jurnal manual yang bisa diedit disini.'); }
+function editJurnal(id) { var j=db.akuntansi.find(x=>x.id===id); if(j && j.tipe==='Manual'){ g('jIdValue').value=j.id; g('jTgl').value=new Date(j.tgl).toISOString().split('T')[0]; g('jKet').value=j.ket; g('jNominal').value=j.nominal; g('btnSimpanJ').innerText='Update'; g('btnBatalJ').style.display='block'; } else toast('Hanya jurnal manual yang bisa diedit disini.'); }
 function batalEditJ() { g('jIdValue').value=''; g('jTgl').value=''; g('jKet').value=''; g('jNominal').value=''; g('btnSimpanJ').innerText='Catat'; g('btnBatalJ').style.display='none'; }
 function hapusJurnal(id) { var j=db.akuntansi.find(x=>x.id===id); if(j && j.tipe==='Manual') { if(confirm('Hapus jurnal?')) { db.akuntansi=db.akuntansi.filter(x=>x.id!==id); addToQueue('Akuntansi','DELETE',id,null); renderAll(); } } else toast('Jurnal sistem tidak bisa dihapus manual.'); }
 
@@ -491,7 +487,7 @@ function renderLaporanAkuntansi() {
     
     // Auto link to Modal Detail jika ada kode [TX...]
     var ketHtml = esc(a.ket).replace(/\[(TX[A-Z0-9]+)\]/g, `<button class="btn btn-link btn-sm p-0 fw-bold" onclick="lihatDetailTx('$1')">[$1]</button>`);
-    var aksi = a.tipe==='Manual' ? `<button class="btn btn-sm text-primary p-0" ${oc('editJurnal',a.id)}><i class="fa-solid fa-pen"></i></button> <button class="btn btn-sm text-danger p-0" ${oc('hapusJurnal',a.id)}><i class="fa-solid fa-trash"></i></button>` : '';
+    var aksi = a.tipe==='Manual' ? `<button class="btn btn-sm text-primary p-0 me-1" ${oc('editJurnal',a.id)}><i class="fa-solid fa-pen"></i></button><button class="btn btn-sm text-danger p-0" ${oc('hapusJurnal',a.id)}><i class="fa-solid fa-trash"></i></button>` : '';
     return `<tr><td>${new Date(a.tgl).toLocaleDateString('id-ID')}</td><td>${ketHtml}</td><td>${esc(a.debit)}</td><td>${esc(a.kredit)}</td><td class="text-end fw-bold">${formatRp(a.nominal)}</td><td class="text-center">${aksi}</td></tr>`;
   }).join('');
   g('dashPendapatan').innerText=formatRp(pd); g('dashBeban').innerText=formatRp(bb); g('dashModal').innerText=formatRp(md); g('dashLaba').innerText=formatRp(pd-bb);
@@ -499,11 +495,11 @@ function renderLaporanAkuntansi() {
 
 function prosesTutupBuku() {
   var labaRugiText = g('dashLaba').innerText.replace(/[^\d]/g, ''); var nominalLR = parseInt(labaRugiText, 10);
-  if(nominalLR === 0) return alert('Tidak ada Laba/Rugi yang perlu ditutup.');
-  if(!confirm('Tutup Buku akan mengenolkan saldo nominal (Pendapatan & Beban) dan memindahkannya ke Modal. Lanjutkan?')) return;
+  if(nominalLR === 0) return alert('Tidak ada Laba/Rugi berjalan yang perlu ditutup.');
+  if(!confirm('Tutup Buku akan mengenolkan saldo nominal (Pendapatan & Beban berjalan) dan memindahkannya ke Modal Laba Ditahan. Lanjutkan?')) return;
   
   var tgl = new Date().toISOString(), idJr = genId('JB');
-  var deb = nominalLR > 0 ? 'Pendapatan Jasa' : 'Modal (Rugi)', kre = nominalLR > 0 ? 'Modal Laba Ditahan' : 'Beban'; // Simplifikasi
+  var deb = nominalLR > 0 ? 'Pendapatan Jasa' : 'Modal (Rugi)', kre = nominalLR > 0 ? 'Modal Laba Ditahan' : 'Beban';
   
   db.akuntansi.push({ id: idJr, tgl: tgl, ket: 'TUTUP BUKU PERIODE', debit: deb, kredit: kre, nominal: nominalLR, tipe: 'TutupBuku' });
   addToQueue('Akuntansi', 'INSERT', null, [idJr, tgl, 'TutupBuku', 'TUTUP BUKU PERIODE', deb, kre, nominalLR]);
@@ -523,7 +519,7 @@ function cetakLaporanAkuntansiLengkap() {
       <table style="width:100%;max-width:600px;margin:0 auto 30px auto;border-collapse:collapse;font-size:14px">
         <tr><td style="padding:10px">Total Pendapatan Jasa & Lainnya</td><td style="padding:10px;text-align:right;font-weight:bold">${g('dashPendapatan').innerText}</td></tr>
         <tr><td style="padding:10px">Total Beban & Pengeluaran</td><td style="padding:10px;text-align:right;color:red;font-weight:bold">(${g('dashBeban').innerText})</td></tr>
-        <tr style="font-weight:bold;font-size:16px;background:#f3f4f6"><td style="padding:10px">LABA / RUGI BERSIH</td><td style="padding:10px;text-align:right">${g('dashLaba').innerText}</td></tr>
+        <tr style="font-weight:bold;font-size:16px;background:#f3f4f6"><td style="padding:10px">LABA / RUGI BERSIH BERJALAN</td><td style="padding:10px;text-align:right">${g('dashLaba').innerText}</td></tr>
         <tr style="font-weight:bold;background:#eee"><td style="padding:10px">MODAL DISETOR & LABA DITAHAN</td><td style="padding:10px;text-align:right">${g('dashModal').innerText}</td></tr>
       </table>
       <h3 style="font-size:14px;border-bottom:2px solid #000;padding-bottom:5px">Rincian Buku Besar</h3>
@@ -565,13 +561,13 @@ function cetakBannerPromo() {
 }
 
 // --- SYNC & VENDOR CORE ---
-function addToQueue(tb, act, id, arr, param) { var it = { opId: genId('OP'), table: tb, action: act, id: id, data: arr }; if(param) Object.assign(it, param); syncQueue.push(it); saveQ(); setSyncUI('pend'); }
+function addToQueue(tb, act, id, arr, param) { var it = { opId: genId('OP'), table: tb, action: act, id: id, data: arr }; if(param) Object.assign(it, param); syncQueue.push(it); localStorage.setItem('erpSyncQueue_v9_1', JSON.stringify(syncQueue)); setSyncUI('pend'); }
 async function processSync() {
   if (syncing) return; if (!syncQueue.length) { setSyncUI('ok'); return; }
   syncing = true; setSyncUI('sync'); var batch = syncQueue.slice(0, 50);
   try {
     let res = await apiPost('sync', batch);
-    if (res && (res.status === 'success' || res.status === 'empty')) { syncQueue = syncQueue.slice(batch.length); saveQ(); setSyncUI(syncQueue.length?'pend':'ok'); }
+    if (res && (res.status === 'success' || res.status === 'empty')) { syncQueue = syncQueue.slice(batch.length); localStorage.setItem('erpSyncQueue_v9_1', JSON.stringify(syncQueue)); setSyncUI(syncQueue.length?'pend':'ok'); }
     else { if(res && res.message && res.message.includes('Lisensi')) g('saasLockScreen').style.display = 'flex'; setSyncUI('fail'); }
   } catch(e) { setSyncUI('off'); } finally { syncing = false; }
 }
