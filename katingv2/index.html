@@ -52,7 +52,6 @@ main#main{padding-bottom:110px} @media(min-width:768px){main#main{padding-bottom
 @media(min-width:768px){#toast{bottom:2rem}}
 .table thead th{background:var(--c1);color:var(--c4);font-size:.75rem;font-weight:700;border:0} .table td{font-size:.8rem}
 .modal-content{border-radius:1.5rem;border:0} #saasLockScreen{position:fixed;inset:0;background:var(--c7);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;color:#fff;padding:1.5rem;text-align:center}
-/* Utility classes */
 .chip { display:inline-block; padding:0.25rem 0.5rem; font-size:0.7rem; font-weight:700; border-radius:0.5rem; }
 .tx-link { cursor:pointer; color:var(--bs-primary); text-decoration:underline; font-weight:700;} .tx-link:hover{color:var(--c7)}
 @media print{body *{visibility:hidden} #printArea,#printArea *{visibility:visible} #printArea{position:absolute;left:0;top:0;width:100%} .print-receipt{width:58mm;font-family:monospace;font-size:12px;background:#fff;padding:10px} .print-report{width:100%;background:#fff;padding:20px;font-family:sans-serif} html,body{overflow:visible}}
@@ -60,7 +59,6 @@ main#main{padding-bottom:110px} @media(min-width:768px){main#main{padding-bottom
 </head>
 <body>
 
-<!-- ================== HTML STRUCTURE ================== -->
 <div id="saasLockScreen"><i class="fa-solid fa-lock text-danger mb-4" style="font-size:4rem"></i><h1 class="h2 fw-bold">Akses Sistem Ditangguhkan</h1><p class="text-white-50 mb-4" style="max-width:28rem">Masa sewa/lisensi aplikasi Anda telah berakhir. Silakan hubungi Vendor.</p><button onclick="bukaAdminPanel()" class="btn btn-sm btn-outline-light"><i class="fa-solid fa-key"></i> Vendor Login</button></div>
 <div id="printArea" style="display:none"></div>
 <div id="toast"></div>
@@ -77,7 +75,6 @@ main#main{padding-bottom:110px} @media(min-width:768px){main#main{padding-bottom
   </nav>
 
   <div class="flex-grow-1 d-flex flex-column" style="min-width:0">
-    <!-- HEADER -->
     <header class="d-flex align-items-center justify-content-between px-3 px-md-4 pb-2 bg-white border-bottom" style="padding-top:calc(.5rem + env(safe-area-inset-top))">
       <div class="d-flex align-items-center gap-2"><h1 id="pageTitle" class="h4 fw-bold mb-0" style="color:var(--c7)">Kasir</h1></div>
       <div class="d-flex align-items-center gap-2">
@@ -109,7 +106,7 @@ main#main{padding-bottom:110px} @media(min-width:768px){main#main{padding-bottom
               <div class="d-flex justify-content-between align-items-center mb-1"><span class="form-label mb-0">Pelanggan</span><span id="cartCount" class="badge" style="background:var(--c1);color:var(--c5)">0 Item</span></div>
               <div class="d-flex gap-2 mb-3">
                  <select id="posPelanggan" class="form-select fw-semibold" onchange="cekGuestPos()"></select>
-                 <input type="text" id="posGuestName" class="form-control d-none" placeholder="Nama Pelanggan">
+                 <input type="text" id="posGuestName" class="form-control" placeholder="Pelanggan Umum (Isi Nama)">
               </div>
               <input type="hidden" id="posRefBookingId" value="">
               <div id="cartItems" class="mb-3"></div>
@@ -118,7 +115,13 @@ main#main{padding-bottom:110px} @media(min-width:768px){main#main{padding-bottom
                   <div class="col-6"><select id="metodeBayar" class="form-select form-select-sm fw-semibold"><option value="Cash">Tunai</option><option value="QRIS">QRIS</option><option value="Transfer">Transfer</option></select></div>
                   <div class="col-6"><select id="statusBayar" class="form-select form-select-sm fw-bold text-success"><option value="Lunas">LUNAS</option><option value="Belum Bayar">PIUTANG</option></select></div>
                 </div>
-                <div class="d-flex justify-content-between align-items-end mb-3"><span class="fw-semibold" style="color:var(--c4)">Total</span><span id="totalPrice" class="serif fw-bold fs-2" style="color:var(--c6)">Rp 0</span></div>
+                <div class="d-flex justify-content-between align-items-end mb-3">
+                  <div class="fw-semibold" style="color:var(--c4)">Total <div id="cartDiskonText" class="text-danger small fw-bold"></div></div>
+                  <div class="text-end">
+                    <div id="cartSubtotal" class="small text-muted text-decoration-line-through d-none"></div>
+                    <div id="totalPrice" class="serif fw-bold fs-2" style="color:var(--c6)">Rp 0</div>
+                  </div>
+                </div>
                 <button onclick="prosesCheckout()" class="btn btn-primary w-100 py-3">BAYAR &amp; STRUK</button>
               </div>
             </div>
@@ -133,7 +136,7 @@ main#main{padding-bottom:110px} @media(min-width:768px){main#main{padding-bottom
           <input type="hidden" id="bIdValue">
           <div class="row g-2">
             <div class="col-sm-6 col-lg-3"><label class="form-label">Waktu</label><input type="datetime-local" id="bWaktu" required class="form-control"></div>
-            <div class="col-sm-6 col-lg-3"><label class="form-label">Pelanggan</label><div class="d-flex gap-1"><select id="bPelanggan" class="form-select" onchange="cekGuestBooking()"></select><input type="text" id="bGuestName" class="form-control d-none" placeholder="Nama"></div></div>
+            <div class="col-sm-6 col-lg-3"><label class="form-label">Pelanggan</label><div class="d-flex gap-1"><select id="bPelanggan" class="form-select" onchange="cekGuestBooking()"></select><input type="text" id="bGuestName" class="form-control" placeholder="Nama"></div></div>
             <div class="col-sm-6 col-lg-4"><label class="form-label">Pilih Layanan</label><button type="button" class="btn btn-outline-primary w-100 text-start" onclick="showM('modalPilihLayanan')"><i class="fa-solid fa-list-check me-2"></i><span id="bLayananLabel">Pilih Item (0)</span></button><input type="hidden" id="bLayananData"></div>
             <div class="col-sm-6 col-lg-2 d-grid align-items-end d-flex gap-2"><button type="submit" id="btnSimpanB" class="btn btn-primary flex-grow-1">Buat</button><button type="button" id="btnBatalB" onclick="batalEditBooking()" class="btn btn-secondary" style="display:none"><i class="fa-solid fa-xmark"></i></button></div>
           </div>
@@ -143,7 +146,7 @@ main#main{padding-bottom:110px} @media(min-width:768px){main#main{padding-bottom
 
       <!-- 3. CRM TAB -->
       <section id="crm" class="tab-panel"><div class="cardx p-3 p-md-4">
-        <div class="d-flex justify-content-between mb-3"><h2 class="h5 fw-bold mb-0">Kelola Member</h2><button class="btn btn-sm btn-outline-secondary" onclick="manageSettings('Level Member', 'level_member')"><i class="fa-solid fa-gear"></i> Setup Level</button></div>
+        <div class="d-flex justify-content-between mb-3"><h2 class="h5 fw-bold mb-0">Kelola Member</h2><button class="btn btn-sm btn-outline-secondary" onclick="manageSettings('Level Member (Diskon)', 'level_member')"><i class="fa-solid fa-gear"></i> Setup Level & Diskon</button></div>
         <form id="formMember" class="tint p-3 mb-4" onsubmit="simpanMember(event)">
           <input type="hidden" id="mIdValue">
           <div class="row g-2">
@@ -159,11 +162,11 @@ main#main{padding-bottom:110px} @media(min-width:768px){main#main{padding-bottom
       </div></section>
 
       <!-- 4. AKUNTING TAB -->
-      <section id="akunting" class="tab-panel">
+      <section id="akunting" class="tab-panel pb-5 mb-5">
         <div class="row g-3 mb-3">
           <div class="col-md-4"><div class="cardx p-3 h-100"><div class="small fw-bold" style="color:var(--c4)">Pendapatan Jasa</div><div class="fs-4 fw-black fw-bold text-success" id="dashPendapatan">Rp 0</div></div></div>
           <div class="col-md-4"><div class="cardx p-3 h-100"><div class="small fw-bold" style="color:var(--c4)">Beban/Pengeluaran</div><div class="fs-4 fw-bold text-danger" id="dashBeban">Rp 0</div></div></div>
-          <div class="col-md-4"><div class="p-3 h-100 text-white" style="background:var(--c7);border-radius:1.25rem"><div class="d-flex justify-content-between align-items-start"><div class="small fw-bold" style="color:var(--c3)">LABA / RUGI BERSIH</div><button onclick="tutupBuku()" class="btn btn-sm btn-outline-light py-0" title="Tutup Buku Akhir Bulan"><i class="fa-solid fa-lock"></i> Tutup</button></div><div class="fs-3 fw-bold" id="dashLaba">Rp 0</div><div class="border-top mt-2 pt-2" style="border-color:var(--c5)!important"><div style="font-size:.65rem;color:var(--c3)" class="fw-bold text-uppercase">Modal Disetor (Modal - Prive)</div><div class="fw-bold" id="dashModal">Rp 0</div></div></div></div>
+          <div class="col-md-4"><div class="p-3 h-100 text-white" style="background:var(--c7);border-radius:1.25rem"><div class="d-flex justify-content-between align-items-start"><div class="small fw-bold" style="color:var(--c3)">LABA / RUGI AKTIF</div><button onclick="tutupBukuUI()" class="btn btn-sm btn-outline-light py-0" title="Tutup Buku Akhir Bulan"><i class="fa-solid fa-lock"></i> Tutup</button></div><div class="fs-3 fw-bold" id="dashLaba">Rp 0</div><div class="border-top mt-2 pt-2" style="border-color:var(--c5)!important"><div style="font-size:.65rem;color:var(--c3)" class="fw-bold text-uppercase">Modal Disetor (Modal - Prive)</div><div class="fw-bold" id="dashModal">Rp 0</div></div></div></div>
         </div>
         <div class="row g-3">
           <div class="col-lg-4"><div class="cardx p-3 p-md-4"><h3 class="h6 fw-bold mb-3">Input Kas Manual</h3>
@@ -176,14 +179,29 @@ main#main{padding-bottom:110px} @media(min-width:768px){main#main{padding-bottom
               <div class="d-flex gap-2"><button type="submit" id="btnSimpanJ" class="btn flex-grow-1" style="background:var(--c7);color:#fff">Catat</button><button type="button" id="btnBatalJ" onclick="batalEditJurnal()" class="btn btn-secondary" style="display:none"><i class="fa-solid fa-xmark"></i></button></div>
             </form>
           </div></div>
-          <div class="col-lg-8"><div class="cardx p-3 p-md-4"><div class="d-flex flex-column flex-md-row justify-content-between gap-2 border-bottom pb-3 mb-3"><div><h3 class="h6 fw-bold mb-0">Buku Besar (Ledger)</h3><small class="text-muted">Klik [TX..] untuk lihat nota.</small></div><div class="d-flex gap-2"><input type="text" id="searchLedger" class="form-control form-control-sm" placeholder="Cari Jurnal..." onkeyup="filterTabel('searchLedger','tabelJurnal')"><button onclick="cetakLaporanLabaRugi()" class="btn btn-sm btn-outline-primary text-nowrap"><i class="fa-solid fa-print"></i> Cetak Laba Rugi PDF</button></div></div>
+          <div class="col-lg-8"><div class="cardx p-3 p-md-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between gap-2 border-bottom pb-3 mb-3">
+               <div><h3 class="h6 fw-bold mb-0">Buku Besar (Ledger)</h3><small class="text-muted">Klik [TX..] untuk lihat nota.</small></div>
+               <div class="d-flex flex-wrap gap-2 justify-content-md-end">
+                  <input type="text" id="searchLedger" class="form-control form-control-sm" style="max-width:140px" placeholder="Cari..." onkeyup="filterTabel('searchLedger','tabelJurnal')">
+                  <button onclick="cetakLaporanLabaRugi()" class="btn btn-sm btn-outline-primary" title="Cetak Laba Rugi Aktif"><i class="fa-solid fa-print"></i> Laba Rugi</button>
+                  <button onclick="showM('modalLaporanLama')" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-file-pdf"></i> Arsip Lama</button>
+                  <button onclick="bukaRiwayatTutupBuku()" class="btn btn-sm btn-outline-warning text-dark"><i class="fa-solid fa-clock-rotate-left"></i> Histori Tutup</button>
+               </div>
+            </div>
           <div class="table-responsive" style="max-height:50vh"><table class="table table-hover align-middle mb-0"><thead style="position:sticky;top:0"><tr><th>Tgl</th><th>Ref/Ket</th><th>Debit</th><th>Kredit</th><th class="text-end">Nominal</th><th class="text-center"><i class="fa-solid fa-gear"></i></th></tr></thead><tbody id="tabelJurnal"></tbody></table></div></div></div>
         </div>
       </section>
 
       <!-- 5. MASTER TAB -->
       <section id="master" class="tab-panel"><div class="cardx p-3 p-md-4">
-        <div class="d-flex justify-content-between mb-3"><h2 class="h5 fw-bold mb-0">Data Produk &amp; Layanan</h2><div><button class="btn btn-sm btn-outline-primary me-2" onclick="cetakKatalogPDF()"><i class="fa-solid fa-file-pdf"></i> Cetak Katalog</button><button class="btn btn-sm btn-outline-secondary" onclick="manageSettings('Kategori Produk', 'kategori_produk')"><i class="fa-solid fa-gear"></i> Setup Kategori</button></div></div>
+        <div class="d-flex justify-content-between mb-3"><h2 class="h5 fw-bold mb-0">Data Produk &amp; Master</h2>
+          <div>
+            <button class="btn btn-sm btn-outline-info me-2" onclick="showProfilUsaha()"><i class="fa-solid fa-store"></i> Profil Usaha</button>
+            <button class="btn btn-sm btn-outline-primary me-2" onclick="cetakKatalogPDF()"><i class="fa-solid fa-file-pdf"></i> Cetak Katalog</button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="manageSettings('Kategori Produk', 'kategori_produk')"><i class="fa-solid fa-gear"></i> Setup Kategori</button>
+          </div>
+        </div>
         <form id="formProduk" class="tint p-3 mb-4" onsubmit="simpanProduk(event)"><input type="hidden" id="pIdValue"><div class="row g-2 align-items-end">
           <div class="col-lg-3"><label class="form-label">Nama Item</label><input type="text" id="pNama" required class="form-control"></div>
           <div class="col-sm-6 col-lg-2"><label class="form-label">Kategori</label><select id="pKategori" class="form-select"></select></div>
@@ -209,17 +227,31 @@ main#main{padding-bottom:110px} @media(min-width:768px){main#main{padding-bottom
 <button id="cartBar" class="d-lg-none" onclick="toggleCart(true)"><span><i class="fa-solid fa-bag-shopping me-2"></i><span id="cartBarCount">0 Item</span></span><span>Lihat Pesanan &middot; <span id="cartBarTotal">Rp 0</span></span></button>
 
 <!-- ================== MODALS ================== -->
-<!-- Modal Struk -->
+<div class="modal fade" id="modalProfilUsaha" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title fw-bold"><i class="fa-solid fa-store me-2" style="color:var(--c4)"></i>Profil Usaha</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form onsubmit="simpanProfilUsaha(event)"><div class="mb-2"><label class="form-label">Nama Perusahaan / Toko</label><input type="text" id="puNama" class="form-control" required></div><div class="mb-2"><label class="form-label">Alamat Lengkap</label><textarea id="puAlamat" class="form-control" required></textarea></div><div class="mb-2"><label class="form-label">Nomor Telepon / WA</label><input type="tel" id="puTelp" class="form-control"></div><div class="mb-3"><label class="form-label">URL Logo (PNG/JPG)</label><input type="url" id="puLogo" class="form-control" placeholder="https://..."></div><button type="submit" class="btn btn-primary w-100">Simpan Profil</button></form></div></div></div></div>
+
+<div class="modal fade" id="modalTutupBuku" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title fw-bold">Tutup Buku &amp; Penyesuaian Laba</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="d-flex justify-content-between mb-1"><span>Total Pendapatan:</span><span id="tbPendapatan" class="fw-bold text-success"></span></div><div class="d-flex justify-content-between mb-1"><span>Total Beban:</span><span id="tbBeban" class="fw-bold text-danger"></span></div><div class="d-flex justify-content-between mb-3 pb-2 border-bottom fw-bold"><span>Laba Kotor Aktif:</span><span id="tbLaba"></span></div><div class="mb-3"><label class="form-label text-primary">Potongan (Bonus Karyawan/Pajak dll)</label><input type="number" id="tbPotongan" class="form-control fw-bold" value="0" min="0" oninput="hitungLabaBersihTB()"></div><div class="p-3 tint rounded-3 d-flex justify-content-between align-items-center"><span class="fw-bold text-muted">Sisa Laba Ditahan (Modal):</span><span id="tbLabaBersih" class="fs-5 fw-bold text-success"></span></div><button onclick="prosesTutupBuku()" class="btn btn-primary w-100 mt-4 py-2">Proses & Kunci Pembukuan</button></div></div></div></div>
+
+<div class="modal fade" id="modalRiwayatTB" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title fw-bold">Histori Tutup Buku</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div id="listRiwayatTB" class="d-grid gap-2"></div></div></div></div></div>
+
+<div class="modal fade" id="modalLaporanLama" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-sm"><div class="modal-content"><div class="modal-header"><h5 class="modal-title fw-bold">Arsip Laba Rugi</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><label class="form-label">Pilih Bulan & Tahun</label><input type="month" id="llBulan" class="form-control mb-3"><button onclick="prosesCetakLaporanLama()" class="btn btn-primary w-100">Cetak PDF</button></div></div></div></div>
+
 <div class="modal fade" id="modalStruk" tabindex="-1"><div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down"><div class="modal-content"><div class="modal-header"><h5 class="modal-title fw-bold"><i class="fa-solid fa-receipt me-2" style="color:var(--c4)"></i>Struk Transaksi</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="row g-3"><div class="col-md-6"><div class="tint p-3 d-flex justify-content-center align-items-center" style="min-height:12rem; overflow-y:auto"><img id="strukImg" alt="Membuat struk..." style="max-width:100%; border-radius:0; box-shadow:0 8px 24px -8px rgba(0,0,0,.3)"></div></div><div class="col-md-6 d-grid gap-2 align-content-start"><div><label class="form-label">Kirim via WA ke Nomor (Pastikan diawali 62/08)</label><input type="tel" id="strukWA" class="form-control" placeholder="628xx"></div><button class="btn py-3" style="background:var(--c7);color:#fff" onclick="strukCetakBT()"><i class="fa-solid fa-print me-2"></i>Cetak Thermal (Bluetooth)</button><button class="btn btn-outline-primary py-3 bg-white" onclick="strukSimpan()"><i class="fa-solid fa-image me-2"></i>Simpan JPG</button><button class="btn text-white py-3" style="background:#25D366" onclick="strukWA()"><i class="fa-brands fa-whatsapp me-2 fs-5"></i>Kirim ke WhatsApp</button><button class="btn btn-link text-muted" data-bs-dismiss="modal">Selesai</button></div></div></div></div></div></div>
-<!-- Modal Riwayat POS -->
+
 <div class="modal fade" id="modalRiwayat" tabindex="-1"><div class="modal-dialog modal-xl modal-dialog-scrollable modal-fullscreen-md-down"><div class="modal-content"><div class="modal-header"><h5 class="modal-title fw-bold"><i class="fa-solid fa-clock-rotate-left me-2" style="color:var(--c4)"></i>Riwayat &amp; Void Transaksi</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><input type="text" id="searchRiwayat" class="form-control mb-3" placeholder="Cari Transaksi..." onkeyup="filterTabel('searchRiwayat','tabelRiwayatPOS')"><div class="table-responsive"><table class="table table-hover align-middle"><thead><tr><th>ID/Tgl</th><th>Pelanggan</th><th>Total</th><th>Status</th><th class="text-center">Aksi &amp; Struk</th></tr></thead><tbody id="tabelRiwayatPOS"></tbody></table></div></div></div></div></div>
-<!-- Modal Pilih Layanan (Booking) -->
+
 <div class="modal fade" id="modalPilihLayanan" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title fw-bold">Pilih Layanan / Produk</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><input type="text" id="searchBLayanan" class="form-control mb-3" placeholder="Cari..." onkeyup="filterLayananBooking()"><div class="list-group" id="listBLayanan"></div></div><div class="modal-footer"><button class="btn btn-primary w-100" data-bs-dismiss="modal">Selesai Pilih</button></div></div></div></div>
-<!-- Modal Pengaturan Dinamis -->
-<div class="modal fade" id="modalPengaturan" tabindex="-1"><div class="modal-dialog modal-sm modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title fw-bold" id="setJudul">Pengaturan</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="d-flex gap-2 mb-3"><input type="text" id="setBaru" class="form-control form-control-sm" placeholder="Tambah Baru"><button class="btn btn-sm btn-primary" onclick="tambahPengaturan()"><i class="fa-solid fa-plus"></i></button></div><ul class="list-group list-group-flush" id="setList"></ul><input type="hidden" id="setKunci"></div></div></div></div>
-<!-- Modal Kartu Member -->
+
+<div class="modal fade" id="modalPengaturan" tabindex="-1"><div class="modal-dialog modal-sm modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title fw-bold" id="setJudul">Pengaturan</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body">
+  <div class="d-flex gap-2 mb-3">
+    <input type="text" id="setBaru" class="form-control form-control-sm" placeholder="Tambah Baru">
+    <div id="setDiskonContainer" class="d-none" style="width:110px"><input type="number" id="setDiskon" class="form-control form-control-sm" placeholder="% Diskon"></div>
+    <button class="btn btn-sm btn-primary" onclick="tambahPengaturan()"><i class="fa-solid fa-plus"></i></button>
+  </div>
+  <ul class="list-group list-group-flush" id="setList"></ul><input type="hidden" id="setKunci">
+</div></div></div></div>
+
 <div class="modal fade" id="modalKartuMember" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content bg-transparent border-0"><div class="modal-body text-center"><canvas id="canvasKartu" style="max-width:100%; border-radius:1rem; box-shadow:0 12px 30px rgba(0,0,0,0.5); display:block; margin:auto;"></canvas><div class="mt-4 d-flex justify-content-center gap-2"><button class="btn btn-primary" onclick="simpanKartuJPG()"><i class="fa-solid fa-image"></i> Simpan JPG</button><button class="btn btn-light" data-bs-dismiss="modal">Tutup</button></div></div></div></div></div>
-<!-- Modal Admin -->
+
 <div class="modal fade" id="modalAdmin" tabindex="-1" style="z-index:99999"><div class="modal-dialog modal-dialog-centered modal-sm"><div class="modal-content"><div class="modal-header"><div><h5 class="modal-title fw-bold"><i class="fa-solid fa-crown text-warning"></i> Vendor Dashboard</h5><small class="text-muted">Pengaturan White-label & SaaS</small></div><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body d-grid gap-3"><div><label class="form-label">Nama Aplikasi Klien:</label><input type="text" id="admAppName" class="form-control"></div><div><label class="form-label">URL Logo Klien (PNG):</label><input type="text" id="admAppIcon" class="form-control"></div><div class="row g-2"><div class="col-4"><label class="form-label">Primary</label><input type="color" id="admColorPrimary" class="form-control form-control-color w-100"></div><div class="col-4"><label class="form-label">Light</label><input type="color" id="admColorLight" class="form-control form-control-color w-100"></div><div class="col-4"><label class="form-label">Dark</label><input type="color" id="admColorDark" class="form-control form-control-color w-100"></div></div><button onclick="updateVendorTheme()" class="btn btn-outline-primary mb-3">Terapkan Tema UI</button><hr class="m-0"><div><label class="form-label">Perpanjang Masa Aktif S/D:</label><input type="date" id="adminNewDate" class="form-control fw-bold"></div><div><label class="form-label">Ubah PIN Admin (opsional):</label><input type="password" id="adminNewPin" class="form-control"></div><div><label class="form-label">PIN Admin Saat Ini (Wajib):</label><input type="password" id="adminCurrentPin" class="form-control text-center fw-bold"></div><button onclick="updateSaaS()" class="btn" style="background:var(--c7);color:#fff">Perbarui Lisensi</button></div></div></div></div>
 
 <!-- ================== JAVASCRIPT SCRIPTS ================== -->
@@ -230,7 +262,7 @@ main#main{padding-bottom:110px} @media(min-width:768px){main#main{padding-bottom
 // =============================================================
 // KONFIGURASI API DAN PWA (GANTI URL INI)
 // =============================================================
-const GAS_URL = "https://script.google.com/macros/s/AKfycbyiH5vQgzt2uX_QhGN3ykUOnVCENDHM5ZVPKGkDkqLvFlp-GFBkThBFNaW8_vDcWD5t/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwfv7YqPatSAvOC-j-IyyKbP3p21NpXeUU2mQbRzhlzQq7gJ77RgGlOYrKeF0laX7PA/exec";
 
 if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js'); }
 
@@ -238,29 +270,40 @@ async function apiGet(action, params = "") { let res = await fetch(`${GAS_URL}?a
 async function apiPost(action, payload) { let res = await fetch(`${GAS_URL}?action=${action}`, { method: 'POST', body: JSON.stringify(payload) }); return await res.json(); }
 
 function applyVendorTheme(c) {
-  if(!c || !c.appName) return;
-  document.title = c.appName; document.querySelectorAll('.brand b').forEach(el => el.innerText = c.appName);
-  if(c.appIcon) { document.getElementById('sideLogo').src = c.appIcon; document.getElementById('dynamic-favicon').href = c.appIcon; }
+  if(!c) return;
   const root = document.documentElement;
-  root.style.setProperty('--c5', c.colorPrimary); root.style.setProperty('--c1', c.colorLight); root.style.setProperty('--c7', c.colorDark); root.style.setProperty('--bs-primary', c.colorPrimary);
-  const manifest = { name: c.appName, short_name: c.appName, start_url: "./index.html", display: "standalone", background_color: c.colorLight, theme_color: c.colorPrimary, icons: [{ src: c.appIcon, sizes: "512x512", type: "image/png" }] };
-  const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'}); document.getElementById('dynamic-manifest').href = URL.createObjectURL(blob);
+  if(c.colorPrimary) {
+    root.style.setProperty('--c5', c.colorPrimary); root.style.setProperty('--bs-primary', c.colorPrimary);
+    root.style.setProperty('--c1', c.colorLight); root.style.setProperty('--c7', c.colorDark);
+  }
+}
+function applyTokoProfile(t) {
+  document.title = t.nama || 'ERP POS'; 
+  document.querySelectorAll('.brand b').forEach(el => el.innerText = t.nama || 'ERP POS');
+  if(t.logo) { 
+    document.getElementById('sideLogo').src = t.logo; 
+    document.getElementById('sideLogo').style.display = 'block';
+    document.getElementById('dynamic-favicon').href = t.logo; 
+    const manifest = { name: t.nama, short_name: t.nama, start_url: "./index.html", display: "standalone", background_color: "#f8f1e8", theme_color: "#774a2e", icons: [{ src: t.logo, sizes: "512x512", type: "image/png" }] };
+    const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'}); document.getElementById('dynamic-manifest').href = URL.createObjectURL(blob);
+  }
 }
 
 // =============================================================
 // STATE & UTILS
 // =============================================================
-var TOKO = { nama: 'ERP POS V2', alamat: 'Terima Kasih Atas Kunjungan Anda', telp: '' };
+var TOKO = { nama: 'ERP POS V2', alamat: 'Terima Kasih Atas Kunjungan Anda', telp: '', logo: '' };
 var Q = "'", db = { produk: [], booking: [], member: [], akuntansi: [], transaksi: [], kategori: [], level: [] }, cart = [], bookingCart = [], syncing = false, syncQueue = [], curTab = 'pos', SC = null, toastT = null;
 try { syncQueue = JSON.parse(localStorage.getItem('erpSyncQueue_v9')) || []; } catch(e){}
 
 function g(id) { return document.getElementById(id); }
 function formatRp(n) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n); }
-function cleanRp(n) { return 'Rp' + Number(n).toLocaleString('id-ID'); } // Fix thermal padding issue
+function parseRp(str) { return parseInt(str.replace(/[^0-9]/g, ''), 10) || 0; }
+function cleanRp(n) { return 'Rp' + Number(n).toLocaleString('id-ID'); } 
 function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 function genId(p) { return p + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 5).toUpperCase(); }
 function oc(fn, id) { return 'onclick="' + fn + '(' + Q + esc(id) + Q + ')"'; }
-function namaTampil(p) { return p ? String(p) : 'Guest'; }
+function namaTampil(p) { return p ? String(p) : 'Pelanggan Umum'; }
 function normWA(v) { var n = String(v||'').replace(/\D/g,''); if (n.charAt(0)==='0') n='62'+n.slice(1); else if (n.charAt(0)==='8') n='62'+n; return (n.length>=10)?n:''; }
 function toast(msg) { var t = g('toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(toastT); toastT = setTimeout(()=>t.style.display='none', 4000); }
 function showM(id) { bootstrap.Modal.getOrCreateInstance(g(id)).show(); }
@@ -274,21 +317,23 @@ async function initApp() {
   try {
     let s = await apiGet('getInitialData');
     if (s.vendorConfig) {
-      applyVendorTheme(s.vendorConfig); TOKO.nama = s.vendorConfig.appName;
+      applyVendorTheme(s.vendorConfig); 
       g('admAppName').value = s.vendorConfig.appName; g('admAppIcon').value = s.vendorConfig.appIcon; g('admColorPrimary').value = s.vendorConfig.colorPrimary; g('admColorLight').value = s.vendorConfig.colorLight; g('admColorDark').value = s.vendorConfig.colorDark;
     }
     if (s.license && s.license.isExpired) lockScreen(true);
     if (s.license && s.license.expiryDate) g('adminNewDate').value = String(s.license.expiryDate).split('T')[0];
     
-    // Parse Pengaturan Dinamis
     if(s.pengaturan) {
       s.pengaturan.forEach(r => {
         if(r[0] === 'kategori_produk') try { db.kategori = JSON.parse(r[1]); } catch(e){}
-        if(r[0] === 'level_member') try { db.level = JSON.parse(r[1]); } catch(e){}
+        if(r[0] === 'level_member') try { let p = JSON.parse(r[1]); db.level = p.map(x=>typeof x==='string'?{nama:x,diskon:0}:x); } catch(e){}
+        if(r[0] === 'profil_usaha') try { TOKO = Object.assign(TOKO, JSON.parse(r[1])); } catch(e){}
       });
     }
     if(!db.kategori.length) db.kategori = ['Layanan','Barang Fisik'];
-    if(!db.level.length) db.level = ['Bronze','Gold'];
+    if(!db.level.length) db.level = [{nama:'Bronze', diskon:0},{nama:'Gold', diskon:10}];
+    
+    applyTokoProfile(TOKO); // Set Header/Struk
 
     if(s.produk) db.produk = s.produk.map(r => ({ id: String(r[0]), nama: String(r[1]), kategori: String(r[2]), harga: Number(r[3])||0, ket: String(r[5]||'') }));
     if(s.booking) db.booking = s.booking.map(r => ({ id: String(r[0]), waktu: r[1], pelanggan: String(r[2]), layanan: String(r[3]), status: r[4], total: Number(r[5])||0 }));
@@ -308,15 +353,37 @@ function renderAll() {
 function updateDropdowns() {
   var optKat = db.kategori.map(k=>`<option value="${esc(k)}">${esc(k)}</option>`).join('');
   g('pKategori').innerHTML = optKat; g('filterKatPos').innerHTML = '<option value="">Semua Kategori</option>' + optKat;
-  var optLvl = db.level.map(l=>`<option value="${esc(l)}">${esc(l)}</option>`).join('');
+  var optLvl = db.level.map(l=>`<option value="${esc(l.nama)}">${esc(l.nama)} (${l.diskon||0}%)</option>`).join('');
   g('mLevel').innerHTML = optLvl;
   var optPelanggan = '<option value="">Guest / Manual</option>' + db.member.filter(m=>m.status==='Aktif').map(m => `<option value="${esc(m.nama)}">${esc(m.nama)} (${esc(m.level)})</option>`).join('');
   g('posPelanggan').innerHTML = optPelanggan; g('bPelanggan').innerHTML = optPelanggan;
 }
 
+// --- PROFIL USAHA ---
+function showProfilUsaha() {
+  g('puNama').value = TOKO.nama || '';
+  g('puAlamat').value = TOKO.alamat || '';
+  g('puTelp').value = TOKO.telp || '';
+  g('puLogo').value = TOKO.logo || '';
+  showM('modalProfilUsaha');
+}
+function simpanProfilUsaha(e) {
+  e.preventDefault();
+  TOKO.nama = g('puNama').value; TOKO.alamat = g('puAlamat').value; TOKO.telp = g('puTelp').value; TOKO.logo = g('puLogo').value;
+  applyTokoProfile(TOKO);
+  addToQueue('Pengaturan', 'INSERT', 'profil_usaha', ['profil_usaha', JSON.stringify(TOKO)]);
+  hideM('modalProfilUsaha'); toast('Profil Usaha Tersimpan');
+}
+
 // --- POS & CART ---
-function cekGuestPos() { g('posGuestName').classList.toggle('d-none', g('posPelanggan').value !== ""); }
-function getCustPosName() { return g('posPelanggan').value || g('posGuestName').value || 'Guest'; }
+function cekGuestPos() { 
+  var isGuest = g('posPelanggan').value === "";
+  g('posGuestName').classList.toggle('d-none', !isGuest); 
+}
+function getCustPosName() { 
+  var val = g('posPelanggan').value;
+  return val ? val : (g('posGuestName').value.trim() || 'Pelanggan Umum'); 
+}
 
 function cariKatalog() {
   var q = g('searchKatalog').value.toLowerCase(), kat = g('filterKatPos').value;
@@ -331,9 +398,30 @@ function addToCart(id) {
 }
 function kurangiItem(i) { if(cart[i].qty > 1) cart[i].qty--; else cart.splice(i,1); renderCart(); }
 function renderCart() {
-  var total = 0, count = 0;
-  var h = cart.map((c, i) => { total += c.harga*c.qty; count += c.qty; return `<div class="tint p-2 mb-2 d-flex justify-content-between align-items-center"><div class="flex-grow-1 pe-2" style="min-width:0"><div class="fw-bold small text-truncate">${esc(c.nama)}</div><div class="small fw-bold" style="color:var(--c5)">${formatRp(c.harga)}</div></div><div class="d-flex align-items-center bg-white border rounded-3"><button class="btn btn-sm" onclick="kurangiItem(${i})"><i class="fa-solid fa-minus"></i></button><span class="fw-bold px-1">${c.qty}</span><button class="btn btn-sm" ${oc('addToCart', c.id)}><i class="fa-solid fa-plus"></i></button></div></div>`; }).join('');
+  var subtotal = 0, count = 0;
+  var h = cart.map((c, i) => { subtotal += c.harga*c.qty; count += c.qty; return `<div class="tint p-2 mb-2 d-flex justify-content-between align-items-center"><div class="flex-grow-1 pe-2" style="min-width:0"><div class="fw-bold small text-truncate">${esc(c.nama)}</div><div class="small fw-bold" style="color:var(--c5)">${formatRp(c.harga)}</div></div><div class="d-flex align-items-center bg-white border rounded-3"><button class="btn btn-sm" onclick="kurangiItem(${i})"><i class="fa-solid fa-minus"></i></button><span class="fw-bold px-1">${c.qty}</span><button class="btn btn-sm" ${oc('addToCart', c.id)}><i class="fa-solid fa-plus"></i></button></div></div>`; }).join('');
+  
+  var diskonMember = 0;
+  var cust = g('posPelanggan').value;
+  var selectedMember = db.member.find(m => m.nama === cust);
+  if (selectedMember) {
+     var lvl = db.level.find(l => l.nama === selectedMember.level);
+     if (lvl) diskonMember = lvl.diskon || 0;
+  }
+  
+  var potongan = subtotal * (diskonMember / 100);
+  var total = subtotal - potongan;
+
   g('cartItems').innerHTML = h || '<p class="text-center text-muted small mt-4">Pilih produk</p>';
+  if (potongan > 0) {
+      g('cartDiskonText').innerText = `(-${diskonMember}%)`;
+      g('cartSubtotal').innerText = formatRp(subtotal);
+      g('cartSubtotal').classList.remove('d-none');
+  } else {
+      g('cartDiskonText').innerText = '';
+      g('cartSubtotal').classList.add('d-none');
+  }
+  
   g('totalPrice').innerText = formatRp(total); g('cartCount').innerText = count + ' Item'; g('cartBarCount').innerText = count + ' Item'; g('cartBarTotal').innerText = formatRp(total);
   g('cartBar').style.display = (count > 0 && curTab === 'pos') ? 'flex' : 'none'; if(!count) toggleCart(false);
 }
@@ -342,30 +430,34 @@ function toggleCart(open) { if(window.innerWidth>=992) return; var o = bootstrap
 function loadBookingKeCart(idBk) {
   if(!idBk) { g('posRefBookingId').value = ''; cart=[]; renderCart(); return; }
   var bk = db.booking.find(b => b.id === idBk); if(!bk) return;
-  
-  // Set Customer Name
   var opt = Array.from(g('posPelanggan').options).find(o => o.value === bk.pelanggan);
   if(opt) { g('posPelanggan').value = bk.pelanggan; g('posGuestName').classList.add('d-none'); }
   else { g('posPelanggan').value = ""; g('posGuestName').value = bk.pelanggan; g('posGuestName').classList.remove('d-none'); }
   
-  g('posRefBookingId').value = bk.id;
-  cart = []; // Clear current cart
-  try {
-      let items = JSON.parse(bk.layanan);
-      items.forEach(it => {
-          let p = db.produk.find(x => x.id === it.id);
-          if(p) cart.push({id: p.id, nama: p.nama, harga: p.harga, qty: it.qty});
-      });
-  } catch(e) { toast("Data layanan booking lama."); }
+  g('posRefBookingId').value = bk.id; cart = [];
+  try { let items = JSON.parse(bk.layanan); items.forEach(it => { let p = db.produk.find(x => x.id === it.id); if(p) cart.push({id: p.id, nama: p.nama, harga: p.harga, qty: it.qty}); }); } catch(e) { toast("Data layanan booking lama."); }
   renderCart(); toggleCart(true);
 }
 
 function prosesCheckout() {
   if(cart.length===0) { toast('Keranjang Kosong!'); return; }
-  var total = cart.reduce((s,i) => s + i.harga*i.qty, 0), cust = getCustPosName();
-  var method = g('metodeBayar').value, status = g('statusBayar').value, detail = cart.map(c => `${c.nama}(x${c.qty})`).join(', ');
-  var tgl = new Date().toISOString(), idTx = genId('TX');
   
+  var subtotal = cart.reduce((s,i) => s + i.harga*i.qty, 0);
+  var cust = getCustPosName();
+  var diskonMember = 0;
+  var selectedMember = db.member.find(m => m.nama === cust);
+  if (selectedMember) {
+     var lvl = db.level.find(l => l.nama === selectedMember.level);
+     if (lvl) diskonMember = lvl.diskon || 0;
+  }
+  var potongan = subtotal * (diskonMember / 100);
+  var total = subtotal - potongan;
+  
+  var method = g('metodeBayar').value, status = g('statusBayar').value;
+  var detail = cart.map(c => `${c.nama}(x${c.qty})`).join(', ');
+  if(potongan > 0) detail += ` | Diskon Member (${diskonMember}%): -${formatRp(potongan)}`;
+  
+  var tgl = new Date().toISOString(), idTx = genId('TX');
   var newTx = { id: idTx, tgl: tgl, pelanggan: cust, total: total, metode: method, status: status, detail: detail, log: '-' };
   db.transaksi.unshift(newTx); addToQueue('Transaksi', 'INSERT', null, [idTx, tgl, cust, total, method, status, detail, '-']);
   
@@ -376,7 +468,7 @@ function prosesCheckout() {
   var bkId = g('posRefBookingId').value; 
   if(bkId) { var b = db.booking.find(x=>x.id===bkId); if(b) b.status='Selesai'; addToQueue('Booking', 'UPDATE_STATUS', bkId, null, { statusCol: 5, newStatus: 'Selesai' }); }
   
-  cart = []; g('posPanggilBooking').value = ''; g('posRefBookingId').value = ''; g('posPelanggan').value=""; g('posGuestName').value=""; g('posGuestName').classList.add('d-none');
+  cart = []; g('posPanggilBooking').value = ''; g('posRefBookingId').value = ''; g('posPelanggan').value=""; g('posGuestName').value=""; cekGuestPos();
   toggleCart(false); renderAll(); bukaStruk(newTx, 'STRUK PEMBELIAN');
 }
 
@@ -403,8 +495,7 @@ function lunasiPiutang(idTx) {
 function batalTransaksi(idTx) {
   var alasan = prompt('Alasan Void?'); if(!alasan) return;
   var tx = findTx(idTx); if(!tx) return;
-  // Cek apakah bulan sudah ditutup
-  var isClosed = db.akuntansi.find(a => a.ket.includes(`[${idTx}]`) && a.status === 'Closed');
+  var isClosed = db.akuntansi.find(a => a.ket.includes(`[${idTx}]`) && a.status.startsWith('Closed_'));
   if(isClosed) return alert('Transaksi ini sudah Tutup Buku, tidak bisa di VOID.');
 
   tx.status = 'Batal'; tx.log = 'VOID: ' + alasan;
@@ -416,16 +507,16 @@ function batalTransaksi(idTx) {
 }
 
 // --- STRUK (Murni Canvas Vertikal) ---
-function parseItems(d) { return String(d).split(', ').map(s => { var i = s.lastIndexOf('(x'); if(i>0 && s.endsWith(')')) { var q = parseInt(s.slice(i+2,-1),10); if(q>0) return {n:s.slice(0,i), q:q}; } return {n:s, q:1}; }); }
+function parseItems(d) { return String(d).split(' | ')[0].split(', ').map(s => { var i = s.lastIndexOf('(x'); if(i>0 && s.endsWith(')')) { var q = parseInt(s.slice(i+2,-1),10); if(q>0) return {n:s.slice(0,i), q:q}; } return {n:s, q:1}; }); }
 function cetakStrukUlang(id) { var t = findTx(id); if(t) { hideM('modalRiwayat'); setTimeout(()=>bukaStruk(t,'SALINAN STRUK'), 350); } }
 function drawStruk(tx, hd) {
   var S=2, W=380, L=30, R=W-30, CX=W/2, y=0;
   var items = parseItems(tx.detail);
-  var estHeight = 400 + (items.length * 40); // Dinamis tinggi kanvas
+  var estHeight = 440 + (items.length * 40); 
   var cc = document.createElement('canvas'); cc.width = W*S; cc.height = estHeight*S;
   var c = cc.getContext('2d'); c.scale(S,S);
   
-  c.fillStyle='#fff'; c.fillRect(0,0,W,estHeight); // Background putih
+  c.fillStyle='#fff'; c.fillRect(0,0,W,estHeight); 
   function txt(t,x,font,col,al='left') { c.font=font; c.fillStyle=col; c.textAlign=al; c.fillText(t,x,y); }
   function row(a,b) { y+=24; txt(a,L,'400 13px monospace','#333'); txt(b,R,'700 13px monospace','#000','right'); }
   function sep(){ y+=15; c.strokeStyle='#ccc'; c.setLineDash([4, 4]); c.beginPath(); c.moveTo(L,y); c.lineTo(R,y); c.stroke(); y+=5; c.setLineDash([]); }
@@ -434,12 +525,14 @@ function drawStruk(tx, hd) {
   c.fillStyle='#fff'; c.textAlign='center'; c.font='bold 24px serif'; c.fillText(TOKO.nama.charAt(0).toUpperCase(), CX, y+30);
   y+=70; txt(TOKO.nama, CX, 'bold 20px serif', '#000', 'center');
   y+=20; txt(TOKO.alamat, CX, '12px sans-serif', '#555', 'center');
+  if(TOKO.telp) { y+=15; txt(TOKO.telp, CX, '12px sans-serif', '#555', 'center'); }
   y+=30; txt(hd, CX, 'bold 14px sans-serif', '#000', 'center'); y+=10;
   sep();
   row('ID Transaksi', tx.id); row('Tanggal', new Date(tx.tgl).toLocaleString('id-ID')); row('Pelanggan', namaTampil(tx.pelanggan)); row('Tipe Bayar', tx.metode);
   sep();
   txt('Rincian Pesanan', L, 'bold 12px sans-serif', '#888'); y+=10;
   items.forEach(it => { y+=20; txt(it.n, L, '600 14px sans-serif', '#000'); txt('x'+it.q, R, 'bold 14px sans-serif', '#000', 'right'); });
+  if(tx.detail.includes('| Diskon')) { y+=20; txt('Diskon Member', L, '600 14px sans-serif', '#d9534f'); txt(tx.detail.split('| Diskon')[1].replace(/[^0-9-Rp.]/g,''), R, 'bold 14px sans-serif', '#d9534f', 'right'); }
   sep();
   y+=25; txt('TOTAL BAYAR', L, 'bold 14px sans-serif', '#000'); txt(formatRp(tx.total), R, 'bold 22px serif', '#000', 'right');
   y+=30; txt('*** ' + tx.status.toUpperCase() + ' ***', CX, 'bold 16px sans-serif', tx.status==='Lunas'?'#047857':'#b91c1c', 'center');
@@ -494,7 +587,9 @@ function escPos(tx, hd) {
   function raw(...a){o.push(...a);} function line(s){ for(let i=0;i<s.length;i++) o.push(s.charCodeAt(i)); o.push(10); } function sep(){line('--------------------------------');} function row(l,r){ l=String(l);r=String(r); l=l.slice(0,Math.max(1,W-r.length-1)); line(l+' '.repeat(W-l.length-r.length)+r); }
   raw(27,64, 27,97,1, 29,33,17); line(TOKO.nama); raw(29,33,0); line(hd); raw(27,97,0); sep();
   row('No', tx.id); row('Plg', namaTampil(tx.pelanggan)); sep();
-  parseItems(tx.detail).forEach(i=>row(i.n, 'x'+i.q)); sep();
+  parseItems(tx.detail).forEach(i=>row(i.n, 'x'+i.q)); 
+  if(tx.detail.includes('| Diskon')) row('Diskon Member', tx.detail.split('| Diskon')[1].replace(/[^0-9-Rp.]/g,''));
+  sep();
   raw(27,69,1); row('TOTAL', cleanRp(tx.total)); raw(27,69,0); row('Status', tx.status); sep();
   raw(27,97,1); line('Terima kasih!'); raw(27,100,4, 29,86,66,0); return o;
 }
@@ -503,6 +598,7 @@ function strukCetakBT() {
   btConnect().then(ch => btSend(ch, escPos(SC.tx, SC.hd))).then(() => toast('Mencetak...'))
   .catch(e => { if(e.name==='NotFoundError')return; if(confirm('Printer BT gagal/tidak didukung. Cetak lewat browser?')) {
     var html = parseItems(SC.tx.detail).map(i=>`<div style="display:flex;justify-content:space-between;font-size:12px"><span>${esc(i.n)}</span><span>x${i.q}</span></div>`).join('');
+    if(SC.tx.detail.includes('| Diskon')) html += `<div style="display:flex;justify-content:space-between;font-size:12px;color:red"><span>Diskon</span><span>${SC.tx.detail.split('| Diskon')[1].replace(/[^0-9-Rp.]/g,'')}</span></div>`;
     g('printArea').innerHTML = `<div class="print-receipt"><div style="text-align:center;border-bottom:1px dashed #000;margin-bottom:10px"><h2>${esc(TOKO.nama)}</h2><p>${esc(SC.hd)}<br>${SC.tx.id}</p></div>${html}<div style="border-top:1px dashed #000;display:flex;justify-content:space-between;font-weight:bold;margin-top:10px"><span>TOTAL</span><span>${cleanRp(SC.tx.total)}</span></div></div>`;
     g('printArea').style.display='block'; window.print(); g('printArea').style.display='none';
   } });
@@ -578,33 +674,26 @@ function bukaKartuMember(id) {
   var cv = g('canvasKartu'), c = cv.getContext('2d'), W=600, H=380, S=2;
   cv.width=W*S; cv.height=H*S; c.scale(S,S);
   
-  // Background Card
   var grd = c.createLinearGradient(0,0,W,H);
   grd.addColorStop(0, getComputedStyle(document.documentElement).getPropertyValue('--c7'));
   grd.addColorStop(1, getComputedStyle(document.documentElement).getPropertyValue('--c5'));
   c.fillStyle=grd; c.beginPath(); c.roundRect(0,0,W,H,20); c.fill();
-  
-  // Chip simulasi
   c.fillStyle='rgba(255,215,0,0.8)'; c.beginPath(); c.roundRect(50, 140, 60, 45, 8); c.fill();
   
   c.fillStyle='#fff'; c.textAlign='left';
   c.font='bold 28px serif'; c.fillText(TOKO.nama, 50, 70);
   c.font='16px sans-serif'; c.fillText('MEMBER CARD', 50, 100);
-  
   c.font='italic 20px sans-serif'; c.fillStyle='rgba(255,255,255,0.7)'; c.textAlign='right'; c.fillText(m.level.toUpperCase(), W-50, 70);
   
   c.fillStyle='#fff'; c.textAlign='left'; c.font='bold 26px monospace';
   var fmtId = m.id.replace(/(.{4})/g, '$1 ').trim(); c.fillText(fmtId, 50, 240);
-  
   c.font='bold 22px sans-serif'; c.fillText(m.nama.toUpperCase(), 50, 310);
   c.font='14px sans-serif'; c.fillStyle='rgba(255,255,255,0.7)'; c.fillText('Member Sejak: ' + m.tgl, 50, 335);
   
   showM('modalKartuMember');
 }
 function simpanKartuJPG() {
-  g('canvasKartu').toBlob(b => {
-    var a = document.createElement('a'); a.href=URL.createObjectURL(b); a.download='MemberCard.jpg'; document.body.appendChild(a); a.click(); a.remove();
-  }, 'image/jpeg', 1.0);
+  g('canvasKartu').toBlob(b => { var a = document.createElement('a'); a.href=URL.createObjectURL(b); a.download='MemberCard.jpg'; document.body.appendChild(a); a.click(); a.remove(); }, 'image/jpeg', 1.0);
 }
 
 function renderMember() { 
@@ -620,13 +709,23 @@ function manageSettings(title, key) {
   g('setJudul').innerText = 'Set: ' + title; g('setKunci').value = key; curSettingKey = key; renderSettings(); showM('modalPengaturan');
 }
 function renderSettings() {
-  var arr = curSettingKey === 'kategori_produk' ? db.kategori : db.level;
-  g('setList').innerHTML = arr.map((v, i) => `<li class="list-group-item d-flex justify-content-between align-items-center px-1"><span>${esc(v)}</span><button class="btn btn-sm text-danger" onclick="hapusPengaturan(${i})"><i class="fa-solid fa-trash"></i></button></li>`).join('');
+  if (curSettingKey === 'kategori_produk') {
+    g('setList').innerHTML = db.kategori.map((v, i) => `<li class="list-group-item d-flex justify-content-between align-items-center px-1"><span>${esc(v)}</span><button class="btn btn-sm text-danger" onclick="hapusPengaturan(${i})"><i class="fa-solid fa-trash"></i></button></li>`).join('');
+    g('setDiskonContainer').classList.add('d-none');
+  } else if (curSettingKey === 'level_member') {
+    g('setList').innerHTML = db.level.map((v, i) => `<li class="list-group-item d-flex justify-content-between align-items-center px-1"><span>${esc(v.nama)} (${v.diskon}%)</span><button class="btn btn-sm text-danger" onclick="hapusPengaturan(${i})"><i class="fa-solid fa-trash"></i></button></li>`).join('');
+    g('setDiskonContainer').classList.remove('d-none');
+  }
 }
 function tambahPengaturan() {
   var v = g('setBaru').value.trim(); if(!v) return;
-  var arr = curSettingKey === 'kategori_produk' ? db.kategori : db.level;
-  if(arr.includes(v)) return alert('Sudah ada!'); arr.push(v); g('setBaru').value='';
+  if (curSettingKey === 'kategori_produk') {
+    if(db.kategori.includes(v)) return alert('Sudah ada!'); db.kategori.push(v);
+  } else {
+    var d = parseFloat(g('setDiskon').value) || 0;
+    if(db.level.find(l=>l.nama===v)) return alert('Sudah ada!'); db.level.push({nama: v, diskon: d});
+  }
+  g('setBaru').value=''; g('setDiskon').value='';
   simpanPengaturanSync(); renderSettings(); updateDropdowns();
 }
 function hapusPengaturan(idx) {
@@ -635,10 +734,10 @@ function hapusPengaturan(idx) {
 }
 function simpanPengaturanSync() {
   var arr = curSettingKey === 'kategori_produk' ? db.kategori : db.level;
-  addToQueue('Pengaturan', 'INSERT', curSettingKey, [curSettingKey, JSON.stringify(arr)]); // INSERT will act as UPSERT in backend logic
+  addToQueue('Pengaturan', 'INSERT', curSettingKey, [curSettingKey, JSON.stringify(arr)]); 
 }
 
-// --- AKUNTING ---
+// --- AKUNTING & TUTUP BUKU ---
 function gantiJenisJurnal() { var j = g('jJenisKas').value, o = g('jAkunLawan'); if (j === 'Pengeluaran') o.innerHTML = '<option>Beban Operasional</option><option>Pembelian Stok</option><option>Prive</option>'; else if (j === 'Pemasukan') o.innerHTML = '<option>Pendapatan Lain</option>'; else o.innerHTML = '<option>Modal Awal</option><option>Tambahan Modal</option>'; }
 function simpanJurnalManual(e) {
   e.preventDefault(); var idEdit=g('jIdValue').value, tgl=g('jTgl').value, jenis=g('jJenisKas').value, akun=g('jAkunLawan').value, ket=g('jKet').value, nom=parseInt(g('jNominal').value,10); if(nom<=0)return;
@@ -651,14 +750,14 @@ function simpanJurnalManual(e) {
   batalEditJurnal(); renderAll(); toast('Jurnal dicatat');
 }
 function editJurnal(id) {
-  var a = db.akuntansi.find(x=>x.id===id); if(!a || a.status==='Closed') return alert('Tidak bisa edit jurnal Tutup Buku / Terkunci.');
+  var a = db.akuntansi.find(x=>x.id===id); if(!a || a.status.startsWith('Closed_')) return alert('Tidak bisa edit jurnal Tutup Buku / Terkunci.');
   g('jIdValue').value=a.id; g('jTgl').value=a.tgl.split('T')[0]; g('jKet').value=a.ket; g('jNominal').value=a.nominal;
   if(a.debit==='Kas Utama'){ g('jJenisKas').value=a.kredit.includes('Modal')?'Modal':'Pemasukan'; gantiJenisJurnal(); g('jAkunLawan').value=a.kredit; }
   else { g('jJenisKas').value='Pengeluaran'; gantiJenisJurnal(); g('jAkunLawan').value=a.debit; }
   g('btnSimpanJ').innerText='Update'; g('btnBatalJ').style.display='block'; g('jTgl').scrollIntoView();
 }
 function batalEditJurnal() { g('formJurnal').reset(); g('jIdValue').value=''; g('btnSimpanJ').innerText='Catat'; g('btnBatalJ').style.display='none'; gantiJenisJurnal(); }
-function hapusJurnal(id) { var a = db.akuntansi.find(x=>x.id===id); if(a && a.status==='Closed') return alert('Terkunci!'); if(confirm('Hapus jurnal manual ini?')) { db.akuntansi=db.akuntansi.filter(x=>x.id!==id); addToQueue('Akuntansi','DELETE',id,null); renderAll(); } }
+function hapusJurnal(id) { var a = db.akuntansi.find(x=>x.id===id); if(a && a.status.startsWith('Closed_')) return alert('Terkunci!'); if(confirm('Hapus jurnal manual ini?')) { db.akuntansi=db.akuntansi.filter(x=>x.id!==id); addToQueue('Akuntansi','DELETE',id,null); renderAll(); } }
 
 function lihatDetailTx(id) { var t=findTx(id); if(t) { bukaRiwayatPOS(); g('searchRiwayat').value=id; filterTabel('searchRiwayat','tabelRiwayatPOS'); } }
 function formatKetLedger(ket) { return esc(ket).replace(/\[(TX[A-Z0-9]+)\]/g, '<span class="tx-link" onclick="lihatDetailTx(\'$1\')">[$1]</span>'); }
@@ -667,63 +766,122 @@ function renderLaporanAkuntansi() {
   var pd=0, bb=0, md=0; 
   g('tabelJurnal').innerHTML = db.akuntansi.slice().reverse().map(a => {
     var isInc = a.kredit.includes('Pendapatan'), isExp = a.debit.includes('Beban')||a.debit.includes('Pembelian'), isMod = a.kredit.includes('Modal')||a.debit.includes('Modal')||a.debit.includes('Prive');
-    if(a.status!=='Closed') { // Hitungan dashbord hanya untuk yg belum tutup buku
-      if(isInc) pd+=a.nominal; if(a.debit.includes('Pendapatan')) pd-=a.nominal; // reversal
+    if(a.status === 'Aktif') { 
+      if(isInc) pd+=a.nominal; if(a.debit.includes('Pendapatan')) pd-=a.nominal;
       if(isExp) bb+=a.nominal;
-      if(isMod) md+=(a.kredit.includes('Modal')?a.nominal:-a.nominal);
     }
-    var act = (a.tipe==='Manual' && a.status!=='Closed') ? `<button class="btn btn-sm btn-link p-0 text-primary" ${oc('editJurnal',a.id)}><i class="fa-solid fa-pen"></i></button><button class="btn btn-sm btn-link p-0 text-danger ms-2" ${oc('hapusJurnal',a.id)}><i class="fa-solid fa-trash"></i></button>` : `<i class="fa-solid fa-lock text-muted" style="font-size:0.7rem"></i>`;
-    return `<tr class="${a.status==='Closed'?'table-light text-muted':''}"><td><small>${new Date(a.tgl).toLocaleDateString('id-ID')}</small></td><td>${formatKetLedger(a.ket)}</td><td><small>${esc(a.debit)}</small></td><td><small>${esc(a.kredit)}</small></td><td class="text-end fw-bold">${formatRp(a.nominal)}</td><td class="text-center">${act}</td></tr>`; 
+    if(isMod) md+=(a.kredit.includes('Modal')?a.nominal:-a.nominal);
+    var act = (a.tipe==='Manual' && a.status==='Aktif') ? `<button class="btn btn-sm btn-link p-0 text-primary" ${oc('editJurnal',a.id)}><i class="fa-solid fa-pen"></i></button><button class="btn btn-sm btn-link p-0 text-danger ms-2" ${oc('hapusJurnal',a.id)}><i class="fa-solid fa-trash"></i></button>` : `<i class="fa-solid fa-lock text-muted" style="font-size:0.7rem"></i>`;
+    return `<tr class="${a.status!=='Aktif'?'table-light text-muted':''}"><td><small>${new Date(a.tgl).toLocaleDateString('id-ID')}</small></td><td>${formatKetLedger(a.ket)}</td><td><small>${esc(a.debit)}</small></td><td><small>${esc(a.kredit)}</small></td><td class="text-end fw-bold">${formatRp(a.nominal)}</td><td class="text-center">${act}</td></tr>`; 
   }).join('');
   g('dashPendapatan').innerText=formatRp(pd); g('dashBeban').innerText=formatRp(bb); g('dashModal').innerText=formatRp(md); g('dashLaba').innerText=formatRp(pd-bb);
 }
 
-function tutupBuku() {
-  if(!confirm('Tutup Buku akan menghitung Laba/Rugi saat ini, menambahkannya ke Modal (Laba Ditahan), dan mengunci transaksi sebelumnya. Lanjutkan?')) return;
+function tutupBukuUI() {
   var pd=0, bb=0;
-  db.akuntansi.filter(a=>a.status!=='Closed').forEach(a=>{ if(a.kredit.includes('Pendapatan'))pd+=a.nominal; if(a.debit.includes('Pendapatan'))pd-=a.nominal; if(a.debit.includes('Beban')||a.debit.includes('Pembelian'))bb+=a.nominal; });
-  var laba = pd-bb; if(laba===0) return alert('Tidak ada mutasi Laba/Rugi untuk ditutup.');
-  var tgl = new Date().toISOString(), idJr = genId('TB');
-  // Flag old as closed (Soft closing di lokal, backend update via batch jika mau, tp utk PWA cukup update state yg terpampang)
-  db.akuntansi.forEach(a => { if(a.status!=='Closed'){ a.status='Closed'; addToQueue('Akuntansi','UPDATE',a.id,[a.id,a.tgl,a.tipe,a.ket,a.debit,a.kredit,a.nominal,'Closed']); } });
+  db.akuntansi.filter(a=>a.status==='Aktif').forEach(a=>{ if(a.kredit.includes('Pendapatan'))pd+=a.nominal; if(a.debit.includes('Pendapatan'))pd-=a.nominal; if(a.debit.includes('Beban')||a.debit.includes('Pembelian'))bb+=a.nominal; });
+  g('tbPendapatan').innerText = formatRp(pd); g('tbBeban').innerText = formatRp(bb); g('tbLaba').innerText = formatRp(pd-bb);
+  g('tbPotongan').value = 0; hitungLabaBersihTB();
+  showM('modalTutupBuku');
+}
+
+function hitungLabaBersihTB() {
+  var laba = parseRp(g('tbLaba').innerText), pot = parseInt(g('tbPotongan').value)||0;
+  g('tbLabaBersih').innerText = formatRp(laba - pot);
+}
+
+function prosesTutupBuku() {
+  var pd=0, bb=0;
+  db.akuntansi.filter(a=>a.status==='Aktif').forEach(a=>{ if(a.kredit.includes('Pendapatan'))pd+=a.nominal; if(a.debit.includes('Pendapatan'))pd-=a.nominal; if(a.debit.includes('Beban')||a.debit.includes('Pembelian'))bb+=a.nominal; });
+  var laba = pd-bb, pot = parseInt(g('tbPotongan').value)||0, labaBersih = laba - pot;
+  if(laba === 0 && pot === 0) return alert('Tidak ada mutasi Laba/Rugi aktif untuk ditutup.');
   
-  var deb=laba>0?'Ikhtisar Laba Rugi':'Modal (Laba Ditahan)', kre=laba>0?'Modal (Laba Ditahan)':'Ikhtisar Laba Rugi', nom=Math.abs(laba);
-  db.akuntansi.push({id:idJr, tgl:tgl, tipe:'Tutup Buku', ket:'Tutup Buku Periode Ini', debit:deb, kredit:kre, nominal:nom, status:'Aktif'});
-  addToQueue('Akuntansi','INSERT',null,[idJr,tgl,'Tutup Buku','Tutup Buku Periode Ini',deb,kre,nom,'Aktif']);
-  renderAll(); toast('Tutup Buku Selesai');
+  var tgl = new Date().toISOString(), batchId = 'Closed_' + Date.now();
+  db.akuntansi.forEach(a => { if(a.status === 'Aktif'){ a.status = batchId; addToQueue('Akuntansi','UPDATE',a.id,[a.id,a.tgl,a.tipe,a.ket,a.debit,a.kredit,a.nominal,batchId]); } });
+  
+  if (pot > 0) {
+    let idPot = genId('TB');
+    db.akuntansi.push({id:idPot, tgl:tgl, tipe:'Tutup Buku', ket:'Potongan Laba (Bonus/Pajak dll)', debit:'Beban Lain-lain', kredit:'Kas Utama', nominal:pot, status:batchId});
+    addToQueue('Akuntansi','INSERT',null,[idPot,tgl,'Tutup Buku','Potongan Laba (Bonus/Pajak dll)','Beban Lain-lain','Kas Utama',pot,batchId]);
+  }
+  
+  if (labaBersih !== 0) {
+    let idJr = genId('TB'), deb=labaBersih>0?'Ikhtisar Laba Rugi':'Modal (Laba Ditahan)', kre=labaBersih>0?'Modal (Laba Ditahan)':'Ikhtisar Laba Rugi', nom=Math.abs(labaBersih);
+    db.akuntansi.push({id:idJr, tgl:tgl, tipe:'Tutup Buku', ket:'Laba Ditahan ['+batchId+']', debit:deb, kredit:kre, nominal:nom, status:batchId});
+    addToQueue('Akuntansi','INSERT',null,[idJr,tgl,'Tutup Buku','Laba Ditahan ['+batchId+']',deb,kre,nom,batchId]);
+  }
+  hideM('modalTutupBuku'); renderAll(); toast('Tutup Buku Selesai & Terkunci');
+}
+
+function bukaRiwayatTutupBuku() {
+   var tb = db.akuntansi.filter(a => a.tipe === 'Tutup Buku' && a.status.startsWith('Closed_')).reverse();
+   var batches = {}; tb.forEach(a => { if(!batches[a.status]) batches[a.status] = []; batches[a.status].push(a); });
+   g('listRiwayatTB').innerHTML = Object.keys(batches).map(k => {
+      return `<div class="tint p-3 mb-2 d-flex justify-content-between align-items-center"><div><div class="fw-bold">Batch: ${new Date(parseInt(k.split('_')[1])).toLocaleString('id-ID')}</div><div class="small text-muted">${batches[k].length} Jurnal Penyesuaian</div></div><button class="btn btn-sm btn-outline-danger" onclick="undoTutupBuku('${k}')">Undo (Buka)</button></div>`;
+   }).join('') || '<p class="text-center text-muted">Belum ada riwayat tutup buku.</p>';
+   showM('modalRiwayatTB');
+}
+
+function undoTutupBuku(batchId) {
+  if(!confirm('Yakin membatalkan tutup buku ini? Data jurnal akan terbuka kembali.')) return;
+  var toDel = [];
+  db.akuntansi = db.akuntansi.filter(a => { if (a.tipe === 'Tutup Buku' && a.status === batchId) { toDel.push(a.id); return false; } return true; });
+  toDel.forEach(id => addToQueue('Akuntansi', 'DELETE', id, null));
+  db.akuntansi.forEach(a => { if (a.status === batchId) { a.status = 'Aktif'; addToQueue('Akuntansi', 'UPDATE', a.id, [a.id, a.tgl, a.tipe, a.ket, a.debit, a.kredit, a.nominal, 'Aktif']); } });
+  hideM('modalRiwayatTB'); renderAll(); toast('Tutup Buku Dibatalkan');
 }
 
 // --- PDF REPORTS (jsPDF) ---
 window.jsPDF = window.jspdf.jsPDF;
 function cetakLaporanLabaRugi() {
   const doc = new jsPDF(); var y = 20;
-  doc.setFontSize(18); doc.setFont("helvetica", "bold"); doc.text(TOKO.nama, 105, y, {align: "center"}); y+=8;
-  doc.setFontSize(12); doc.setFont("helvetica", "normal"); doc.text("LAPORAN LABA RUGI", 105, y, {align: "center"}); y+=10;
+  doc.setFontSize(18); doc.setFont("helvetica", "bold"); doc.text(TOKO.nama, 105, y, {align: "center"}); y+=6;
+  doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.text(TOKO.alamat + (TOKO.telp ? ' | Telp: ' + TOKO.telp : ''), 105, y, {align: "center"}); y+=10;
+  doc.setFontSize(12); doc.text("LAPORAN LABA RUGI AKTIF", 105, y, {align: "center"}); y+=10;
   doc.setFontSize(10); doc.text("Dicetak pada: " + new Date().toLocaleString('id-ID'), 105, y, {align: "center"}); y+=15;
   
   var pd=0, bb=0, dataTbl=[];
-  db.akuntansi.filter(a=>a.status!=='Closed').forEach(a=>{
+  db.akuntansi.filter(a=>a.status==='Aktif').forEach(a=>{
     var isInc = a.kredit.includes('Pendapatan'), isExp = a.debit.includes('Beban')||a.debit.includes('Pembelian');
     if(isInc || isExp || a.debit.includes('Pendapatan')) {
       dataTbl.push([new Date(a.tgl).toLocaleDateString('id-ID'), a.ket, (isInc||a.debit.includes('Pendapatan')?'Pendapatan':'Beban'), formatRp(a.nominal)]);
       if(isInc) pd+=a.nominal; if(a.debit.includes('Pendapatan')) pd-=a.nominal; if(isExp) bb+=a.nominal;
     }
   });
-  
   doc.autoTable({ startY: y, head: [['Tanggal', 'Keterangan', 'Kategori', 'Nominal']], body: dataTbl, theme: 'striped', headStyles: {fillColor: [119, 74, 46]} });
   y = doc.lastAutoTable.finalY + 15;
-  doc.setFont("helvetica", "bold"); doc.text("Total Pendapatan: " + formatRp(pd), 14, y); y+=8;
-  doc.text("Total Beban: " + formatRp(bb), 14, y); y+=10;
-  doc.setFontSize(14); doc.text("LABA BERSIH: " + formatRp(pd-bb), 14, y);
+  doc.setFont("helvetica", "bold"); doc.text("Total Pendapatan: " + formatRp(pd), 14, y); y+=8; doc.text("Total Beban: " + formatRp(bb), 14, y); y+=10; doc.setFontSize(14); doc.text("LABA BERSIH: " + formatRp(pd-bb), 14, y);
+  doc.save('Laba_Rugi_Aktif_'+Date.now()+'.pdf');
+}
+
+function prosesCetakLaporanLama() {
+  var bln = g('llBulan').value; if(!bln) return alert('Pilih bulan');
+  const doc = new jsPDF(); var y = 20;
+  doc.setFontSize(18); doc.setFont("helvetica", "bold"); doc.text(TOKO.nama, 105, y, {align: "center"}); y+=6;
+  doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.text(TOKO.alamat + (TOKO.telp ? ' | Telp: ' + TOKO.telp : ''), 105, y, {align: "center"}); y+=10;
+  doc.setFontSize(12); doc.text("ARSIP LABA RUGI: " + bln, 105, y, {align: "center"}); y+=15;
   
-  doc.save('Laporan_Laba_Rugi_'+Date.now()+'.pdf');
+  var pd=0, bb=0, dataTbl=[];
+  db.akuntansi.forEach(a=>{
+    if(a.tgl.startsWith(bln)) {
+      var isInc = a.kredit.includes('Pendapatan'), isExp = a.debit.includes('Beban')||a.debit.includes('Pembelian');
+      if(isInc || isExp || a.debit.includes('Pendapatan')) {
+        dataTbl.push([new Date(a.tgl).toLocaleDateString('id-ID'), a.ket, (isInc||a.debit.includes('Pendapatan')?'Pendapatan':'Beban'), formatRp(a.nominal)]);
+        if(isInc) pd+=a.nominal; if(a.debit.includes('Pendapatan')) pd-=a.nominal; if(isExp) bb+=a.nominal;
+      }
+    }
+  });
+  if(dataTbl.length===0) return alert('Tidak ada data di bulan ini');
+  doc.autoTable({ startY: y, head: [['Tanggal', 'Keterangan', 'Kategori', 'Nominal']], body: dataTbl, theme: 'striped', headStyles: {fillColor: [119, 74, 46]} });
+  y = doc.lastAutoTable.finalY + 15;
+  doc.setFont("helvetica", "bold"); doc.text("Total Pendapatan: " + formatRp(pd), 14, y); y+=8; doc.text("Total Beban: " + formatRp(bb), 14, y); y+=10; doc.setFontSize(14); doc.text("LABA BERSIH: " + formatRp(pd-bb), 14, y);
+  doc.save('Laba_Rugi_'+bln+'.pdf'); hideM('modalLaporanLama');
 }
 
 function cetakKatalogPDF() {
   const doc = new jsPDF(); var y = 20;
   doc.setFontSize(22); doc.setFont("helvetica", "bold"); doc.text(TOKO.nama.toUpperCase(), 105, y, {align: "center"}); y+=8;
   doc.setFontSize(14); doc.text("KATALOG PRODUK & LAYANAN", 105, y, {align: "center"}); y+=15;
-  
   var dataTbl = db.produk.map(p => [p.nama, p.kategori, p.ket||'-', cleanRp(p.harga)]);
   doc.autoTable({ startY: y, head: [['Nama Item', 'Kategori', 'Keterangan', 'Harga']], body: dataTbl, theme: 'grid', styles: {fontSize: 11}, headStyles: {fillColor: [47, 27, 17]} });
   doc.save('Katalog_Produk.pdf');
